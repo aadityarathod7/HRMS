@@ -1,0 +1,27 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://SanviiTechmet
+          predicates:
+            - Path=/user/**,/auth/**,/role/**,/file/**,/departments/**
+          filters:
+            - RemoveRequestHeader=Cookie
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG

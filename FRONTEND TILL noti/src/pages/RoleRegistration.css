@@ -1,0 +1,136 @@
+.txt_field {
+    position: relative;
+    border-bottom: 2px solid #adadad;
+    margin: 30px 0;
+  }
+  
+  .txt_field input {
+    width: 100%;
+    padding: 0 5px;
+    height: 40px;
+    font-size: 16px;
+    border: none;
+    background: none;
+    outline: none;
+  }
+  
+  .txt_field label {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    color: #adadad;
+    transform: translateY(-50%);
+    font-size: 16px;
+    pointer-events: none;
+    transition: .5s;
+  }
+  
+  .txt_field span::before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 0px;
+    height: 2px;
+    background: #8E24AA;
+    transition: .5s;
+  }
+  
+  .txt_field input:focus ~ label,
+  .txt_field input:valid ~ label {
+    top: -5px;
+    color: #8E24AA;
+  }
+  
+  .txt_field input:focus ~ span::before,
+  .txt_field input:valid ~ span::before {
+    width: 100%;
+  }
+  
+  /* Special styling for date input */
+  .txt_field input[type="date"] {
+    color: #666;
+  }
+  
+  .txt_field input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }
+  
+  /* When date is selected, move the label up */
+  .txt_field input[type="date"]:not(:placeholder-shown) ~ label {
+    top: -5px;
+    color: #8E24AA;
+  }
+
+  .custom-date-input::-webkit-datetime-edit-text,
+.custom-date-input::-webkit-datetime-edit-month-field,
+.custom-date-input::-webkit-datetime-edit-day-field,
+.custom-date-input::-webkit-datetime-edit-year-field {
+    color: transparent;
+}
+
+.custom-date-input::-webkit-calendar-picker-indicator {
+    background: transparent;
+    bottom: 0;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+}
+
+/* Show the label properly when date is selected */
+.custom-date-input:not(:placeholder-shown) {
+    color: black;
+}
+
+/* Keep the label up when date is focused or has value */
+.txt_field input[type="date"]:focus ~ label,
+.txt_field input[type="date"]:not(:placeholder-shown) ~ label {
+    top: -5px;
+    color: #8E24AA;
+}
+
+.txt_field select {
+    width: 100%;
+    padding: 0 5px;
+    height: 40px;
+    font-size: 16px;
+    border: none;
+    background: none;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Style for textarea */
+.txt_field textarea {
+    width: 100%;
+    padding: 10px 5px;
+    font-size: 16px;
+    border: none;
+    background: none;
+    outline: none;
+    min-height: 100px;
+}
+
+/* Adjust label position for textarea */
+.txt_field textarea ~ label {
+    top: 10px;
+}
+
+.txt_field textarea:focus ~ label,
+.txt_field textarea:valid ~ label {
+    top: -5px;
+    color: #8E24AA;
+}
+
+/* Style for select when value is selected */
+.txt_field select:focus ~ label,
+.txt_field select:valid ~ label {
+    top: -5px;
+    color: #8E24AA;
+}
+
