@@ -3,8 +3,7 @@ import axios from "axios";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import { useParams, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
 const ViewProject: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -159,11 +158,6 @@ const ViewProject: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <ToastContainer
-        position="top-right"
-        autoClose={1000}
-        hideProgressBar={false}
-      />
       <div className="bg-blue-50 shadow-lg rounded-lg p-8 w-1/2 ml-40 mt-20 mb-20">
         <DashboardSidebar isCollapsed={isCollapsed} />
         <DashboardNavbar toggleSidebar={toggleSidebar} />

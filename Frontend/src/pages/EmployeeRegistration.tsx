@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; //
+import { toast } from "react-toastify";
 import "./EmployeeRegistration.css";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
@@ -365,7 +364,6 @@ const EmployeeRegistration = () => {
           {errorMessage && (
             <div className="text-red-500 mt-4">{errorMessage}</div>
           )}
-          <ToastContainer />
         </div>
       </div>
     </div>

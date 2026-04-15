@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -121,7 +120,6 @@ const ResetPassword = () => {
           </p>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 };

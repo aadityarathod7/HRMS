@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import axios from "axios";
@@ -180,7 +179,6 @@ const RoleRegistration = () => {
           {errorMessage && (
             <div className="text-red-500 mt-4">{errorMessage}</div>
           )}
-          <ToastContainer />
         </div>
       </div>
     </div>

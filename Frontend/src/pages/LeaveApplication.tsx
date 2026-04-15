@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import "./LeaveApplication.css";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
@@ -191,7 +190,6 @@ const LeaveApplication = () => {
               </Button>
             </div>
           </form>
-          <ToastContainer />
         </div>
       </div>
     </div>

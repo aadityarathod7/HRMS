@@ -1,5 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -41,6 +43,26 @@ const App: React.FC = () => {
         <ToastProvider>
           <Toaster />
           <Sonner />
+          <ToastContainer
+            toastStyle={{
+              backgroundColor: 'white',
+              color: '#1e40af',
+              fontFamily: 'var(--font-system)',
+              fontWeight: 300,
+              borderRadius: '8px',
+              border: '1px solid #dbeafe',
+            }}
+            progressStyle={{
+              background: '#2563eb',
+            }}
+            icon={({ type }) => {
+              if (type === 'success') return <span style={{ color: '#2563eb', fontSize: '18px' }}>✓</span>;
+              if (type === 'error') return <span style={{ color: '#dc2626', fontSize: '18px' }}>✕</span>;
+              return null;
+            }}
+            position="bottom-right"
+            autoClose={3000}
+          />
           <BrowserRouter>
             <Routes>
               <Route path="/leave-balance" element={<LeaveBalance />} />

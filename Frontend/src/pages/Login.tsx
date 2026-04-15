@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import "./Login.css";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 
@@ -148,7 +147,6 @@ const Login = () => {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 };

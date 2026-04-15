@@ -74,18 +74,6 @@
   .sidebar-transition {
     @apply transition-all duration-300 ease-in-out;
   }
-  .Toastify__toast {
-    opacity: 1 !important; 
-    display: block !important; 
-}
-
-.Toastify__toast--success {
-    background-color: green; 
-}
-
-.Toastify__toast--error {
-    background-color: red; 
-}
 .button {
   background-color: #2563eb;
   color: white;
@@ -366,7 +354,46 @@ input:focus {
 }
 
 .notification-item:last-child {
-  border-bottom: none; /* Remove border for last item */
+  border-bottom: none;
+}
+
+/* Toast theme overrides - must be outside @layer for specificity */
+.Toastify__toast.Toastify__toast--success {
+    background: #2563eb !important;
+    color: white !important;
+}
+
+.Toastify__toast.Toastify__toast--error {
+    background: #1e3a5f !important;
+    color: white !important;
+}
+
+.Toastify__toast.Toastify__toast--info {
+    background: #dbeafe !important;
+    color: #1e40af !important;
+}
+
+.Toastify__toast.Toastify__toast--warning {
+    background: #93c5fd !important;
+    color: #1e3a8a !important;
+}
+
+.Toastify__toast {
+    font-family: var(--font-system) !important;
+    font-weight: 300 !important;
+    border-radius: 8px !important;
+}
+
+.Toastify__toast .Toastify__progress-bar {
+    background: rgba(255, 255, 255, 0.4) !important;
+}
+
+.Toastify__toast .Toastify__close-button {
+    color: white !important;
+}
+
+.Toastify__toast .Toastify__toast-icon svg {
+    fill: white !important;
 }
 
 }
