@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LogIn } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,15 +13,12 @@ const Login = () => {
   const [userName, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [createdBy, setCreatedBy] = useState<string>("");
-  const isFormVisible = true;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      console.log("Logging in with:", { userName, password });
       const response = await fetch("http://localhost:5000/auth/login", {
         method: "POST",
         headers: {
@@ -33,17 +29,11 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Login response data:", data);
-
         if (userName) {
           localStorage.setItem("username", userName);
-          console.log("Username:", userName);
-        } else {
-          console.error("Username is undefined in the response data.");
         }
         localStorage.setItem("token", data.token);
         localStorage.setItem("creatorName", userName);
-        setCreatedBy(userName);
 
         toast.success("Login successful!");
         setTimeout(() => {
@@ -64,95 +54,89 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-700 p-4">
-      <style>{`
-        .txt_field input:focus,
-        .txt_field select:focus {
-          outline: none;
-          box-shadow: none;
-        }
-
-        .txt_field input:-webkit-autofill,
-        .txt_field input:-webkit-autofill:hover,
-        .txt_field input:-webkit-autofill:focus {
-          -webkit-box-shadow: 0 0 0px 1000px white inset;
-        }
-      `}</style>
-      <Card className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-md border-white/20 shadow-xl hover:shadow-blue-500/20 transition-all duration-300">
-        {/* Logo Container */}
-        <div className="flex justify-center mt-8 mb-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-md mx-auto">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-8">
           <img
             src="/Sanvii Logo Final V1.png"
             alt="Company Logo"
-            className="h-35 w-40 mb-4"
+            className="h-20 w-auto mb-3"
           />
         </div>
 
-        {/* <CardHeader className="space-y-1 text-center">
-                    <CardTitle className="text-3xl font-light tracking-tight text-gray-900"></CardTitle>
-                </CardHeader> */}
-        <CardContent>
+        {/* Card */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <h2 className="text-2xl font-light tracking-tight text-gray-900 text-center mb-8">
+            Sign in to your account
+          </h2>
+
           <form onSubmit={handleLogin}>
-            <div className="txt_field">
+            <div className="mb-5">
+              <label className="block text-sm text-gray-600 mb-1.5">Username</label>
               <input
                 type="text"
                 value={userName}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                placeholder="Enter your username"
               />
-              <span></span>
-              <label>Username</label>
             </div>
-            <div className="txt_field">
+            <div className="mb-6">
+              <label className="block text-sm text-gray-600 mb-1.5">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                placeholder="Enter your password"
               />
-              <span></span>
-              <label>Password</label>
             </div>
-            <div className="mt-12">
-              <Button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white transition-all duration-300"
-                disabled={loading}
-              >
-                {loading ? (
-                  "Signing in..."
-                ) : (
-                  <>
-                    <LogIn className="mr-2 h-4 w-4" /> Sign in
-                  </>
-                )}
-              </Button>
-            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white py-2.5 transition-all duration-300"
+              disabled={loading}
+            >
+              {loading ? (
+                "Signing in..."
+              ) : (
+                <>
+                  <LogIn className="mr-2 h-4 w-4" /> Sign in
+                </>
+              )}
+            </Button>
           </form>
+
           {errorMessage && (
-            <div className="text-red-500 mt-4">{errorMessage}</div>
+            <div className="text-red-500 text-sm mt-4 text-center">{errorMessage}</div>
           )}
-          <div>
-            <p className="flex justify-center mt-4 text-gray-600">
-              Forgot Password?{" "}
-              <Link
-                to="/forgot-password"
-                className="text-blue-600 ml-1 hover:text-blue-800"
-              >
-                Reset here
-              </Link>
-            </p>
+
+          <p className="text-center mt-5 text-sm text-gray-500">
+            Forgot Password?{" "}
+            <Link
+              to="/forgot-password"
+              className="text-blue-600 hover:text-blue-800"
+            >
+              Reset here
+            </Link>
+          </p>
+
+          <div className="mt-5 flex items-center gap-3">
+            <div className="flex-1 h-px bg-gray-200"></div>
+            <span className="text-xs text-gray-400">or</span>
+            <div className="flex-1 h-px bg-gray-200"></div>
           </div>
-          <div className="mt-4">
+
+          <div className="mt-5 flex justify-center">
             <GoogleOAuthProvider clientId="968620113133-cn4ccu7fhso7tson5kpg5pfr53qn1b8v.apps.googleusercontent.com">
               <GoogleLogin
                 onSuccess={(credentialResponse) => {
-                  console.log(credentialResponse);
                   const credential = credentialResponse.credential;
                   if (credential) {
-                    // Store the credential in local storage
                     localStorage.setItem("google_credential", credential);
-                    // Redirect to the callback page
                     window.location.href = "/auth/google/callback";
                   }
                 }}
@@ -162,8 +146,8 @@ const Login = () => {
               />
             </GoogleOAuthProvider>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
       <ToastContainer />
     </div>
   );
