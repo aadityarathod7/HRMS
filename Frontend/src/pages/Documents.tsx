@@ -231,7 +231,7 @@ const Documents: React.FC = () => {
           <div className="w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg p-4 md:p-6">
             <div className="mb-6">
               <button
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-500 hover:to-purple-500 mr-2"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 mr-2"
                 onClick={() => document.getElementById("file-input")?.click()}
               >
                 Browse
@@ -246,7 +246,7 @@ const Documents: React.FC = () => {
               />
 
               <button
-                className={`bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-500 hover:to-purple-500 mr-2 ${
+                className={`bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 mr-2 ${
                   isUploading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
                 onClick={handleUpload}
@@ -332,7 +332,7 @@ const Documents: React.FC = () => {
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-500 hover:to-purple-500"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500"
                   onClick={fetchFiles}
                 >
                   Apply Filters

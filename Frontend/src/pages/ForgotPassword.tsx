@@ -45,10 +45,10 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-blue-900 to-blue-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-blue-700 p-4">
       <Card className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-md border-white/20 shadow-xl hover:shadow-blue-500/20 transition-all duration-300">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight text-gray-900">
+          <CardTitle className="text-3xl font-light tracking-tight text-gray-900">
             Forgot Password
           </CardTitle>
         </CardHeader>
@@ -67,7 +67,7 @@ const ForgotPassword = () => {
             <div className="mt-12">
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white transition-all duration-300"
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white transition-all duration-300"
                 disabled={loading}
               >
                 {loading ? "Sending..." : "Send Reset Link"}

@@ -1,12 +1,9 @@
 import React, { useState } from "react";
-import { useToast } from "@/context/ToastContext";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
-import Toast from "@/components/Toast";
 
 const TimeSheetManagement: React.FC = () => {
-  const { toasts, addToast, removeToast } = useToast();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleSidebar = () => {
@@ -24,16 +21,6 @@ const TimeSheetManagement: React.FC = () => {
         }`}
       >
         <div className="p-5 flex-grow">
-          <button onClick={() => addToast("New Time Sheet Notification!")}>
-            Show Toast
-          </button>
-          {toasts.map((message, index) => (
-            <Toast
-              key={index}
-              message={message}
-              onClose={() => removeToast(index)}
-            />
-          ))}
         </div>
 
         <Footer />

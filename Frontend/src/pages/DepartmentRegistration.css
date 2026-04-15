@@ -32,14 +32,14 @@
   left: 0;
   width: 0px;
   height: 2px;
-  background: #8E24AA;
+  background: #2563eb;
   transition: .5s;
 }
 
 .txt_field input:focus ~ label,
 .txt_field input:valid ~ label {
   top: -5px;
-  color: #8E24AA;
+  color: #2563eb;
 }
 
 .txt_field input:focus ~ span::before,
@@ -59,7 +59,7 @@
 /* When date is selected, move the label up */
 .txt_field input[type="date"]:not(:placeholder-shown) ~ label {
   top: -5px;
-  color: #8E24AA;
+  color: #2563eb;
 }
 
 .custom-date-input::-webkit-datetime-edit-text,
@@ -91,7 +91,7 @@
 .txt_field input[type="date"]:focus ~ label,
 .txt_field input[type="date"]:not(:placeholder-shown) ~ label {
   top: -5px;
-  color: #8E24AA;
+  color: #2563eb;
 }
 
 .txt_field select {
@@ -124,13 +124,13 @@
 .txt_field textarea:focus ~ label,
 .txt_field textarea:valid ~ label {
   top: -5px;
-  color: #8E24AA;
+  color: #2563eb;
 }
 
 /* Style for select when value is selected */
 .txt_field select:focus ~ label,
 .txt_field select:valid ~ label {
   top: -5px;
-  color: #8E24AA;
+  color: #2563eb;
 }
 

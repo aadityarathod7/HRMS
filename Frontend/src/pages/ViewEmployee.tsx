@@ -166,7 +166,7 @@ const ViewEmployee: React.FC = () => {
             </>
           ) : (
             <button
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded"
+              className="bg-blue-600 text-white px-4 py-2 rounded"
               onClick={() => setIsEditing(true)}
             >
               Edit
@@ -179,7 +179,7 @@ const ViewEmployee: React.FC = () => {
             Back
           </button>
         </div>
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-4">
+        <h2 className="text-3xl font-light tracking-tight text-gray-900 mb-4">
           Employee Details
         </h2>
         {user ? (

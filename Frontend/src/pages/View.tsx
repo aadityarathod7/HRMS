@@ -93,7 +93,7 @@ const View: React.FC = () => {
                                         loadFileContent(id);
                                         setFileIdToEdit(id);
                                     }}
-                                    className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:from-blue-500 hover:to-purple-500 transition"
+                                    className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-500 transition"
                                 >
                                     Edit
                                 </button>

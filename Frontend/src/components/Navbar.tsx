@@ -220,7 +220,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
             {/* CTA Button - matching website style */}
             <Button
               onClick={handleLogout}
-              className="ml-2 hidden sm:inline-flex bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-light rounded-md px-4 py-2 text-sm"
+              className="ml-2 hidden sm:inline-flex bg-blue-600 hover:bg-blue-500 text-white font-light rounded-md px-4 py-2 text-sm"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Logout

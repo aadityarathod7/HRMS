@@ -243,7 +243,7 @@ const ViewRole: React.FC = () => {
             </>
           ) : (
             <button
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded"
+              className="bg-blue-600 text-white px-4 py-2 rounded"
               onClick={() => setIsEditing(true)}
             >
               Edit
@@ -256,7 +256,7 @@ const ViewRole: React.FC = () => {
             Back
           </button>
         </div>
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-4">
+        <h2 className="text-3xl font-light tracking-tight text-gray-900 mb-4">
           Role Details
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">

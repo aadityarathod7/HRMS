@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { useToast } from "@/context/ToastContext";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
-import Toast from "@/components/Toast";
 import { Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -27,7 +25,6 @@ ChartJS.register(
 );
 
 const LeaveBalance: React.FC = () => {
-  const { toasts, addToast, removeToast } = useToast();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleSidebar = () => {
@@ -72,16 +69,6 @@ const LeaveBalance: React.FC = () => {
         }`}
       >
         <div className="p-5 flex-grow">
-          <button onClick={() => addToast("New Time Sheet Notification!")}>
-            Show Toast
-          </button>
-          {toasts.map((message, index) => (
-            <Toast
-              key={index}
-              message={message}
-              onClose={() => removeToast(index)}
-            />
-          ))}
           <h2 className="text-xl  text-blue-600 font-bold mb-4 mt-20"></h2>
           <div className="flex flex-row justify-between p-5 flex-grow">
             <div className="w-1/2 pr-2">

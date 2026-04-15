@@ -380,7 +380,7 @@ const ProjectManagement: React.FC = () => {
           </label>
           <div className="relative mt-20">
             <select
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:from-blue-500 hover:to-purple-500 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:bg-blue-500 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
               value={selectedStatus}
               onChange={handleStatusChange}
             >
@@ -395,7 +395,7 @@ const ProjectManagement: React.FC = () => {
           </div>
         </div>
         <Link to="/project-registration">
-          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 mt-20 rounded-lg hover:from-blue-500 hover:to-purple-500 transition duration-300">
+          <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
             Add Project
           </button>
         </Link>
