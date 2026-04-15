@@ -31,6 +31,8 @@ import ViewProject from "./pages/ViewProject";
 import LeaveApplication from "./pages/LeaveApplication";
 import ViewLeave from "./pages/ViewLeave";
 import LeaveManagement from "./pages/LeaveManagement";
+import AttendanceManagement from "./pages/AttendanceManagement";
+import PayrollManagement from "./pages/PayrollManagement";
 import GoogleCallback from "./pages/auth/google/callback";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -111,6 +113,14 @@ const App: React.FC = () => {
               <Route
                 path="/time-sheet-management"
                 element={<TimeSheetManagement />}
+              />
+              <Route
+                path="/attendance-management"
+                element={<AttendanceManagement />}
+              />
+              <Route
+                path="/payroll-management"
+                element={<PayrollManagement />}
               />
 
               <Route

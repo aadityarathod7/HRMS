@@ -33,6 +33,9 @@ app.use('/manager', require('./routes/manager'));
 app.use('/file', require('./routes/file'));
 app.use('/project', require('./routes/project'));
 app.use('/Leaves', require('./routes/leaves'));
+app.use('/timesheets', require('./routes/timesheet'));
+app.use('/attendance', require('./routes/attendance'));
+app.use('/payroll', require('./routes/payroll'));
 
 // Error handler
 app.use(errorHandler);

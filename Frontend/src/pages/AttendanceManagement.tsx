@@ -3,75 +3,65 @@ import axios from "axios";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
-import { CheckCircle, Close } from "@mui/icons-material";
 import { toast } from "react-toastify";
 
-interface TimesheetEntry {
+interface AttendanceEntry {
   id: string;
   userId: { id: string; firstname: string; lastname: string; userName: string };
   date: string;
-  hoursWorked: number;
-  project: { name: string; projectId: string } | null;
-  taskDescription: string;
+  checkIn: string;
+  checkOut: string;
   status: string;
+  notes: string;
 }
 
-const TimeSheetManagement: React.FC = () => {
+const AttendanceManagement: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [timesheets, setTimesheets] = useState<TimesheetEntry[]>([]);
+  const [records, setRecords] = useState<AttendanceEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState("ALL");
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  const fetchTimesheets = async () => {
+  const fetchRecords = async () => {
     try {
       const token = localStorage.getItem("token");
       const url = selectedStatus === "ALL"
-        ? "http://localhost:5000/timesheets/all"
-        : `http://localhost:5000/timesheets/status/${selectedStatus}`;
+        ? "http://localhost:5000/attendance/all"
+        : `http://localhost:5000/attendance/status/${selectedStatus}`;
       const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTimesheets(response.data);
+      setRecords(response.data);
     } catch (error) {
-      console.error("Error fetching timesheets:", error);
+      console.error("Error fetching attendance:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchTimesheets(); }, [selectedStatus]);
+  useEffect(() => { fetchRecords(); }, [selectedStatus]);
 
-  const handleApprove = async (id: string) => {
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Delete this attendance record?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/timesheets/updateStatus/${id}?status=APPROVED`, {}, {
+      await axios.delete(`http://localhost:5000/attendance/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success("Timesheet approved");
-      fetchTimesheets();
-    } catch (error) { toast.error("Failed to approve"); }
-  };
-
-  const handleReject = async (id: string) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/timesheets/updateStatus/${id}?status=REJECTED`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success("Timesheet rejected");
-      fetchTimesheets();
-    } catch (error) { toast.error("Failed to reject"); }
+      toast.success("Record deleted");
+      fetchRecords();
+    } catch (error) { toast.error("Failed to delete"); }
   };
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      PENDING: "bg-yellow-100 text-yellow-800",
-      APPROVED: "bg-green-100 text-green-800",
-      REJECTED: "bg-red-100 text-red-800",
+      PRESENT: "bg-green-100 text-green-800",
+      ABSENT: "bg-red-100 text-red-800",
+      HALF_DAY: "bg-yellow-100 text-yellow-800",
+      ON_LEAVE: "bg-blue-100 text-blue-800",
     };
-    return <span className={`px-2 py-1 text-xs font-medium rounded-full ${styles[status] || "bg-gray-100"}`}>{status}</span>;
+    return <span className={`px-2 py-1 text-xs font-medium rounded-full ${styles[status] || "bg-gray-100"}`}>{status.replace("_", " ")}</span>;
   };
 
   return (
@@ -87,9 +77,10 @@ const TimeSheetManagement: React.FC = () => {
               onChange={(e) => setSelectedStatus(e.target.value)}
             >
               <option value="ALL">All</option>
-              <option value="PENDING">Pending</option>
-              <option value="APPROVED">Approved</option>
-              <option value="REJECTED">Rejected</option>
+              <option value="PRESENT">Present</option>
+              <option value="ABSENT">Absent</option>
+              <option value="HALF_DAY">Half Day</option>
+              <option value="ON_LEAVE">On Leave</option>
             </select>
           </div>
           <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200">
@@ -98,33 +89,28 @@ const TimeSheetManagement: React.FC = () => {
                 <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="p-3 font-medium text-gray-700 text-left">Employee</th>
                   <th className="p-3 font-medium text-gray-700 text-left">Date</th>
-                  <th className="p-3 font-medium text-gray-700 text-left">Project</th>
-                  <th className="p-3 font-medium text-gray-700 text-left">Hours</th>
-                  <th className="p-3 font-medium text-gray-700 text-left">Task</th>
+                  <th className="p-3 font-medium text-gray-700 text-left">Check In</th>
+                  <th className="p-3 font-medium text-gray-700 text-left">Check Out</th>
                   <th className="p-3 font-medium text-gray-700 text-left">Status</th>
+                  <th className="p-3 font-medium text-gray-700 text-left">Notes</th>
                   <th className="p-3 font-medium text-gray-700 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {loading ? (
                   <tr><td colSpan={7} className="p-5 text-center text-gray-500">Loading...</td></tr>
-                ) : timesheets.length === 0 ? (
-                  <tr><td colSpan={7} className="p-5 text-center text-gray-500">No timesheet entries found</td></tr>
-                ) : timesheets.map((entry) => (
+                ) : records.length === 0 ? (
+                  <tr><td colSpan={7} className="p-5 text-center text-gray-500">No attendance records found</td></tr>
+                ) : records.map((entry) => (
                   <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
                     <td className="p-3 text-gray-700">{entry.userId?.firstname} {entry.userId?.lastname}</td>
                     <td className="p-3 text-gray-600">{new Date(entry.date).toLocaleDateString()}</td>
-                    <td className="p-3 text-gray-600">{entry.project?.name || "N/A"}</td>
-                    <td className="p-3 text-gray-600">{entry.hoursWorked}h</td>
-                    <td className="p-3 text-gray-600">{entry.taskDescription || "-"}</td>
+                    <td className="p-3 text-gray-600">{entry.checkIn || "-"}</td>
+                    <td className="p-3 text-gray-600">{entry.checkOut || "-"}</td>
                     <td className="p-3">{getStatusBadge(entry.status)}</td>
+                    <td className="p-3 text-gray-600">{entry.notes || "-"}</td>
                     <td className="p-3">
-                      {entry.status === "PENDING" && (
-                        <div className="flex gap-2">
-                          <button onClick={() => handleApprove(entry.id)} className="text-green-600 hover:text-green-800" title="Approve"><CheckCircle fontSize="small" /></button>
-                          <button onClick={() => handleReject(entry.id)} className="text-red-600 hover:text-red-800" title="Reject"><Close fontSize="small" /></button>
-                        </div>
-                      )}
+                      <button onClick={() => handleDelete(entry.id)} className="text-red-600 hover:text-red-800 text-sm">Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -138,4 +124,4 @@ const TimeSheetManagement: React.FC = () => {
   );
 };
 
-export default TimeSheetManagement;
+export default AttendanceManagement;
