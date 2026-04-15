@@ -21,7 +21,7 @@ const View: React.FC = () => {
         const fetchFileDetails = async () => {
             try {
                 const token = localStorage.getItem("token") || "";
-                const response = await axios.get(`http://localhost:8081/file/get-file-content/${id}`, {
+                const response = await axios.get(`http://localhost:5000/file/get-file-content/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setFileContent(response.data);
@@ -38,7 +38,7 @@ const View: React.FC = () => {
     const loadFileContent = async (fileId: string) => {
         try {
             const token = localStorage.getItem("token") || "";
-            const response = await axios.get(`http://localhost:8081/file/get-file-content/${fileId}`, {
+            const response = await axios.get(`http://localhost:5000/file/get-file-content/${fileId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -68,7 +68,7 @@ const View: React.FC = () => {
     const handleEditFile = async (fileId: string, content: string) => {
         try {
             const token = localStorage.getItem("token") || "";
-            const response = await axios.put(`http://localhost:8081/file/update/${fileId}`, { newContent: content }, {
+            const response = await axios.put(`http://localhost:5000/file/update/${fileId}`, { newContent: content }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

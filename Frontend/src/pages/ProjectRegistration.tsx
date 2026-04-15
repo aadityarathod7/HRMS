@@ -46,7 +46,7 @@ const ProjectRegistration = () => {
       const token = localStorage.getItem("token");
       console.log("Sending request with body:", newProject);
 
-      const response = await fetch("http://localhost:8082/project/create", {
+      const response = await fetch("http://localhost:5000/project/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

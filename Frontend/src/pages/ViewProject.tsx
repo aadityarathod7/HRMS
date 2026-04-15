@@ -21,7 +21,7 @@ const ViewProject: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:8082/project/${id}`,
+          `http://localhost:5000/project/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -67,7 +67,7 @@ const ViewProject: React.FC = () => {
         };
 
         await axios.put(
-          `http://localhost:8082/project/update/${id}`,
+          `http://localhost:5000/project/update/${id}`,
           updateProjectRequest,
           {
             headers: {
@@ -80,7 +80,7 @@ const ViewProject: React.FC = () => {
         toast.success("Project updated successfully!");
         setIsEditing(false);
         const updatedProject = await axios.get(
-          `http://localhost:8082/project/${id}`,
+          `http://localhost:5000/project/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -102,7 +102,7 @@ const ViewProject: React.FC = () => {
         };
 
         await axios.put(
-          `http://localhost:8081/project/deactivate/${project.id}`,
+          `http://localhost:5000/project/deactivate/${project.id}`,
           {},
           { headers }
         );
@@ -132,7 +132,7 @@ const ViewProject: React.FC = () => {
         console.log(`Activating project for user ID: ${project.id}`);
 
         const response = await axios.put(
-          `http://localhost:8081/project/activate/${project.id}`,
+          `http://localhost:5000/project/activate/${project.id}`,
           {},
           { headers }
         );

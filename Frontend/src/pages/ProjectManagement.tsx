@@ -28,7 +28,7 @@ const ProjectManagement: React.FC = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const response = await axios.get("http://localhost:8082/project/all", {
+      const response = await axios.get("http://localhost:5000/project/all", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -58,7 +58,7 @@ const ProjectManagement: React.FC = () => {
 
       try {
         const response = await axios.get(
-          "http://localhost:8082/project/getByStatus/INACTIVE",
+          "http://localhost:5000/project/getByStatus/INACTIVE",
           {
             headers: {
               "Content-Type": "application/json",
@@ -90,7 +90,7 @@ const ProjectManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8082/project/activate/${id}`,
+        `http://localhost:5000/project/activate/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -130,7 +130,7 @@ const ProjectManagement: React.FC = () => {
 
       const response = await axios({
         method: "PATCH",
-        url: `http://localhost:8082/project/deactivate/${projectId}`,
+        url: `http://localhost:5000/project/deactivate/${projectId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -165,7 +165,7 @@ const ProjectManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:8082/project/getByStatus/ACTIVE",
+        "http://localhost:5000/project/getByStatus/ACTIVE",
         {
           method: "GET",
           headers: {
@@ -213,7 +213,7 @@ const ProjectManagement: React.FC = () => {
     if (window.confirm("Are you sure you want to deactivate this project?")) {
       try {
         const response = await fetch(
-          `http://localhost:8082/project/deactivate/${id}`,
+          `http://localhost:5000/project/deactivate/${id}`,
           {
             method: "PATCH",
           }
@@ -235,7 +235,7 @@ const ProjectManagement: React.FC = () => {
     if (window.confirm("Are you sure you want to activate this project?")) {
       try {
         const response = await fetch(
-          `http://localhost:8082/project/activate/${id}`,
+          `http://localhost:5000/project/activate/${id}`,
           {
             method: "PUT",
           }
@@ -263,7 +263,7 @@ const ProjectManagement: React.FC = () => {
       if (!token) return;
 
       const response = await axios.get(
-        "http://localhost:8082/project/getByStatus/COMPLETED",
+        "http://localhost:5000/project/getByStatus/COMPLETED",
         {
           headers: {
             "Content-Type": "application/json",
@@ -285,7 +285,7 @@ const ProjectManagement: React.FC = () => {
       if (!token) return;
 
       const response = await axios.get(
-        "http://localhost:8082/project/getByStatus/ACTIVE",
+        "http://localhost:5000/project/getByStatus/ACTIVE",
         {
           headers: {
             "Content-Type": "application/json",
@@ -307,7 +307,7 @@ const ProjectManagement: React.FC = () => {
       if (!token) return;
 
       const response = await axios.get(
-        "http://localhost:8082/project/getByStatus/ONHOLD",
+        "http://localhost:5000/project/getByStatus/ONHOLD",
         {
           headers: {
             "Content-Type": "application/json",
@@ -346,7 +346,7 @@ const ProjectManagement: React.FC = () => {
       const newproject = {};
 
       const response = await axios.post(
-        "http://localhost:8082/project/create",
+        "http://localhost:5000/project/create",
         newproject,
         {
           headers: {

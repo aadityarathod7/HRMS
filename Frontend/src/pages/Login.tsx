@@ -23,7 +23,7 @@ const Login = () => {
 
     try {
       console.log("Logging in with:", { userName, password });
-      const response = await fetch("http://localhost:8081/auth/login", {
+      const response = await fetch("http://localhost:5000/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

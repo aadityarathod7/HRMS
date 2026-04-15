@@ -81,7 +81,7 @@ const LeaveManagement: React.FC = () => {
 
       try {
         const response = await axios.get(
-          "http://localhost:8081/Leaves/inactive",
+          "http://localhost:5000/Leaves/inactive",
           {
             headers: {
               "Content-Type": "application/json",
@@ -113,7 +113,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8081/Leaves/activate/${id}`,
+        `http://localhost:5000/Leaves/activate/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -155,7 +155,7 @@ const LeaveManagement: React.FC = () => {
 
       const response = await axios({
         method: "PATCH",
-        url: `http://localhost:8081/Leaves/deactivate/${LeaveId}`,
+        url: `http://localhost:5000/Leaves/deactivate/${LeaveId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -274,7 +274,7 @@ const LeaveManagement: React.FC = () => {
     if (window.confirm("Are you sure you want to activate this Leave?")) {
       try {
         const response = await fetch(
-          `http://localhost:8081/Leaves/activate/${id}`,
+          `http://localhost:5000/Leaves/activate/${id}`,
           {
             method: "PUT",
           }
@@ -317,7 +317,7 @@ const LeaveManagement: React.FC = () => {
       const newLeave = {};
 
       const response = await axios.post(
-        "http://localhost:8081/Leaves/create",
+        "http://localhost:5000/Leaves/create",
         newLeave,
         {
           headers: {
@@ -341,7 +341,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.patch(
-        `http://localhost:8081/Leaves/approve/${id}`,
+        `http://localhost:5000/Leaves/approve/${id}`,
         {},
         {
           headers: {
@@ -363,7 +363,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.patch(
-        `http://localhost:8081/Leaves/reject/${id}`,
+        `http://localhost:5000/Leaves/reject/${id}`,
         {},
         {
           headers: {

@@ -83,7 +83,7 @@ const Documents: React.FC = () => {
 
       const token = localStorage.getItem("token");
       const response = await axios.get<PageResponse>(
-        `http://localhost:8081/file/filter?${queryParams.toString()}`,
+        `http://localhost:5000/file/filter?${queryParams.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -127,7 +127,7 @@ const Documents: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:8081/file/delete/${id}`);
+      await axios.delete(`http://localhost:5000/file/delete/${id}`);
       setFiles(files.filter((file) => file.id !== id));
       setCheckedFiles((prev) => prev.filter((fileId) => fileId !== id));
     } catch (err) {
@@ -140,7 +140,7 @@ const Documents: React.FC = () => {
     try {
       const selectedDocs = checkedFiles;
       const promises = selectedDocs.map((id) =>
-        axios.delete(`http://localhost:8081/file/delete/${id}`)
+        axios.delete(`http://localhost:5000/file/delete/${id}`)
       );
       await Promise.all(promises);
       setFiles(files.filter((file) => !selectedDocs.includes(file.id)));
@@ -172,7 +172,7 @@ const Documents: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.post(
-          "http://localhost:8081/file/upload",
+          "http://localhost:5000/file/upload",
           formData,
           {
             headers: {
@@ -181,7 +181,7 @@ const Documents: React.FC = () => {
           }
         );
 
-        if (response.status === 200) {
+        if (response.status === 200 || response.status === 201) {
           setUploadMessage("File uploaded successfully");
           setTimeout(() => setUploadMessage(null), 3000);
           await fetchFiles();

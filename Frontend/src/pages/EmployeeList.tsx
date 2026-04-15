@@ -25,7 +25,7 @@ const EmployeeList: React.FC = () => {
     console.log("Username from local storage:", username); // Debugging log
     try {
       const response = await fetch(
-        `http://localhost:8081/user/all?isActive=${isActive ? 1 : 0}`
+        `http://localhost:5000/user/all?isActive=${isActive ? 1 : 0}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -70,7 +70,7 @@ const EmployeeList: React.FC = () => {
     if (window.confirm("Are you sure you want to deactivate this employee?")) {
       try {
         const response = await fetch(
-          `http://localhost:8081/user/deactivate/${id}`,
+          `http://localhost:5000/user/deactivate/${id}`,
           {
             method: "PUT",
           }
@@ -93,7 +93,7 @@ const EmployeeList: React.FC = () => {
     if (window.confirm("Are you sure you want to activate this employee?")) {
       try {
         const response = await fetch(
-          `http://localhost:8081/user/activate/${id}`,
+          `http://localhost:5000/user/activate/${id}`,
           {
             method: "PUT",
           }

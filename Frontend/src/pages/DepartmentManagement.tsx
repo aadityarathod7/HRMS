@@ -27,7 +27,7 @@ const DepartmentManagement: React.FC = () => {
       }
 
       const response = await axios.get(
-        "http://localhost:8081/departments/active",
+        "http://localhost:5000/departments/active",
         {
           headers: {
             "Content-Type": "application/json",
@@ -73,7 +73,7 @@ const DepartmentManagement: React.FC = () => {
 
       try {
         const response = await axios.get(
-          "http://localhost:8081/departments/inactive",
+          "http://localhost:5000/departments/inactive",
           {
             headers: {
               "Content-Type": "application/json",
@@ -112,7 +112,7 @@ const DepartmentManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8081/departments/activate/${id}`,
+        `http://localhost:5000/departments/activate/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -160,7 +160,7 @@ const DepartmentManagement: React.FC = () => {
 
       const response = await axios({
         method: "PATCH",
-        url: `http://localhost:8081/departments/deactivate/${departmentId}`,
+        url: `http://localhost:5000/departments/deactivate/${departmentId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -217,7 +217,7 @@ const DepartmentManagement: React.FC = () => {
     ) {
       try {
         const response = await fetch(
-          `http://localhost:8081/departments/deactivate/${id}`,
+          `http://localhost:5000/departments/deactivate/${id}`,
           {
             method: "PATCH",
           }
@@ -239,7 +239,7 @@ const DepartmentManagement: React.FC = () => {
     if (window.confirm("Are you sure you want to activate this department?")) {
       try {
         const response = await fetch(
-          `http://localhost:8081/departments/activate/${id}`,
+          `http://localhost:5000/departments/activate/${id}`,
           {
             method: "PUT",
           }
@@ -284,7 +284,7 @@ const DepartmentManagement: React.FC = () => {
       const newDepartment = {};
 
       const response = await axios.post(
-        "http://localhost:8081/departments/create",
+        "http://localhost:5000/departments/create",
         newDepartment,
         {
           headers: {

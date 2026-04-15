@@ -38,7 +38,7 @@ const DepartmentRegistration = () => {
       const token = localStorage.getItem("token");
       console.log("Sending request with body:", requestBody);
 
-      const response = await fetch("http://localhost:8081/departments/create", {
+      const response = await fetch("http://localhost:5000/departments/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

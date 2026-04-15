@@ -51,7 +51,7 @@ const ViewEmployee: React.FC = () => {
     const fetchUserDetails = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:8081/user/${id}`, {
+        const response = await axios.get(`http://localhost:5000/user/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -105,14 +105,14 @@ const ViewEmployee: React.FC = () => {
         };
 
         await axios.put(
-          `http://localhost:8081/user/update/${id}`,
+          `http://localhost:5000/user/update/${id}`,
           createUserRequest,
           { headers }
         );
         toast.success("User updated successfully!");
         setIsEditing(false);
         const updatedUser = await axios.get(
-          `http://localhost:8081/user/${id}`,
+          `http://localhost:5000/user/${id}`,
           { headers }
         );
         setUser(updatedUser.data);

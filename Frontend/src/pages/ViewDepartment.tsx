@@ -20,7 +20,7 @@ const ViewDepartment: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:8081/departments/${id}`,
+          `http://localhost:5000/departments/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -64,7 +64,7 @@ const ViewDepartment: React.FC = () => {
         };
 
         const response = await axios.put(
-          `http://localhost:8081/departments/update/${id}`,
+          `http://localhost:5000/departments/update/${id}`,
           updateRequest,
           { headers }
         );
