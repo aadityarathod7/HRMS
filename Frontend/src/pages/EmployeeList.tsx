@@ -225,7 +225,7 @@ const EmployeeList: React.FC = () => {
                       </span>
                     </td>
                     <td className="p-3 text-gray-600">
-                      {user.dateOfJoining || "No Date of Joining"}
+                      {user.dateOfJoining ? new Date(user.dateOfJoining).toLocaleDateString() : "No Date of Joining"}
                     </td>
                     <td className="p-3 text-gray-600">
                       {user.contactNumber || "No Contact Number"}

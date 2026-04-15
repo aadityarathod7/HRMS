@@ -331,11 +331,13 @@ const DepartmentManagement: React.FC = () => {
             </span>
           </div>
         </div>
-        <Link to="/department-registration">
-          {isAdminOrHR && <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
-            Add Department
-          </button>
-        </Link>
+        {isAdminOrHR && (
+          <Link to="/department-registration">
+            <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
+              Add Department
+            </button>
+          </Link>
+        )}
       </div>
 
       <div

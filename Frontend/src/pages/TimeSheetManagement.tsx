@@ -97,9 +97,9 @@ const TimeSheetManagement: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      PENDING: "bg-yellow-100 text-yellow-800",
-      APPROVED: "bg-green-100 text-green-800",
-      REJECTED: "bg-red-100 text-red-800",
+      PENDING: "bg-blue-50 text-blue-600",
+      APPROVED: "bg-blue-100 text-blue-700",
+      REJECTED: "bg-blue-200 text-blue-900",
     };
     return <span className={`px-2 py-1 text-xs font-medium rounded-full ${styles[status] || "bg-gray-100"}`}>{status}</span>;
   };

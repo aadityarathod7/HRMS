@@ -328,11 +328,13 @@ const RoleManagement: React.FC = () => {
             </span>
           </div>
         </div>
-        <Link to="/roleregistration">
-          {isAdminOrHR && <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
-            Add Role
-          </button>
-        </Link>
+        {isAdminOrHR && (
+          <Link to="/roleregistration">
+            <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
+              Add Role
+            </button>
+          </Link>
+        )}
       </div>
 
       <div
