@@ -54,7 +54,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-md mx-auto">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
@@ -66,7 +66,7 @@ const Login = () => {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+        <div className="bg-gradient-to-b from-gray-50 to-blue-50 rounded-lg shadow-md border border-gray-200 p-8">
           <h2 className="text-2xl font-light tracking-tight text-gray-900 text-center mb-8">
             Sign in to your account
           </h2>
