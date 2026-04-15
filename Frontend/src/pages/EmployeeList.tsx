@@ -135,7 +135,7 @@ const EmployeeList: React.FC = () => {
         <div className="flex gap-2">
           <div className="relative mt-20">
             <select
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:bg-violet-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:from-blue-500 hover:to-purple-500 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
               value={showInactive ? "inactive" : "active"}
               onChange={(e) => {
                 const isActive = e.target.value === "active";
@@ -152,7 +152,7 @@ const EmployeeList: React.FC = () => {
           </div>
         </div>
         <Link to="/employeeregistration">
-          <button className="bg-purple-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-violet-700 transition duration-300">
+          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 mt-20 rounded-lg hover:from-blue-500 hover:to-purple-500 transition duration-300">
             Register Employee
           </button>
         </Link>
@@ -166,32 +166,32 @@ const EmployeeList: React.FC = () => {
         <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200 mt-5">
           <table className="w-full">
             <thead>
-              <tr className="bg-gradient-to-r from-purple-600 to-violet-600">
-                <th className="p-3 font-semibold text-white text-left">
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Full Name
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Username
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Email
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Branch
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Date of Joining
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Contact Number
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Roles
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Created By
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Actions
                 </th>
               </tr>
@@ -215,7 +215,7 @@ const EmployeeList: React.FC = () => {
                       {user.email || "No Email"}
                     </td>
                     <td className="p-3">
-                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                         {user.branch || "No Branch"}
                       </span>
                     </td>
@@ -242,7 +242,7 @@ const EmployeeList: React.FC = () => {
                       <div className="flex space-x-3">
                         <Link
                           to={`/view-Employee/${user.id}`}
-                          className="text-purple-600 hover:text-purple-800 transition-colors duration-150"
+                          className="text-blue-600 hover:text-blue-800 transition-colors duration-150"
                           title="View"
                         >
                           <Visibility />

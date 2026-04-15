@@ -91,7 +91,7 @@ const ProjectRegistration = () => {
         <Navbar toggleSidebar={toggleSidebar} />
         <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6">
           <div className="space-y-1 text-center mb-4">
-            <h2 className="text-2xl font-bold tracking-tight text-violet-900">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900">
               Project Registration
             </h2>
           </div>
@@ -188,7 +188,7 @@ const ProjectRegistration = () => {
             <div className="mt-6">
               <Button
                 type="submit"
-                className="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700 transition-all duration-300"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-300"
                 disabled={loading}
               >
                 {loading ? "Registering..." : "Register project"}

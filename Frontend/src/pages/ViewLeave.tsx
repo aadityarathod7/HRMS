@@ -116,7 +116,7 @@ const ViewLeave: React.FC = () => {
         theme="light"
         toastClassName="!bg-green !text-violet mt-10"
       />
-      <div className="bg-purple-100 shadow-lg rounded-lg p-8 w-1/2 ml-40 mt-20 mb-20">
+      <div className="bg-blue-50 shadow-lg rounded-lg p-8 w-1/2 ml-40 mt-20 mb-20">
         <DashboardSidebar isCollapsed={isCollapsed} />
         <DashboardNavbar toggleSidebar={toggleSidebar} />
         <div className="flex justify-end mb-4">
@@ -137,7 +137,7 @@ const ViewLeave: React.FC = () => {
             </>
           ) : (
             <button
-              className="bg-purple-600 text-white px-4 py-2 rounded"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded"
               onClick={() => setIsEditing(true)}
             >
               Edit
@@ -150,7 +150,7 @@ const ViewLeave: React.FC = () => {
             Back
           </button>
         </div>
-        <h2 className="text-2xl font-bold tracking-tight text-violet-900 mb-4">
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-4">
           Leave Details
         </h2>
         {leave ? (

@@ -82,11 +82,11 @@ const LeaveBalance: React.FC = () => {
               onClose={() => removeToast(index)}
             />
           ))}
-          <h2 className="text-xl  text-violet-600 font-bold mb-4 mt-20"></h2>
+          <h2 className="text-xl  text-blue-600 font-bold mb-4 mt-20"></h2>
           <div className="flex flex-row justify-between p-5 flex-grow">
             <div className="w-1/2 pr-2">
               <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden">
-                <thead className="bg-purple-600 text-white">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th
                       className="border px-4 py-2 text-left"

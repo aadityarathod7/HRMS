@@ -316,7 +316,7 @@ const DepartmentManagement: React.FC = () => {
           </label>
           <div className="relative mt-20">
             <select
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:bg-violet-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:from-blue-500 hover:to-purple-500 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
               value={showInactive ? "inactive" : "active"}
               onChange={handleStatusChange}
             >
@@ -329,7 +329,7 @@ const DepartmentManagement: React.FC = () => {
           </div>
         </div>
         <Link to="/department-registration">
-          <button className="bg-purple-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-violet-700 transition duration-300">
+          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 mt-20 rounded-lg hover:from-blue-500 hover:to-purple-500 transition duration-300">
             Add Department
           </button>
         </Link>
@@ -343,23 +343,23 @@ const DepartmentManagement: React.FC = () => {
         <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200 mt-5">
           <table className="w-full">
             <thead>
-              <tr className="bg-gradient-to-r from-purple-600 to-violet-600">
-                <th className="p-3 font-semibold text-white text-left">
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Department ID
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Department Name
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Contact Person
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Created By
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Created Date
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Actions
                 </th>
               </tr>
@@ -391,7 +391,7 @@ const DepartmentManagement: React.FC = () => {
                         <div className="flex space-x-3">
                           <Link
                             to={`/view-department/${department.departmentId}`}
-                            className="text-purple-600 hover:text-purple-800 transition-colors duration-150"
+                            className="text-blue-600 hover:text-blue-800 transition-colors duration-150"
                             title="View"
                           >
                             <Visibility />

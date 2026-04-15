@@ -390,7 +390,7 @@ const EmployeeLeaveManagement: React.FC = () => {
           </label>
           <div className="relative mt-20">
             <select
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:bg-purple-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
               value={selectedStatus}
               onChange={handleStatusChange}
             >
@@ -404,7 +404,7 @@ const EmployeeLeaveManagement: React.FC = () => {
           </div>
         </div>
         <Link to="/leave-balance">
-          <button className="bg-purple-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-violet-700 transition duration-300">
+          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 mt-20 rounded-lg hover:from-blue-500 hover:to-purple-500 transition duration-300">
             Leave Balance
           </button>
         </Link>
@@ -418,29 +418,29 @@ const EmployeeLeaveManagement: React.FC = () => {
         <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200 mt-5">
           <table className="w-full">
             <thead>
-              <tr className="bg-gradient-to-r from-purple-600 to-violet-600">
-                <th className="p-3 font-semibold text-white text-left">
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Leave Request ID
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Employee ID
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Reporting Manager ID
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Leave Start Date
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Leave End Date
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Leave Type
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Leave Status
                 </th>
-                <th className="p-3 font-semibold text-white text-left">
+                <th className="p-3 font-medium text-gray-700 text-left">
                   Actions
                 </th>
               </tr>
@@ -472,7 +472,7 @@ const EmployeeLeaveManagement: React.FC = () => {
                         <div className="flex space-x-3">
                           <Link
                             to={`/view-Leave/${Leave.leaveRequestId}`}
-                            className="text-purple-600 hover:text-purple-800 transition-colors duration-150"
+                            className="text-blue-600 hover:text-blue-800 transition-colors duration-150"
                             title="View"
                           >
                             <Visibility />

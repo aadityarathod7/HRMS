@@ -380,7 +380,7 @@ const ProjectManagement: React.FC = () => {
           </label>
           <div className="relative mt-20">
             <select
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:bg-violet-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:from-blue-500 hover:to-purple-500 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
               value={selectedStatus}
               onChange={handleStatusChange}
             >
@@ -395,7 +395,7 @@ const ProjectManagement: React.FC = () => {
           </div>
         </div>
         <Link to="/project-registration">
-          <button className="bg-purple-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-violet-700 transition duration-300">
+          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 mt-20 rounded-lg hover:from-blue-500 hover:to-purple-500 transition duration-300">
             Add Project
           </button>
         </Link>
@@ -412,23 +412,23 @@ const ProjectManagement: React.FC = () => {
           <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200 mt-5">
             <table className="w-full">
               <thead>
-                <tr className="bg-gradient-to-r from-purple-600 to-violet-600">
-                  <th className="p-3 font-semibold text-white text-left">
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="p-3 font-medium text-gray-700 text-left">
                     Project ID
                   </th>
-                  <th className="p-3 font-semibold text-white text-left">
+                  <th className="p-3 font-medium text-gray-700 text-left">
                     Project Name
                   </th>
-                  <th className="p-3 font-semibold text-white text-left">
+                  <th className="p-3 font-medium text-gray-700 text-left">
                     Start Date
                   </th>
-                  <th className="p-3 font-semibold text-white text-left">
+                  <th className="p-3 font-medium text-gray-700 text-left">
                     End Date
                   </th>
-                  <th className="p-3 font-semibold text-white text-left">
+                  <th className="p-3 font-medium text-gray-700 text-left">
                     Status
                   </th>
-                  <th className="p-3 font-semibold text-white text-left">
+                  <th className="p-3 font-medium text-gray-700 text-left">
                     Actions
                   </th>
                 </tr>
@@ -450,7 +450,7 @@ const ProjectManagement: React.FC = () => {
                       </td>
                       <td className="p-3 text-gray-700">
                         
-                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                         
                         {project.status} </span></td>
                       <td className="p-3 text-gray-700 flex space-x-2">
@@ -458,7 +458,7 @@ const ProjectManagement: React.FC = () => {
                           className="bg-transparent hover:bg-gray-200 rounded-full p-2"
                           onClick={() => handleView(project.projectId)}
                         >
-                          <Visibility className="text-purple-600 hover:text-purple-800 transition-colors duration-1500" />
+                          <Visibility className="text-blue-600 hover:text-blue-800 transition-colors duration-1500" />
                         </button>
                         <button
                           onClick={() =>

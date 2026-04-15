@@ -224,14 +224,14 @@ const Documents: React.FC = () => {
       <div
         className={`flex-1 transition-all duration-300 flex flex-col ${
           isCollapsed ? "ml-[70px]" : "ml-[240px]"
-        } mt-20`}
+        } mt-24`}
       >
         <Navbar toggleSidebar={toggleSidebar} />
         <div className="flex-1 p-4">
           <div className="w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg p-4 md:p-6">
             <div className="mb-6">
               <button
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700 mr-2"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-500 hover:to-purple-500 mr-2"
                 onClick={() => document.getElementById("file-input")?.click()}
               >
                 Browse
@@ -246,7 +246,7 @@ const Documents: React.FC = () => {
               />
 
               <button
-                className={`bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700 mr-2 ${
+                className={`bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-500 hover:to-purple-500 mr-2 ${
                   isUploading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
                 onClick={handleUpload}
@@ -275,7 +275,7 @@ const Documents: React.FC = () => {
 
             {/* Filter Section */}
             <div className="mb-6 p-4 bg-white rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-4 text-violet-800">
+              <h3 className="text-xl font-semibold mb-4 text-blue-800">
                 Filter Documents
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -289,7 +289,7 @@ const Documents: React.FC = () => {
                     placeholder="Enter file name"
                     value={filters.fileName}
                     onChange={handleFilterChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:ring-violet-500 focus:border-violet-500"
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-blue-600 focus:border-blue-600"
                   />
                 </div>
                 <div className="space-y-1">
@@ -302,7 +302,7 @@ const Documents: React.FC = () => {
                     placeholder="Enter uploader name"
                     value={filters.uploadedBy}
                     onChange={handleFilterChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:ring-violet-500 focus:border-violet-500"
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-blue-600 focus:border-blue-600"
                   />
                 </div>
                 <div className="space-y-1">
@@ -314,7 +314,7 @@ const Documents: React.FC = () => {
                     name="startDate"
                     value={filters.startDate}
                     onChange={handleFilterChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:ring-violet-500 focus:border-violet-500"
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-blue-600 focus:border-blue-600"
                   />
                 </div>
                 <div className="space-y-1">
@@ -326,13 +326,13 @@ const Documents: React.FC = () => {
                     name="endDate"
                     value={filters.endDate}
                     onChange={handleFilterChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:ring-violet-500 focus:border-violet-500"
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-blue-600 focus:border-blue-600"
                   />
                 </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-500 hover:to-purple-500"
                   onClick={fetchFiles}
                 >
                   Apply Filters
@@ -350,7 +350,7 @@ const Documents: React.FC = () => {
             <div className="grid grid-cols-1 gap-4 mb-6">
               {selectedFiles.length > 0 && (
                 <div>
-                  <h3 className="text-xl font-semibold mb-4 text-violet-800">
+                  <h3 className="text-xl font-semibold mb-4 text-blue-800">
                     Selected Files
                   </h3>
                   <div className="bg-white rounded-lg shadow-md p-1.5 border border-gray-200">
@@ -391,7 +391,7 @@ const Documents: React.FC = () => {
             {loading && <p>Loading files...</p>}
             {error && <p className="text-red-500">{error}</p>}
             {uploadMessage && (
-              <div className="text-purple-600">{uploadMessage}</div>
+              <div className="text-blue-600">{uploadMessage}</div>
             )}
 
             {/* File List Table */}
@@ -401,11 +401,11 @@ const Documents: React.FC = () => {
                   <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200">
                     <table className="w-full">
                       <thead>
-                        <tr className="bg-gradient-to-r from-purple-600 to-violet-600">
-                          <th className="p-3 font-semibold text-white">
+                        <tr className="bg-gray-50 border-b border-gray-200">
+                          <th className="p-3 font-medium text-gray-700">
                             <input
                               type="checkbox"
-                              className="form-checkbox h-4 w-4 text-purple-600 bg-white border-gray-300 rounded"
+                              className="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded"
                               onChange={(e) => {
                                 const allFileIds = files.map((file) => file.id);
                                 setCheckedFiles(
@@ -419,7 +419,7 @@ const Documents: React.FC = () => {
                             />
                           </th>
                           <th
-                            className="p-3 font-semibold text-white text-left cursor-pointer hover:bg-purple-700 transition-colors duration-150"
+                            className="p-3 font-medium text-gray-700 text-left cursor-pointer hover:bg-gray-100 transition-colors duration-150"
                             onClick={() => handleSort("fileName")}
                           >
                             File Name{" "}
@@ -428,7 +428,7 @@ const Documents: React.FC = () => {
                             )}
                           </th>
                           <th
-                            className="p-3 font-semibold text-white text-left cursor-pointer hover:bg-purple-700 transition-colors duration-150"
+                            className="p-3 font-medium text-gray-700 text-left cursor-pointer hover:bg-gray-100 transition-colors duration-150"
                             onClick={() => handleSort("fileType")}
                           >
                             File Type{" "}
@@ -437,7 +437,7 @@ const Documents: React.FC = () => {
                             )}
                           </th>
                           <th
-                            className="p-3 font-semibold text-white text-left cursor-pointer hover:bg-purple-700 transition-colors duration-150"
+                            className="p-3 font-medium text-gray-700 text-left cursor-pointer hover:bg-gray-100 transition-colors duration-150"
                             onClick={() => handleSort("fileSize")}
                           >
                             File Size{" "}
@@ -446,7 +446,7 @@ const Documents: React.FC = () => {
                             )}
                           </th>
                           <th
-                            className="p-3 font-semibold text-white text-left cursor-pointer hover:bg-purple-700 transition-colors duration-150"
+                            className="p-3 font-medium text-gray-700 text-left cursor-pointer hover:bg-gray-100 transition-colors duration-150"
                             onClick={() => handleSort("uploadedBy")}
                           >
                             Uploaded By{" "}
@@ -455,7 +455,7 @@ const Documents: React.FC = () => {
                             )}
                           </th>
                           <th
-                            className="p-3 font-semibold text-white text-left cursor-pointer hover:bg-purple-700 transition-colors duration-150"
+                            className="p-3 font-medium text-gray-700 text-left cursor-pointer hover:bg-gray-100 transition-colors duration-150"
                             onClick={() => handleSort("createdDate")}
                           >
                             Created Date{" "}
@@ -463,7 +463,7 @@ const Documents: React.FC = () => {
                               <span>{sortDir === "asc" ? "↑" : "↓"}</span>
                             )}
                           </th>
-                          <th className="p-3 font-semibold text-white text-left">
+                          <th className="p-3 font-medium text-gray-700 text-left">
                             Actions
                           </th>
                         </tr>
@@ -482,7 +482,7 @@ const Documents: React.FC = () => {
                               <td className="p-3 text-center">
                                 <input
                                   type="checkbox"
-                                  className="form-checkbox h-4 w-4 text-purple-600 border-gray-300 rounded"
+                                  className="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded"
                                   checked={checkedFiles.includes(file.id)}
                                   onChange={(e) =>
                                     handleSelectFile(file.id, e.target.checked)
@@ -493,7 +493,7 @@ const Documents: React.FC = () => {
                                 {file.fileName}
                               </td>
                               <td className="p-3">
-                                <span className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                                <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                                   {fileExtension}
                                 </span>
                               </td>
@@ -510,7 +510,7 @@ const Documents: React.FC = () => {
                                 <div className="flex space-x-2">
                                   <Link
                                     to={`/view/${file.id}`}
-                                    className="text-purple-600 hover:text-purple-800 transition-colors duration-150"
+                                    className="text-blue-600 hover:text-blue-800 transition-colors duration-150"
                                   >
                                     <Visibility />
                                   </Link>
@@ -539,7 +539,7 @@ const Documents: React.FC = () => {
                   onClick={() => setCurrentPage(0)}
                   disabled={currentPage === 0}
                   className={`p-2 border rounded ${
-                    currentPage === 0 ? "bg-white" : "bg-violet-600 text-white"
+                    currentPage === 0 ? "bg-white" : "bg-blue-600 text-white"
                   }`}
                 >
                   <FaAngleDoubleLeft size={10} />
@@ -551,7 +551,7 @@ const Documents: React.FC = () => {
                   }
                   disabled={currentPage === 0}
                   className={`p-2 border rounded ${
-                    currentPage === 0 ? "bg-white" : "bg-violet-600 text-white"
+                    currentPage === 0 ? "bg-white" : "bg-blue-600 text-white"
                   }`}
                 >
                   <FaAngleLeft size={10} />
@@ -581,7 +581,7 @@ const Documents: React.FC = () => {
                   className={`p-2 border rounded ${
                     currentPage >= totalPages - 1
                       ? "bg-white"
-                      : "bg-violet-600 text-white"
+                      : "bg-blue-600 text-white"
                   }`}
                 >
                   <FaAngleRight size={10} />
@@ -593,7 +593,7 @@ const Documents: React.FC = () => {
                   className={`p-2 border rounded ${
                     currentPage >= totalPages - 1
                       ? "bg-white"
-                      : "bg-violet-600 text-white"
+                      : "bg-blue-600 text-white"
                   }`}
                 >
                   <FaAngleDoubleRight size={10} />

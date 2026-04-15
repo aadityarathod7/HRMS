@@ -63,10 +63,10 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-500/80 to-purple-500/80 p-4">
-      <Card className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-md border-white/20 shadow-xl hover:shadow-purple-500/20 transition-all duration-300">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-blue-900 to-blue-800 p-4">
+      <Card className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-md border-white/20 shadow-xl hover:shadow-blue-500/20 transition-all duration-300">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight text-violet-900">
+          <CardTitle className="text-2xl font-bold tracking-tight text-gray-900">
             Reset Password
           </CardTitle>
         </CardHeader>
@@ -97,7 +97,7 @@ const ResetPassword = () => {
             <div className="mt-12">
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white transition-all duration-300"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white transition-all duration-300"
                 disabled={loading}
               >
                 {loading ? "Resetting..." : "Reset Password"}
@@ -107,7 +107,7 @@ const ResetPassword = () => {
           <div className="mt-4 text-center">
             <button
               onClick={() => navigate("/login")}
-              className="text-purple-600 hover:text-purple-800"
+              className="text-blue-600 hover:text-blue-800"
             >
               Back to Login
             </button>

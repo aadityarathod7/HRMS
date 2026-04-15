@@ -168,7 +168,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
   ];
   return (
     <div
-      className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-gradient-to-b from-violet-500/10 to-purple-500/10 backdrop-blur-md border-r border-white/20 sidebar-transition ${
+      className={`fixed left-0 top-20 h-[calc(100vh-5rem)] bg-gradient-to-b from-gray-50 to-blue-50 backdrop-blur-md border-r border-gray-200 sidebar-transition ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
@@ -177,7 +177,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
           <div key={item.label}>
             <Button
               variant="ghost"
-              className="justify-start w-full text-violet-900 hover:bg-violet-500/10 hover:text-violet-700 transition-colors"
+              className="justify-start w-full text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors"
               onClick={item.onClick}
             >
               <item.icon className="h-5 w-5" />
@@ -204,7 +204,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                   <Button
                     key={subItem.label}
                     variant="ghost"
-                    className="justify-start w-full pl-6 text-violet-900 hover:bg-violet-500/10 hover:text-violet-700 transition-colors"
+                    className="justify-start w-full pl-6 text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors"
                     onClick={subItem.onClick}
                   >
                     <subItem.icon className="h-4 w-4" />

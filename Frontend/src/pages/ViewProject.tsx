@@ -164,7 +164,7 @@ const ViewProject: React.FC = () => {
         autoClose={1000}
         hideProgressBar={false}
       />
-      <div className="bg-purple-100 shadow-lg rounded-lg p-8 w-1/2 ml-40 mt-20 mb-20">
+      <div className="bg-blue-50 shadow-lg rounded-lg p-8 w-1/2 ml-40 mt-20 mb-20">
         <DashboardSidebar isCollapsed={isCollapsed} />
         <DashboardNavbar toggleSidebar={toggleSidebar} />
         <div className="flex justify-end mb-4">
@@ -185,7 +185,7 @@ const ViewProject: React.FC = () => {
             </>
           ) : (
             <button
-              className="bg-purple-600 text-white px-4 py-2 rounded"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded"
               onClick={() => setIsEditing(true)}
             >
               Edit
@@ -198,7 +198,7 @@ const ViewProject: React.FC = () => {
             Back
           </button>
         </div>
-        <h2 className="text-2xl font-bold tracking-tight text-violet-900 mb-4">
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-4">
           Project Details
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
