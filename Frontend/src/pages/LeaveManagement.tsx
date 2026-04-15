@@ -34,6 +34,9 @@ const LeaveManagement: React.FC = () => {
     setIsCollapsed(!isCollapsed);
   };
 
+  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
+
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -474,7 +477,7 @@ const LeaveManagement: React.FC = () => {
                           </Link>
                           {selectedStatus === "PENDING" && (
                             <button
-                              onClick={() => handleDelete(Leave.leaveRequestId)}
+                              onClick={() => isAdminOrHR && handleDelete(Leave.leaveRequestId)}
                               className="text-red-600 hover:text-red-800 transition-colors duration-150"
                               title="Delete"
                             >

@@ -23,6 +23,8 @@ const ViewLeave: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
 
   useEffect(() => {
     const fetchLeaveDetails = async () => {
@@ -124,7 +126,7 @@ const ViewLeave: React.FC = () => {
           ) : (
             <button
               className="bg-blue-600 text-white px-4 py-2 rounded"
-              onClick={() => setIsEditing(true)}
+              onClick={() => isAdminOrHR && setIsEditing(true)}
             >
               Edit
             </button>

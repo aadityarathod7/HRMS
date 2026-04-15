@@ -27,6 +27,9 @@ const RoleManagement: React.FC = () => {
     setIsCollapsed(!isCollapsed);
   };
 
+  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
+
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -326,7 +329,7 @@ const RoleManagement: React.FC = () => {
           </div>
         </div>
         <Link to="/roleregistration">
-          <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
+          {isAdminOrHR && <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
             Add Role
           </button>
         </Link>
@@ -386,7 +389,7 @@ const RoleManagement: React.FC = () => {
                           </Link>
                           {showInactive ? (
                             <button
-                              onClick={() => handleActivateRole(role.id)}
+                              onClick={() => isAdminOrHR && handleActivateRole(role.id)}
                               className="text-green-600 hover:text-green-800 transition-colors duration-150"
                               title="Activate"
                             >

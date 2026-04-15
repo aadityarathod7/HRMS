@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 
 interface AttendanceEntry {
   id: string;
-  userId: { id: string; firstname: string; lastname: string; userName: string };
+  userId: { id: string; firstname: string; lastname: string; userName: string } | string;
   date: string;
   checkIn: string;
   checkOut: string;
@@ -20,6 +20,11 @@ const AttendanceManagement: React.FC = () => {
   const [records, setRecords] = useState<AttendanceEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState("ALL");
+  const [showForm, setShowForm] = useState(false);
+  const [users, setUsers] = useState<any[]>([]);
+  const [form, setForm] = useState({ userId: "", date: "", checkIn: "", checkOut: "", status: "PRESENT", notes: "" });
+  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
@@ -29,26 +34,40 @@ const AttendanceManagement: React.FC = () => {
       const url = selectedStatus === "ALL"
         ? "http://localhost:5000/attendance/all"
         : `http://localhost:5000/attendance/status/${selectedStatus}`;
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setRecords(response.data);
-    } catch (error) {
-      console.error("Error fetching attendance:", error);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { console.error("Error fetching attendance:", error); }
+    finally { setLoading(false); }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get("http://localhost:5000/user/all", { headers: { Authorization: `Bearer ${token}` } });
+      setUsers(res.data);
+    } catch (error) { console.error("Error fetching users:", error); }
   };
 
   useEffect(() => { fetchRecords(); }, [selectedStatus]);
+  useEffect(() => { fetchUsers(); }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post("http://localhost:5000/attendance/mark", form, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success("Attendance marked");
+      setForm({ userId: "", date: "", checkIn: "", checkOut: "", status: "PRESENT", notes: "" });
+      setShowForm(false);
+      fetchRecords();
+    } catch (error) { toast.error("Failed to mark attendance"); }
+  };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Delete this attendance record?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/attendance/delete/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(`http://localhost:5000/attendance/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Record deleted");
       fetchRecords();
     } catch (error) { toast.error("Failed to delete"); }
@@ -82,7 +101,56 @@ const AttendanceManagement: React.FC = () => {
               <option value="HALF_DAY">Half Day</option>
               <option value="ON_LEAVE">On Leave</option>
             </select>
+            {isAdminOrHR && (
+              <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-500 transition">
+                {showForm ? "Cancel" : "Mark Attendance"}
+              </button>
+            )}
           </div>
+
+          {showForm && isAdminOrHR && (
+            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow border border-gray-200 p-6 mb-5">
+              <h3 className="text-lg font-light text-gray-900 mb-4">Mark Attendance</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Employee</label>
+                  <select required value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <option value="">Select Employee</option>
+                    {users.map((u: any) => <option key={u.id} value={u.id}>{u.firstname} {u.lastname}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Date</label>
+                  <input type="date" required value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Status</label>
+                  <select required value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <option value="PRESENT">Present</option>
+                    <option value="ABSENT">Absent</option>
+                    <option value="HALF_DAY">Half Day</option>
+                    <option value="ON_LEAVE">On Leave</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Check In</label>
+                  <input type="time" value={form.checkIn} onChange={(e) => setForm({ ...form, checkIn: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Check Out</label>
+                  <input type="time" value={form.checkOut} onChange={(e) => setForm({ ...form, checkOut: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Notes</label>
+                  <input type="text" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Optional notes" />
+                </div>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-500 transition">Submit</button>
+              </div>
+            </form>
+          )}
+
           <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200">
             <table className="w-full">
               <thead>
@@ -103,14 +171,14 @@ const AttendanceManagement: React.FC = () => {
                   <tr><td colSpan={7} className="p-5 text-center text-gray-500">No attendance records found</td></tr>
                 ) : records.map((entry) => (
                   <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="p-3 text-gray-700">{entry.userId?.firstname} {entry.userId?.lastname}</td>
+                    <td className="p-3 text-gray-700">{typeof entry.userId === 'object' ? `${entry.userId.firstname} ${entry.userId.lastname}` : entry.userId}</td>
                     <td className="p-3 text-gray-600">{new Date(entry.date).toLocaleDateString()}</td>
                     <td className="p-3 text-gray-600">{entry.checkIn || "-"}</td>
                     <td className="p-3 text-gray-600">{entry.checkOut || "-"}</td>
                     <td className="p-3">{getStatusBadge(entry.status)}</td>
                     <td className="p-3 text-gray-600">{entry.notes || "-"}</td>
                     <td className="p-3">
-                      <button onClick={() => handleDelete(entry.id)} className="text-red-600 hover:text-red-800 text-sm">Delete</button>
+                      {isAdminOrHR && <button onClick={() => handleDelete(entry.id)} className="text-red-600 hover:text-red-800 text-sm">Delete</button>}
                     </td>
                   </tr>
                 ))}

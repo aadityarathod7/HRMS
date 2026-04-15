@@ -8,10 +8,10 @@ import { toast } from "react-toastify";
 
 interface TimesheetEntry {
   id: string;
-  userId: { id: string; firstname: string; lastname: string; userName: string };
+  userId: { id: string; firstname: string; lastname: string; userName: string } | string;
   date: string;
   hoursWorked: number;
-  project: { name: string; projectId: string } | null;
+  project: { name: string; projectId: string } | string | null;
   taskDescription: string;
   status: string;
 }
@@ -21,6 +21,12 @@ const TimeSheetManagement: React.FC = () => {
   const [timesheets, setTimesheets] = useState<TimesheetEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState("ALL");
+  const [showForm, setShowForm] = useState(false);
+  const [users, setUsers] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [form, setForm] = useState({ userId: "", date: "", hoursWorked: "", project: "", taskDescription: "" });
+  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
@@ -30,25 +36,51 @@ const TimeSheetManagement: React.FC = () => {
       const url = selectedStatus === "ALL"
         ? "http://localhost:5000/timesheets/all"
         : `http://localhost:5000/timesheets/status/${selectedStatus}`;
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setTimesheets(response.data);
     } catch (error) {
       console.error("Error fetching timesheets:", error);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
+  };
+
+  const fetchUsersAndProjects = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const [usersRes, projectsRes] = await Promise.all([
+        axios.get("http://localhost:5000/user/all", { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get("http://localhost:5000/project/all", { headers: { Authorization: `Bearer ${token}` } }),
+      ]);
+      setUsers(usersRes.data);
+      setProjects(projectsRes.data);
+    } catch (error) { console.error("Error fetching data:", error); }
   };
 
   useEffect(() => { fetchTimesheets(); }, [selectedStatus]);
+  useEffect(() => { fetchUsersAndProjects(); }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post("http://localhost:5000/timesheets/create", {
+        userId: form.userId,
+        date: form.date,
+        hoursWorked: Number(form.hoursWorked),
+        project: form.project || undefined,
+        taskDescription: form.taskDescription,
+        createdBy: localStorage.getItem("username") || "system",
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success("Timesheet added");
+      setForm({ userId: "", date: "", hoursWorked: "", project: "", taskDescription: "" });
+      setShowForm(false);
+      fetchTimesheets();
+    } catch (error) { toast.error("Failed to add timesheet"); }
+  };
 
   const handleApprove = async (id: string) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/timesheets/updateStatus/${id}?status=APPROVED`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.put(`http://localhost:5000/timesheets/updateStatus/${id}?status=APPROVED`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Timesheet approved");
       fetchTimesheets();
     } catch (error) { toast.error("Failed to approve"); }
@@ -57,9 +89,7 @@ const TimeSheetManagement: React.FC = () => {
   const handleReject = async (id: string) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/timesheets/updateStatus/${id}?status=REJECTED`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.put(`http://localhost:5000/timesheets/updateStatus/${id}?status=REJECTED`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Timesheet rejected");
       fetchTimesheets();
     } catch (error) { toast.error("Failed to reject"); }
@@ -91,7 +121,50 @@ const TimeSheetManagement: React.FC = () => {
               <option value="APPROVED">Approved</option>
               <option value="REJECTED">Rejected</option>
             </select>
+            {isAdminOrHR && (
+              <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-500 transition">
+                {showForm ? "Cancel" : "Add Timesheet"}
+              </button>
+            )}
           </div>
+
+          {showForm && isAdminOrHR && (
+            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow border border-gray-200 p-6 mb-5">
+              <h3 className="text-lg font-light text-gray-900 mb-4">Add Timesheet Entry</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Employee</label>
+                  <select required value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <option value="">Select Employee</option>
+                    {users.map((u: any) => <option key={u.id} value={u.id}>{u.firstname} {u.lastname}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Date</label>
+                  <input type="date" required value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Hours Worked</label>
+                  <input type="number" required min="0" max="24" step="0.5" value={form.hoursWorked} onChange={(e) => setForm({ ...form, hoursWorked: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="8" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Project</label>
+                  <select value={form.project} onChange={(e) => setForm({ ...form, project: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <option value="">Select Project</option>
+                    {projects.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm text-gray-600 mb-1">Task Description</label>
+                  <input type="text" value={form.taskDescription} onChange={(e) => setForm({ ...form, taskDescription: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="What did you work on?" />
+                </div>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-500 transition">Submit</button>
+              </div>
+            </form>
+          )}
+
           <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200">
             <table className="w-full">
               <thead>
@@ -112,14 +185,14 @@ const TimeSheetManagement: React.FC = () => {
                   <tr><td colSpan={7} className="p-5 text-center text-gray-500">No timesheet entries found</td></tr>
                 ) : timesheets.map((entry) => (
                   <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="p-3 text-gray-700">{entry.userId?.firstname} {entry.userId?.lastname}</td>
+                    <td className="p-3 text-gray-700">{typeof entry.userId === 'object' ? `${entry.userId.firstname} ${entry.userId.lastname}` : entry.userId}</td>
                     <td className="p-3 text-gray-600">{new Date(entry.date).toLocaleDateString()}</td>
-                    <td className="p-3 text-gray-600">{entry.project?.name || "N/A"}</td>
+                    <td className="p-3 text-gray-600">{typeof entry.project === 'object' && entry.project ? entry.project.name : "N/A"}</td>
                     <td className="p-3 text-gray-600">{entry.hoursWorked}h</td>
                     <td className="p-3 text-gray-600">{entry.taskDescription || "-"}</td>
                     <td className="p-3">{getStatusBadge(entry.status)}</td>
                     <td className="p-3">
-                      {entry.status === "PENDING" && (
+                      {entry.status === "PENDING" && isAdminOrHR && (
                         <div className="flex gap-2">
                           <button onClick={() => handleApprove(entry.id)} className="text-green-600 hover:text-green-800" title="Approve"><CheckCircle fontSize="small" /></button>
                           <button onClick={() => handleReject(entry.id)} className="text-red-600 hover:text-red-800" title="Reject"><Close fontSize="small" /></button>

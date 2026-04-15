@@ -20,6 +20,9 @@ const EmployeeList: React.FC = () => {
     setIsCollapsed(!isCollapsed);
   };
 
+  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
+
   const fetchUsers = async (isActive: boolean) => {
     const username = localStorage.getItem("username"); // Retrieve username from local storage
     console.log("Username from local storage:", username); // Debugging log
@@ -151,11 +154,13 @@ const EmployeeList: React.FC = () => {
             </span>
           </div>
         </div>
-        <Link to="/employeeregistration">
-          <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
-            Register Employee
-          </button>
-        </Link>
+        {isAdminOrHR && (
+          <Link to="/employeeregistration">
+            <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
+              Register Employee
+            </button>
+          </Link>
+        )}
       </div>
 
       <div
@@ -247,7 +252,7 @@ const EmployeeList: React.FC = () => {
                         >
                           <Visibility />
                         </Link>
-                        {showInactive ? (
+                        {isAdminOrHR && (showInactive ? (
                           <button
                             onClick={() => handleActivate(user.id)}
                             className="text-green-600 hover:text-green-800 transition-colors duration-150"
@@ -263,7 +268,7 @@ const EmployeeList: React.FC = () => {
                           >
                             <RemoveCircleOutline />
                           </button>
-                        )}
+                        ))}
                       </div>
                     </td>
                   </tr>

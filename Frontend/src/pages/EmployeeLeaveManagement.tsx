@@ -33,6 +33,9 @@ const EmployeeLeaveManagement: React.FC = () => {
     setIsCollapsed(!isCollapsed);
   };
 
+  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
+
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");

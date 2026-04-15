@@ -23,6 +23,9 @@ const ProjectManagement: React.FC = () => {
     setIsCollapsed(!isCollapsed);
   };
 
+  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
+
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -395,7 +398,7 @@ const ProjectManagement: React.FC = () => {
           </div>
         </div>
         <Link to="/project-registration">
-          <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
+          {isAdminOrHR && <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
             Add Project
           </button>
         </Link>

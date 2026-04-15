@@ -32,7 +32,7 @@ router.post('/login', async (req, res, next) => {
       { expiresIn: '30h' }
     );
 
-    res.json({ token });
+    res.json({ token, roles });
   } catch (error) {
     next(error);
   }

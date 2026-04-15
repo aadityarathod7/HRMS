@@ -7,6 +7,8 @@ import Sidebar from "@/components/Sidebar";
 
 const DepartmentRegistration = () => {
   const [loading, setLoading] = useState(false);
+  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
   const [formData, setFormData] = useState({
     department: "",
     contactPerson: "",

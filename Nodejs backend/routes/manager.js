@@ -1,16 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const managerService = require('../services/managerService');
+const { authenticate, authorize } = require('../middleware/auth');
 
-// PUT /manager/leaveRequest/:leaveRequestId/updateStatus
-router.put('/leaveRequest/:leaveRequestId/updateStatus', async (req, res, next) => {
+router.put('/leaveRequest/:leaveRequestId/updateStatus', authenticate, authorize('ADMIN', 'HR', 'MANAGER'), async (req, res, next) => {
   try {
     const { status } = req.query;
-    const result = await managerService.updateLeaveStatus(req.params.leaveRequestId, status);
-    res.json({ message: result });
-  } catch (error) {
-    next(error);
-  }
+    res.json({ message: await managerService.updateLeaveStatus(req.params.leaveRequestId, status) });
+  } catch (error) { next(error); }
 });
 
 module.exports = router;

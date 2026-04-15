@@ -33,6 +33,7 @@ const Login = () => {
         }
         localStorage.setItem("token", data.token);
         localStorage.setItem("creatorName", userName);
+        localStorage.setItem("roles", JSON.stringify(data.roles || []));
 
         toast.success("Login successful!");
         setTimeout(() => {

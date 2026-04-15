@@ -9,6 +9,8 @@ import axios from "axios";
 const RoleRegistration = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
   const [formData, setFormData] = useState({
     role: "",
     description: "",
