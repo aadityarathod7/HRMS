@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
+import DateInput from "@/components/DateInput";
 
 const inputClass = "w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500";
 const labelClass = "block text-xs text-gray-500 uppercase tracking-wider mb-1.5";
@@ -52,8 +53,8 @@ const ProjectRegistration = () => {
               <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   <div className="sm:col-span-2"><label className={labelClass}>Project Name</label><input type="text" name="name" value={formData.name} onChange={handleChange} required className={inputClass} placeholder="e.g. HRMS Portal" /></div>
-                  <div><label className={labelClass}>Start Date</label><input type="text" name="startDate" value={formData.startDate} onChange={handleChange} required className={inputClass} placeholder="dd/mm/yyyy" onFocus={(e) => e.target.type = "date"} onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }} /></div>
-                  <div><label className={labelClass}>End Date</label><input type="text" name="endDate" value={formData.endDate} onChange={handleChange} required className={inputClass} placeholder="dd/mm/yyyy" onFocus={(e) => e.target.type = "date"} onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }} /></div>
+                  <div><label className={labelClass}>Start Date</label><DateInput value={formData.startDate} onChange={(v) => setFormData({...formData, startDate: v})} required className={inputClass} /></div>
+                  <div><label className={labelClass}>End Date</label><DateInput value={formData.endDate} onChange={(v) => setFormData({...formData, endDate: v})} required className={inputClass} /></div>
                   <div>
                     <label className={labelClass}>Status</label>
                     <select name="status" value={formData.status} onChange={handleChange} required className={inputClass}>

@@ -5,6 +5,7 @@ import axios from "axios";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
+import DateInput from "@/components/DateInput";
 
 const BRANCHES = ["IT", "HR", "BA", "FINANCE", "OPERATIONS", "MARKETING", "DESIGN", "QA", "SALES"];
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -78,8 +79,8 @@ const EmployeeRegistration = () => {
                   <div><label className={labelClass}>Contact Number</label><input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required className={inputClass} placeholder="9876543210" /></div>
                   <div><label className={labelClass}>Username</label><input type="text" name="userName" value={formData.userName} onChange={handleChange} required className={inputClass} placeholder="john.doe" /></div>
                   <div><label className={labelClass}>Password</label><input type="password" name="password" value={formData.password} onChange={handleChange} required className={inputClass} placeholder="Min 6 characters" /></div>
-                  <div><label className={labelClass}>Date of Birth</label><input type="text" name="dob" value={formData.dob} onChange={handleChange} required className={inputClass} placeholder="dd/mm/yyyy" onFocus={(e) => e.target.type = 'date'} onBlur={(e) => { if (!e.target.value) e.target.type = 'text'; }} /></div>
-                  <div><label className={labelClass}>Date of Joining</label><input type="text" name="dateOfJoining" value={formData.dateOfJoining} onChange={handleChange} required className={inputClass} placeholder="dd/mm/yyyy" onFocus={(e) => e.target.type = 'date'} onBlur={(e) => { if (!e.target.value) e.target.type = 'text'; }} /></div>
+                  <div><label className={labelClass}>Date of Birth</label><DateInput value={formData.dob} onChange={(v) => setFormData({...formData, dob: v})} required className={inputClass} /></div>
+                  <div><label className={labelClass}>Date of Joining</label><DateInput value={formData.dateOfJoining} onChange={(v) => setFormData({...formData, dateOfJoining: v})} required className={inputClass} /></div>
                   <div>
                     <label className={labelClass}>Gender</label>
                     <select name="gender" value={formData.gender} onChange={handleChange} required className={inputClass}>

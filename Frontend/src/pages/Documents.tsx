@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { Visibility } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Footer from "@/components/Footer";
+import DateInput from "@/components/DateInput";
 import { toast } from "react-toastify";
 
 interface FileData {
@@ -197,15 +198,15 @@ const Documents: React.FC = () => {
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-1">From</label>
-                <input type="date" value={filters.startDate}
-                  onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
+                <DateInput value={filters.startDate}
+                  onChange={(v) => setFilters(prev => ({ ...prev, startDate: v }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-1">To</label>
-                <input type="date" value={filters.endDate}
-                  onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
+                <DateInput value={filters.endDate}
+                  onChange={(v) => setFilters(prev => ({ ...prev, endDate: v }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
               </div>

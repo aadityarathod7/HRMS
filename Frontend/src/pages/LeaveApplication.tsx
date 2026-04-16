@@ -4,6 +4,7 @@ import axios from "axios";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
+import DateInput from "@/components/DateInput";
 
 const LEAVE_TYPES = ["CASUAL", "SICK", "PRIVILEGE", "COMP_OFF", "MATERNITY", "PATERNITY", "LOP"];
 
@@ -105,17 +106,11 @@ const LeaveApplication = () => {
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Start Date</label>
-                    <input
-                      type="text" name="leaveStartDate" value={formData.leaveStartDate} onChange={handleChange} required
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    />
+                    <DateInput value={formData.leaveStartDate} onChange={(v) => setFormData({...formData, leaveStartDate: v})} required className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">End Date</label>
-                    <input
-                      type="text" name="leaveEndDate" value={formData.leaveEndDate} onChange={handleChange} required
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    />
+                    <DateInput value={formData.leaveEndDate} onChange={(v) => setFormData({...formData, leaveEndDate: v})} required className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Leave Type</label>

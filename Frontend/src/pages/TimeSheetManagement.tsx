@@ -3,6 +3,7 @@ import axios from "axios";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
+import DateInput from "@/components/DateInput";
 import { CheckCircle, Close } from "@mui/icons-material";
 import { toast } from "react-toastify";
 
@@ -142,7 +143,7 @@ const TimeSheetManagement: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Date</label>
-                  <input type="date" required value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                  <DateInput value={form.date} onChange={(v) => setForm({ ...form, date: v })} required className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Hours Worked</label>
