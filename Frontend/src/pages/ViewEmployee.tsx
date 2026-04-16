@@ -2,391 +2,200 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
+import Footer from "@/components/Footer";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
-const AVAILABLE_ROLES = [
-  { value: "ROLE_USER", label: "User" },
-  { value: "ROLE_ADMIN", label: "Admin" },
-  // Add other roles as needed
-];
-
-const AVAILABLE_BLOOD_GROUPS = [
-  { value: "A+", label: "A+" },
-  { value: "A-", label: "A-" },
-  { value: "B+", label: "B+" },
-  { value: "B-", label: "B-" },
-  { value: "AB+", label: "AB+" },
-  { value: "AB-", label: "AB-" },
-  { value: "O+", label: "O+" },
-  { value: "O-", label: "O-" },
-];
-
-const AVAILABLE_BRANCHES = [
-  { value: "IT", label: "Information Technology" },
-  { value: "HR", label: "Human Resources" },
-  { value: "BA", label: "Business Analysis" },
-  { value: "FINANCE", label: "Finance" },
-  { value: "OPERATIONS", label: "Operations" },
-  { value: "MARKETING", label: "Marketing" },
-];
-
-const roleLabels = {
-  ROLE_USER: "User",
-  ROLE_ADMIN: "Admin",
-  // Add other roles as needed
-};
+import { User, Briefcase, CreditCard, Phone, Shield } from "lucide-react";
 
 const ViewEmployee: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState("personal");
   const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
   const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
 
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:5000/user/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUser(response.data);
-      } catch (err) {
-        console.error("Error fetching user details:", err);
-        setError("Failed to load user details. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-    fetchUserDetails();
-  }, [id]);
-
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`http://localhost:5000/user/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      setUser(res.data);
+    } catch (err) { toast.error("Failed to load employee details"); }
+    finally { setLoading(false); }
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setUser((prevUser) => ({ ...prevUser, [name]: value }));
+  useEffect(() => { fetchUser(); }, [id]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setUser((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSaveUser = async () => {
-    if (user) {
-      try {
-        const token = localStorage.getItem("token");
-        const createUserRequest = {
-          firstname: user.firstname,
-          lastname: user.lastname,
-          userName: user.userName,
-          dob: user.dob,
-          contactNumber: user.contactNumber,
-          email: user.email,
-          branch: user.branch,
-          bloodGroup: user.bloodGroup,
-          dateOfJoining: user.dateOfJoining,
-          isActive: user.isActive,
-          address: user.address,
-          gender: user.gender,
-          roles: user.roles.map((role) => role.value),
-        };
-
-        const headers = {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        };
-
-        await axios.put(
-          `http://localhost:5000/user/update/${id}`,
-          createUserRequest,
-          { headers }
-        );
-        toast.success("User updated successfully!");
-        setIsEditing(false);
-        const updatedUser = await axios.get(
-          `http://localhost:5000/user/${id}`,
-          { headers }
-        );
-        setUser(updatedUser.data);
-      } catch (err) {
-        console.error("Error updating user:", err);
-        if (axios.isAxiosError(err) && err.response) {
-          toast.error(`Failed to update user: ${err.response.data}`);
-        } else {
-          toast.error("Failed to update user. Please try again later.");
-        }
-      }
-    }
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`http://localhost:5000/user/update/${id}`, {
+        ...user,
+        roles: user.roles?.map((r: any) => r.role || r) || [],
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success("Employee updated!");
+      setIsEditing(false);
+      fetchUser();
+    } catch (err) { toast.error("Failed to update"); }
   };
 
-  if (loading) return <p>Loading Employee details...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  const Field = ({ label, name, value, type = "text", editable = true }: any) => (
+    <div>
+      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</p>
+      {isEditing && editable ? (
+        <input type={type} name={name} value={value || ""} onChange={handleChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+      ) : (
+        <p className="text-sm text-gray-900">{
+          type === "date" && value ? new Date(value).toLocaleDateString() :
+          value || <span className="text-gray-300">—</span>
+        }</p>
+      )}
+    </div>
+  );
+
+  const tabs = [
+    { id: "personal", label: "Personal", icon: User },
+    { id: "organization", label: "Organization", icon: Briefcase },
+    { id: "bank", label: "Bank & ID", icon: CreditCard },
+    { id: "emergency", label: "Emergency", icon: Phone },
+  ];
+
+  if (loading) return <div className="flex items-center justify-center min-h-screen"><p className="text-gray-400">Loading...</p></div>;
 
   return (
-    <div className="flex flex-col bg-gray-100 min-h-screen">
+    <div className="flex flex-col bg-gray-50 min-h-screen">
       <DashboardSidebar isCollapsed={isCollapsed} />
       <DashboardNavbar toggleSidebar={toggleSidebar} />
-      <div className={`flex flex-col flex-grow transition-all duration-300 ${isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"}`}><div className="pt-28 px-5 pb-5 flex-grow flex justify-center items-start"><div className="w-full max-w-2xl mb-20"><div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
-        <div className="flex justify-end mb-4">
-          {isEditing ? (
-            <>
-              <button
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 transition text-sm"
-                onClick={handleSaveUser}
-              >
-                Save
-              </button>
-              <button
-                className="border border-gray-300 text-gray-600 bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition text-sm ml-2"
-                onClick={() => setIsEditing(false)}
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 transition text-sm"
-              onClick={() => isAdminOrHR && setIsEditing(true)}
-            >
-              Edit
-            </button>
+      <div className={`flex flex-col flex-grow transition-all duration-300 ${isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"}`}>
+        <div className="pt-28 px-5 pb-5 flex-grow">
+          {user && (
+            <div className="max-w-4xl mx-auto">
+              {/* Header Card */}
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl font-light">
+                      {(user.firstname || "?").charAt(0)}{(user.lastname || "").charAt(0)}
+                    </div>
+                    <div>
+                      <h1 className="text-xl font-light text-gray-900">{user.firstname} {user.lastname}</h1>
+                      <p className="text-sm text-gray-500">{user.designation || "—"} · {user.department?.departmentName || "—"}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs text-gray-400">{user.employeeId}</span>
+                        <span className={`px-2 py-0.5 text-[11px] rounded-full font-medium ${
+                          user.status === "ACTIVE" ? "bg-blue-100 text-blue-700" :
+                          user.status === "PROBATION" ? "bg-amber-50 text-amber-700" :
+                          "bg-gray-100 text-gray-600"
+                        }`}>{user.status || (user.isActive ? "ACTIVE" : "INACTIVE")}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {isEditing ? (
+                      <>
+                        <button onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 transition text-sm">Save</button>
+                        <button onClick={() => { setIsEditing(false); fetchUser(); }} className="border border-gray-300 text-gray-600 bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition text-sm">Cancel</button>
+                      </>
+                    ) : (
+                      <>
+                        {isAdminOrHR && <button onClick={() => setIsEditing(true)} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 transition text-sm">Edit</button>}
+                        <button onClick={() => navigate(-1)} className="border border-gray-300 text-gray-600 bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition text-sm">Back</button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Tabs */}
+              <div className="flex gap-1 mb-4">
+                {tabs.map((tab) => (
+                  <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm transition ${
+                      activeTab === tab.id ? "bg-blue-600 text-white" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                    }`}>
+                    <tab.icon size={14} />
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tab Content */}
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                {activeTab === "personal" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <Field label="First Name" name="firstname" value={user.firstname} />
+                    <Field label="Last Name" name="lastname" value={user.lastname} />
+                    <Field label="Email" name="email" value={user.email} />
+                    <Field label="Phone" name="contactNumber" value={user.contactNumber} />
+                    <Field label="Date of Birth" name="dob" value={user.dob} type="date" />
+                    <Field label="Gender" name="gender" value={user.gender} />
+                    <Field label="Blood Group" name="bloodGroup" value={user.bloodGroup} />
+                    <Field label="Address" name="address" value={user.address} />
+                    <Field label="Username" name="userName" value={user.userName} editable={false} />
+                  </div>
+                )}
+
+                {activeTab === "organization" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <Field label="Employee ID" name="employeeId" value={user.employeeId} editable={false} />
+                    <Field label="Designation" name="designation" value={user.designation} />
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Department</p>
+                      <p className="text-sm text-gray-900">{user.department?.departmentName || "—"}</p>
+                    </div>
+                    <Field label="Branch" name="branch" value={user.branch} />
+                    <Field label="Employment Type" name="employmentType" value={user.employmentType} />
+                    <Field label="Date of Joining" name="dateOfJoining" value={user.dateOfJoining} type="date" />
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Reporting Manager</p>
+                      <p className="text-sm text-gray-900">
+                        {user.reportingManager ? `${user.reportingManager.firstname} ${user.reportingManager.lastname} (${user.reportingManager.employeeId})` : "—"}
+                      </p>
+                    </div>
+                    <Field label="CTC (Annual)" name="ctc" value={user.ctc ? `₹${Number(user.ctc).toLocaleString("en-IN")}` : null} editable={false} />
+                    <Field label="Notice Period (Days)" name="noticePeriod" value={user.noticePeriod} />
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Roles</p>
+                      <div className="flex gap-1 flex-wrap">
+                        {user.roles?.map((r: any, i: number) => (
+                          <span key={i} className="px-2 py-0.5 text-xs rounded bg-blue-50 text-blue-700">{r.role || r}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "bank" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <Field label="PAN Number" name="panNumber" value={user.panNumber} />
+                    <Field label="Aadhar Number" name="aadharNumber" value={user.aadharNumber} />
+                    <Field label="Bank Account No." name="bankAccountNumber" value={user.bankAccountNumber} />
+                    <Field label="Bank Name" name="bankName" value={user.bankName} />
+                    <Field label="IFSC Code" name="ifscCode" value={user.ifscCode} />
+                  </div>
+                )}
+
+                {activeTab === "emergency" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <Field label="Emergency Contact Name" name="emergencyContactName" value={user.emergencyContactName} />
+                    <Field label="Emergency Contact Number" name="emergencyContactNumber" value={user.emergencyContactNumber} />
+                  </div>
+                )}
+              </div>
+            </div>
           )}
-          <button
-            className="border border-gray-300 text-gray-600 bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition text-sm ml-2"
-            onClick={() => navigate(-1)}
-          >
-            Back
-          </button>
         </div>
-        <h2 className="text-3xl font-light tracking-tight text-gray-900 mb-4">
-          Employee Details
-        </h2>
-        {user ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-            <div className="space-y-4">
-              <div>
-                <strong>First Name:</strong>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="firstname"
-                    value={user.firstname}
-                    onChange={handleInputChange}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  />
-                ) : (
-                  <p className="min-h-[40px]">{user.firstname || "N/A"}</p>
-                )}
-              </div>
-              <div>
-                <strong>Last Name:</strong>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="lastname"
-                    value={user.lastname}
-                    onChange={handleInputChange}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  />
-                ) : (
-                  <p className="min-h-[40px]">{user.lastname || "N/A"}</p>
-                )}
-              </div>
-              <div>
-                <strong>Username:</strong>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="userName"
-                    value={user.userName}
-                    onChange={handleInputChange}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  />
-                ) : (
-                  <p className="min-h-[40px]">{user.userName || "N/A"}</p>
-                )}
-              </div>
-              <div>
-                <strong>Email:</strong>
-                {isEditing ? (
-                  <input
-                    type="email"
-                    name="email"
-                    value={user.email}
-                    onChange={handleInputChange}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  />
-                ) : (
-                  <p className="min-h-[40px]">{user.email || "N/A"}</p>
-                )}
-              </div>
-              <div>
-                <strong>Phone:</strong>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="contactNumber"
-                    value={user.contactNumber}
-                    onChange={handleInputChange}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  />
-                ) : (
-                  <p className="min-h-[40px]">{user.contactNumber || "N/A"}</p>
-                )}
-              </div>
-              <div>
-                <strong>Address:</strong>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="address"
-                    value={user.address}
-                    onChange={handleInputChange}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  />
-                ) : (
-                  <p className="min-h-[40px]">{user.address || "N/A"}</p>
-                )}
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <strong>Branch:</strong>
-                {isEditing ? (
-                  <select
-                    name="branch"
-                    value={user.branch}
-                    onChange={handleInputChange}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  >
-                    <option value="">Select Branch</option>
-                    {AVAILABLE_BRANCHES.map((branch) => (
-                      <option key={branch.value} value={branch.value}>
-                        {branch.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="min-h-[40px]">{user.branch || "N/A"}</p>
-                )}
-              </div>
-              <div>
-                <strong>Blood Group:</strong>
-                {isEditing ? (
-                  <select
-                    name="bloodGroup"
-                    value={user.bloodGroup}
-                    onChange={handleInputChange}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  >
-                    <option value="">Select Blood Group</option>
-                    {AVAILABLE_BLOOD_GROUPS.map((bloodGroup) => (
-                      <option key={bloodGroup.value} value={bloodGroup.value}>
-                        {bloodGroup.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="min-h-[40px]">{user.bloodGroup || "N/A"}</p>
-                )}
-              </div>
-              <div>
-                <strong>Date of Birth:</strong>
-                {isEditing ? (
-                  <input
-                    type="date"
-                    name="dob"
-                    value={user.dob}
-                    onChange={handleInputChange}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  />
-                ) : (
-                  <p className="min-h-[40px]">{user.dob || "N/A"}</p>
-                )}
-              </div>
-              <div>
-                <strong>Date of Joining:</strong>
-                {isEditing ? (
-                  <input
-                    type="date"
-                    name="dateOfJoining"
-                    value={user.dateOfJoining}
-                    onChange={handleInputChange}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  />
-                ) : (
-                  <p className="min-h-[40px]">{user.dateOfJoining || "N/A"}</p>
-                )}
-              </div>
-              <div>
-                <strong>Gender:</strong>
-                {isEditing ? (
-                  <select
-                    name="gender"
-                    value={user.gender}
-                    onChange={handleInputChange}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  >
-                    <option value="MALE">Male</option>
-                    <option value="FEMALE">Female</option>
-                    <option value="OTHER">Other</option>
-                  </select>
-                ) : (
-                  <p className="min-h-[40px]">{user.gender || "N/A"}</p>
-                )}
-              </div>
-              <div>
-                <strong>Roles:</strong>
-                {isEditing ? (
-                  <select
-                    name="roles"
-                    value={user.roles.length > 0 ? user.roles[0].value : ""}
-                    onChange={(e) => {
-                      const selectedRole = e.target.value;
-                      setUser((prevUser) => ({
-                        ...prevUser,
-                        roles: [
-                          {
-                            value: selectedRole,
-                            label: roleLabels[selectedRole],
-                          },
-                        ],
-                      }));
-                    }}
-                    className="border rounded p-2 w-full min-h-[40px]"
-                  >
-                    <option value="">Select Role</option>
-                    {AVAILABLE_ROLES.map((role) => (
-                      <option key={role.value} value={role.value}>
-                        {role.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="min-h-[40px]">
-                    {user.roles.length > 0
-                      ? user.roles.map((role) => role.label).join(", ")
-                      : "No Roles"}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <p>No user details available.</p>
-        )}
-      </div>
-      </div>
-      </div>
+        <Footer />
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import axios from "axios";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
+import { Download } from "lucide-react";
 import { toast } from "react-toastify";
 
 interface PayrollEntry {
@@ -85,6 +86,25 @@ const PayrollManagement: React.FC = () => {
     } catch (error) { toast.error("Failed to process"); }
   };
 
+  const handleDownloadPayslip = async (id: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`http://localhost:5000/payroll/payslip/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `payslip_${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Payslip downloaded");
+    } catch (error) { toast.error("Failed to download payslip"); }
+  };
+
   const handleMarkPaid = async (id: string) => {
     try {
       const token = localStorage.getItem("token");
@@ -99,12 +119,13 @@ const PayrollManagement: React.FC = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      PENDING: "bg-blue-50 text-blue-600",
-      PROCESSED: "bg-blue-100 text-blue-800",
-      PAID: "bg-blue-100 text-blue-700",
+    const c: Record<string, { dot: string; bg: string; text: string }> = {
+      PENDING: { dot: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-700" },
+      PROCESSED: { dot: "bg-blue-500", bg: "bg-blue-50", text: "text-blue-700" },
+      PAID: { dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700" },
     };
-    return <span className={`px-2 py-1 text-xs font-medium rounded-full ${styles[status] || "bg-gray-100"}`}>{status}</span>;
+    const s = c[status] || { dot: "bg-gray-400", bg: "bg-gray-50", text: "text-gray-600" };
+    return <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${s.bg} ${s.text}`}><span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />{status}</span>;
   };
 
   return (
@@ -211,8 +232,11 @@ const PayrollManagement: React.FC = () => {
                           <button onClick={() => handleMarkPaid(entry.id)} className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-500 transition">Mark Paid</button>
                         )}
                         {entry.status === "PAID" && (
-                          <span className="text-gray-400 text-sm">Paid {entry.paidDate ? new Date(entry.paidDate).toLocaleDateString() : ""}</span>
+                          <span className="text-gray-400 text-xs">Paid {entry.paidDate ? new Date(entry.paidDate).toLocaleDateString() : ""}</span>
                         )}
+                        <button onClick={() => handleDownloadPayslip(entry.id)} className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs hover:bg-gray-200 transition" title="Download Payslip">
+                          <Download size={12} /> Payslip
+                        </button>
                       </div>
                     </td>
                   </tr>

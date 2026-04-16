@@ -96,12 +96,13 @@ const TimeSheetManagement: React.FC = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      PENDING: "bg-blue-50 text-blue-600",
-      APPROVED: "bg-blue-100 text-blue-700",
-      REJECTED: "bg-blue-200 text-blue-900",
+    const c: Record<string, { dot: string; bg: string; text: string }> = {
+      PENDING: { dot: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-700" },
+      APPROVED: { dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700" },
+      REJECTED: { dot: "bg-red-400", bg: "bg-red-50", text: "text-red-600" },
     };
-    return <span className={`px-2 py-1 text-xs font-medium rounded-full ${styles[status] || "bg-gray-100"}`}>{status}</span>;
+    const s = c[status] || { dot: "bg-gray-400", bg: "bg-gray-50", text: "text-gray-600" };
+    return <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${s.bg} ${s.text}`}><span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />{status}</span>;
   };
 
   return (
