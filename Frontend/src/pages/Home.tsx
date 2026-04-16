@@ -134,7 +134,7 @@ const Home: React.FC = () => {
                       <div className="flex flex-wrap gap-2">
                         {stats.upcomingBirthdays.map((b: any, i: number) => (
                           <span key={i} className="bg-amber-50 text-amber-800 px-3 py-1.5 rounded-lg text-sm">
-                            {b.name} · {new Date(b.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                            {b.name} · {new Date(b.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                           </span>
                         ))}
                       </div>
@@ -307,7 +307,7 @@ const Home: React.FC = () => {
                               <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><FileText size={14} /></div>
                               <div>
                                 <p className="text-sm text-gray-800">{l.leaveType} · {l.numberOfDays || 1} day(s)</p>
-                                <p className="text-[11px] text-gray-400">{new Date(l.leaveStartDate).toLocaleDateString()} — {new Date(l.leaveEndDate).toLocaleDateString()}</p>
+                                <p className="text-[11px] text-gray-400">{new Date(l.leaveStartDate).toLocaleDateString('en-GB')} — {new Date(l.leaveEndDate).toLocaleDateString('en-GB')}</p>
                               </div>
                             </div>
                             <Badge status={l.leaveStatus} />

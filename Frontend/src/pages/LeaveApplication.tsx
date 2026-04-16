@@ -106,14 +106,14 @@ const LeaveApplication = () => {
                   <div>
                     <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Start Date</label>
                     <input
-                      type="date" name="leaveStartDate" value={formData.leaveStartDate} onChange={handleChange} required
+                      type="text" name="leaveStartDate" value={formData.leaveStartDate} onChange={handleChange} required
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">End Date</label>
                     <input
-                      type="date" name="leaveEndDate" value={formData.leaveEndDate} onChange={handleChange} required
+                      type="text" name="leaveEndDate" value={formData.leaveEndDate} onChange={handleChange} required
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                   </div>

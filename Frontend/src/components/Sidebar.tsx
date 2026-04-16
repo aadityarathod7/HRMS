@@ -113,8 +113,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
       submenu: [
         { icon: Users, label: "Apply Leave", onClick: () => navigate("/leave-application") },
         ...(isAdminOrHR || isManager ? [
-          { icon: Users, label: "Manage Leaves", onClick: () => navigate("/leave-management") },
-          { icon: Users, label: "Employee Leaves", onClick: () => navigate("/employee-leave-management") },
+          { icon: Users, label: "Manage Leaves", onClick: () => navigate("/employee-leave-management") },
         ] : []),
         { icon: Users, label: "Leave Balance", onClick: () => navigate("/leave-balance") },
       ],
@@ -123,7 +122,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
     { icon: Home, label: "Project Management", onClick: handleProjectManagementClick, roles: "ALL" },
     { icon: Clock, label: "Timesheet", onClick: handleTimeSheetManagementClick, roles: "ALL" },
     { icon: Users, label: "Attendance", onClick: handleAttendanceManagementClick, roles: "ALL" },
-    { icon: DollarSign, label: "Payroll", onClick: handlePayRoleManagementClick, roles: "ADMIN_HR" },
+    { icon: DollarSign, label: "Payroll", onClick: handlePayRoleManagementClick, roles: "ALL" },
     { icon: FileText, label: "Documents", onClick: handleDocumentsClick, roles: "ALL" },
     { icon: LogOut, label: "Logout", onClick: handleLogout, roles: "ALL" },
   ];

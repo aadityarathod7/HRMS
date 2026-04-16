@@ -52,8 +52,8 @@ const ProjectRegistration = () => {
               <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   <div className="sm:col-span-2"><label className={labelClass}>Project Name</label><input type="text" name="name" value={formData.name} onChange={handleChange} required className={inputClass} placeholder="e.g. HRMS Portal" /></div>
-                  <div><label className={labelClass}>Start Date</label><input type="date" name="startDate" value={formData.startDate} onChange={handleChange} required className={inputClass} /></div>
-                  <div><label className={labelClass}>End Date</label><input type="date" name="endDate" value={formData.endDate} onChange={handleChange} required className={inputClass} /></div>
+                  <div><label className={labelClass}>Start Date</label><input type="text" name="startDate" value={formData.startDate} onChange={handleChange} required className={inputClass} placeholder="dd/mm/yyyy" onFocus={(e) => e.target.type = "date"} onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }} /></div>
+                  <div><label className={labelClass}>End Date</label><input type="text" name="endDate" value={formData.endDate} onChange={handleChange} required className={inputClass} placeholder="dd/mm/yyyy" onFocus={(e) => e.target.type = "date"} onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }} /></div>
                   <div>
                     <label className={labelClass}>Status</label>
                     <select name="status" value={formData.status} onChange={handleChange} required className={inputClass}>

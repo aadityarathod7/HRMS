@@ -56,7 +56,7 @@ const ViewEmployee: React.FC = () => {
           className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
       ) : (
         <p className="text-sm text-gray-900">{
-          type === "date" && value ? new Date(value).toLocaleDateString() :
+          type === "date" && value ? new Date(value).toLocaleDateString('en-GB') :
           value || <span className="text-gray-300">—</span>
         }</p>
       )}

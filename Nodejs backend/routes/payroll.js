@@ -17,7 +17,7 @@ router.get('/all', authenticate, async (req, res, next) => {
       const entries = await payrollService.getAllPayrolls();
       return res.json(entries);
     }
-    const entries = await payrollService.getPayrollsByUser(req.user.id);
+    const entries = await payrollService.getPayrollsByUser(req.user.id, false);
     res.json(entries);
   } catch (error) { next(error); }
 });

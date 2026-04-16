@@ -397,3 +397,14 @@ input:focus {
 }
 
 }
+
+/* Force date input to show dd/mm/yyyy format */
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  font-family: var(--font-system);
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  font-family: var(--font-system);
+}

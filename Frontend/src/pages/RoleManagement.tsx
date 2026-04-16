@@ -341,9 +341,6 @@ const RoleManagement: React.FC = () => {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Role ID
-                </th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Role Name
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
@@ -369,11 +366,10 @@ const RoleManagement: React.FC = () => {
                       key={role.id}
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
-                      <td className="px-4 py-3 text-gray-800 text-sm">{role.id}</td>
                       <td className="px-4 py-3 text-gray-800 text-sm">{role.role}</td>
                       <td className="px-4 py-3 text-gray-800 text-sm">{role.description}</td>
                       <td className="px-4 py-3 text-gray-800 text-sm">{role.createdBy}</td>
-                      <td className="px-4 py-3 text-gray-800 text-sm">{role.createdDate ? new Date(role.createdDate).toLocaleDateString() : "-"}</td>
+                      <td className="px-4 py-3 text-gray-800 text-sm">{role.createdDate ? new Date(role.createdDate).toLocaleDateString('en-GB') : "-"}</td>
                       <td className="px-4 py-3">
                         <div className="flex space-x-3">
                           <Link

@@ -423,19 +423,19 @@ const LeaveManagement: React.FC = () => {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Leave Request ID
+                  Employee
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Leave Start Date
+                  Period
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Leave End Date
+                  Type
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Leave Type
+                  Days
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Leave Status
+                  Status
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Actions
@@ -451,16 +451,14 @@ const LeaveManagement: React.FC = () => {
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
                       <td className="px-4 py-3 text-gray-800 text-sm">
-                        {Leave.id}
+                        {typeof Leave.userId === "object" ? `${Leave.userId.firstname} ${Leave.userId.lastname}` : "-"}
                       </td>
-                      <td className="px-4 py-3 text-gray-800 text-sm">
-                        {new Date(Leave.leaveStartDate).toLocaleDateString()}
+                      <td className="px-4 py-3 text-gray-600 text-sm">
+                        {new Date(Leave.leaveStartDate).toLocaleDateString('en-GB')} — {new Date(Leave.leaveEndDate).toLocaleDateString('en-GB')}
                       </td>
-                      <td className="px-4 py-3 text-gray-800 text-sm">
-                        {new Date(Leave.leaveEndDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-3 text-gray-800 text-sm">{Leave.leaveType}</td>
-                      <td className="px-4 py-3 text-gray-800 text-sm">{Leave.leaveStatus}</td>
+                      <td className="px-4 py-3 text-gray-600 text-sm">{Leave.leaveType}</td>
+                      <td className="px-4 py-3 text-gray-600 text-sm">{Leave.numberOfDays || 1} day(s)</td>
+                      <td className="px-4 py-3">{Leave.leaveStatus}</td>
                       <td className="px-4 py-3">
                         <div className="flex space-x-3">
                           <Link

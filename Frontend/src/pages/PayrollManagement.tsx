@@ -12,8 +12,16 @@ interface PayrollEntry {
   month: string;
   year: number;
   basicSalary: number;
-  allowances: number;
-  deductions: number;
+  hra: number;
+  da: number;
+  ta: number;
+  specialAllowance: number;
+  grossSalary: number;
+  pfEmployee: number;
+  professionalTax: number;
+  tds: number;
+  lopDeduction: number;
+  totalDeductions: number;
   netSalary: number;
   status: string;
   paidDate: string | null;
@@ -219,9 +227,9 @@ const PayrollManagement: React.FC = () => {
                     <td className="px-4 py-3 text-gray-600 text-sm">{entry.month}</td>
                     <td className="px-4 py-3 text-gray-600 text-sm">{entry.year}</td>
                     <td className="px-4 py-3 text-gray-600 text-sm">{formatCurrency(entry.basicSalary)}</td>
-                    <td className="p-3 text-green-600">{formatCurrency(entry.allowances)}</td>
-                    <td className="p-3 text-red-600">{formatCurrency(entry.deductions)}</td>
-                    <td className="p-3 text-gray-900 font-medium">{formatCurrency(entry.netSalary)}</td>
+                    <td className="px-4 py-3 text-green-600 text-sm">{formatCurrency((entry.hra || 0) + (entry.da || 0) + (entry.ta || 0) + (entry.specialAllowance || 0))}</td>
+                    <td className="px-4 py-3 text-red-500 text-sm">{formatCurrency(entry.totalDeductions || 0)}</td>
+                    <td className="px-4 py-3 text-gray-900 font-medium text-sm">{formatCurrency(entry.netSalary)}</td>
                     <td className="px-4 py-3">{getStatusBadge(entry.status)}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
@@ -232,7 +240,7 @@ const PayrollManagement: React.FC = () => {
                           <button onClick={() => handleMarkPaid(entry.id)} className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-500 transition">Mark Paid</button>
                         )}
                         {entry.status === "PAID" && (
-                          <span className="text-gray-400 text-xs">Paid {entry.paidDate ? new Date(entry.paidDate).toLocaleDateString() : ""}</span>
+                          <span className="text-gray-400 text-xs">Paid {entry.paidDate ? new Date(entry.paidDate).toLocaleDateString('en-GB') : ""}</span>
                         )}
                         <button onClick={() => handleDownloadPayslip(entry.id)} className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs hover:bg-gray-200 transition" title="Download Payslip">
                           <Download size={12} /> Payslip

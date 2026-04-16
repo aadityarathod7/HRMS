@@ -444,10 +444,10 @@ const ProjectManagement: React.FC = () => {
                       <td className="px-4 py-3 text-gray-800 text-sm">{project.projectId}</td>
                       <td className="px-4 py-3 text-gray-800 text-sm">{project.name}</td>
                       <td className="px-4 py-3 text-gray-800 text-sm">
-                        {new Date(project.startDate).toLocaleDateString()}
+                        {new Date(project.startDate).toLocaleDateString('en-GB')}
                       </td>
                       <td className="px-4 py-3 text-gray-800 text-sm">
-                        {new Date(project.endDate).toLocaleDateString()}
+                        {new Date(project.endDate).toLocaleDateString('en-GB')}
                       </td>
                       <td className="px-4 py-3 text-gray-800 text-sm">
                         

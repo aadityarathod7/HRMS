@@ -273,7 +273,7 @@ const Documents: React.FC = () => {
                     </td>
                     <td className="px-4 py-3 text-gray-600 text-sm">{formatFileSize(file.fileSize)}</td>
                     <td className="px-4 py-3 text-gray-600 text-sm">{file.uploadedBy}</td>
-                    <td className="px-4 py-3 text-gray-600 text-sm">{new Date(file.createdDate).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{new Date(file.createdDate).toLocaleDateString('en-GB')}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <Link to={`/view/${file.id}`} className="text-blue-600 hover:text-blue-800">

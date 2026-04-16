@@ -292,7 +292,7 @@ const ViewRole: React.FC = () => {
               <div>
                 <strong>Created Date:</strong>
                 <p className="min-h-[40px]">
-                  {new Date(user.createdDate).toLocaleDateString()}
+                  {new Date(user.createdDate).toLocaleDateString('en-GB')}
                 </p>
               </div>
             )}

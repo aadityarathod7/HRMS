@@ -187,7 +187,7 @@ const TimeSheetManagement: React.FC = () => {
                 ) : timesheets.map((entry) => (
                   <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 text-gray-800 text-sm">{typeof entry.userId === 'object' ? `${entry.userId.firstname} ${entry.userId.lastname}` : entry.userId}</td>
-                    <td className="px-4 py-3 text-gray-600 text-sm">{new Date(entry.date).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{new Date(entry.date).toLocaleDateString('en-GB')}</td>
                     <td className="px-4 py-3 text-gray-600 text-sm">{typeof entry.project === 'object' && entry.project ? entry.project.name : "N/A"}</td>
                     <td className="px-4 py-3 text-gray-600 text-sm">{entry.hoursWorked}h</td>
                     <td className="px-4 py-3 text-gray-600 text-sm">{entry.taskDescription || "-"}</td>

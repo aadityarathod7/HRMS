@@ -386,7 +386,7 @@ const DepartmentManagement: React.FC = () => {
                         {department.createdBy || "Unknown"}
                       </td>
                       <td className="px-4 py-3 text-gray-800 text-sm">
-                        {department.createdDate ? new Date(department.createdDate).toLocaleDateString() : "-"}
+                        {department.createdDate ? new Date(department.createdDate).toLocaleDateString('en-GB') : "-"}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex space-x-3">

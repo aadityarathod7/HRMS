@@ -63,6 +63,51 @@ router.post('/logout', async (req, res, next) => {
   }
 });
 
+// POST /auth/google — Verify Google token and return our JWT
+router.post('/google', async (req, res, next) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) return res.status(400).json({ message: 'Google credential is required' });
+
+    // Decode Google JWT (header.payload.signature)
+    const payload = JSON.parse(Buffer.from(credential.split('.')[1], 'base64').toString());
+    const { email, given_name, family_name, sub: googleId } = payload;
+
+    if (!email) return res.status(400).json({ message: 'Invalid Google credential' });
+
+    // Find user by email
+    let user = await User.findOne({ email }).populate('roles').populate('department', 'departmentName');
+    if (!user) {
+      return res.status(404).json({ message: `No account found for ${email}. Please contact HR to register.` });
+    }
+
+    const roles = user.roles.map(r => r.role);
+
+    const token = jwt.sign(
+      { id: user._id, username: user.userName, roles },
+      process.env.JWT_SECRET,
+      { expiresIn: '8h' }
+    );
+
+    res.json({
+      token,
+      roles,
+      user: {
+        id: user._id,
+        employeeId: user.employeeId,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        department: user.department,
+        designation: user.designation,
+        profilePicture: user.profilePicture
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // POST /auth/forgot-password
 router.post('/forgot-password', async (req, res, next) => {
   try {

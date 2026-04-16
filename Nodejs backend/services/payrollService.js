@@ -44,8 +44,11 @@ const getPayrollsByStatus = async (status) => {
   return await Payroll.find({ status }).populate('userId', 'firstname lastname employeeId');
 };
 
-const getPayrollsByUser = async (userId) => {
-  return await Payroll.find({ userId }).sort({ year: -1, month: -1 });
+const getPayrollsByUser = async (userId, includeAll = false) => {
+  const filter = includeAll ? { userId } : { userId, status: 'PAID' };
+  return await Payroll.find(filter)
+    .populate('userId', 'firstname lastname employeeId')
+    .sort({ year: -1, month: -1 });
 };
 
 const updatePayroll = async (id, data) => {

@@ -174,7 +174,7 @@ const AttendanceManagement: React.FC = () => {
                 ) : records.map((entry) => (
                   <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 text-gray-800 text-sm">{typeof entry.userId === 'object' ? `${entry.userId.firstname} ${entry.userId.lastname}` : entry.userId}</td>
-                    <td className="px-4 py-3 text-gray-600 text-sm">{new Date(entry.date).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{new Date(entry.date).toLocaleDateString('en-GB')}</td>
                     <td className="px-4 py-3 text-gray-600 text-sm">{entry.checkIn || "-"}</td>
                     <td className="px-4 py-3 text-gray-600 text-sm">{entry.checkOut || "-"}</td>
                     <td className="px-4 py-3">{getStatusBadge(entry.status)}</td>

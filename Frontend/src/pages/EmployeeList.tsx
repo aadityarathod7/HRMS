@@ -204,7 +204,7 @@ const EmployeeList: React.FC = () => {
                     <td className="px-4 py-3 text-gray-600 text-sm">{user.designation || "-"}</td>
                     <td className="px-4 py-3 text-gray-600 text-sm">{user.email || "-"}</td>
                     <td className="px-4 py-3 text-gray-600 text-sm">{user.contactNumber || "-"}</td>
-                    <td className="px-4 py-3 text-gray-600 text-sm">{user.dateOfJoining ? new Date(user.dateOfJoining).toLocaleDateString() : "-"}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{user.dateOfJoining ? new Date(user.dateOfJoining).toLocaleDateString('en-GB') : "-"}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-0.5 text-xs rounded ${
                         user.status === 'ACTIVE' ? 'bg-blue-100 text-blue-700' :

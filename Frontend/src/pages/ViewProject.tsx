@@ -249,14 +249,14 @@ const ViewProject: React.FC = () => {
             <div>
               <strong>Start Date:</strong>
               <p className="min-h-[40px]">
-                {new Date(project.startDate).toLocaleDateString() ||
+                {new Date(project.startDate).toLocaleDateString('en-GB') ||
                   "No start date"}
               </p>
             </div>
             <div>
               <strong>End Date:</strong>
               <p className="min-h-[40px]">
-                {new Date(project.endDate).toLocaleDateString() ||
+                {new Date(project.endDate).toLocaleDateString('en-GB') ||
                   "No end date"}
               </p>
             </div>
@@ -286,7 +286,7 @@ const ViewProject: React.FC = () => {
               <strong>Created Date:</strong>
               <p className="min-h-[40px]">
                 {project.createdDate
-                  ? new Date(project.createdDate).toLocaleDateString()
+                  ? new Date(project.createdDate).toLocaleDateString('en-GB')
                   : "N/A"}
               </p>
             </div>
@@ -298,7 +298,7 @@ const ViewProject: React.FC = () => {
               <strong>Updated Date:</strong>
               <p className="min-h-[40px]">
                 {project.updatedDate
-                  ? new Date(project.updatedDate).toLocaleDateString()
+                  ? new Date(project.updatedDate).toLocaleDateString('en-GB')
                   : "N/A"}
               </p>
             </div>

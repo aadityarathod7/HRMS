@@ -170,7 +170,7 @@ const ViewDepartment: React.FC = () => {
               <strong>Created Date:</strong>
               <div className="border rounded p-2 bg-gray-100 min-h-[40px]">
                 {department.createdDate
-                  ? new Date(department.createdDate).toLocaleDateString()
+                  ? new Date(department.createdDate).toLocaleDateString('en-GB')
                   : "N/A"}
               </div>
             </div>

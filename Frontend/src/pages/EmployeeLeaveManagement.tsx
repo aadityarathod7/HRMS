@@ -428,13 +428,13 @@ const EmployeeLeaveManagement: React.FC = () => {
                   Manager
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Start Date
-                </th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  End Date
+                  Period
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Type
+                </th>
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
+                  Days
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Status
@@ -458,14 +458,12 @@ const EmployeeLeaveManagement: React.FC = () => {
                       <td className="px-4 py-3 text-gray-800 text-sm">
                         {typeof Leave.reportingManagerId === 'object' ? `${Leave.reportingManagerId.firstname} ${Leave.reportingManagerId.lastname}` : Leave.reportingManagerId}
                       </td>
-                      <td className="px-4 py-3 text-gray-800 text-sm">
-                        {new Date(Leave.leaveStartDate).toLocaleDateString()}
+                      <td className="px-4 py-3 text-gray-600 text-sm">
+                        {new Date(Leave.leaveStartDate).toLocaleDateString('en-GB')} — {new Date(Leave.leaveEndDate).toLocaleDateString('en-GB')}
                       </td>
-                      <td className="px-4 py-3 text-gray-800 text-sm">
-                        {new Date(Leave.leaveEndDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-3 text-gray-800 text-sm">{Leave.leaveType}</td>
-                      <td className="px-4 py-3 text-gray-800 text-sm">{Leave.leaveStatus}</td>
+                      <td className="px-4 py-3 text-gray-600 text-sm">{Leave.leaveType}</td>
+                      <td className="px-4 py-3 text-gray-600 text-sm">{Leave.numberOfDays || 1} day(s)</td>
+                      <td className="px-4 py-3 text-gray-600 text-sm">{Leave.leaveStatus}</td>
                       <td className="px-4 py-3">
                         <div className="flex space-x-3">
                           <Link
