@@ -5,12 +5,29 @@ const attendanceSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   checkIn: { type: String },
   checkOut: { type: String },
-  status: { type: String, enum: ['PRESENT', 'ABSENT', 'HALF_DAY', 'ON_LEAVE'], default: 'PRESENT' },
+  hoursWorked: { type: Number, default: 0 },
+  status: { type: String, enum: ['PRESENT', 'ABSENT', 'HALF_DAY', 'ON_LEAVE', 'WFH'], default: 'PRESENT' },
+  location: { type: String, enum: ['OFFICE', 'WFH', 'HYBRID'], default: 'OFFICE' },
+  overtimeHours: { type: Number, default: 0 },
   notes: { type: String },
+  approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   createdDate: { type: Date, default: Date.now }
 }, {
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
+});
+
+// Auto-calculate hoursWorked from checkIn/checkOut
+attendanceSchema.pre('save', function () {
+  if (this.checkIn && this.checkOut) {
+    const [inH, inM] = this.checkIn.split(':').map(Number);
+    const [outH, outM] = this.checkOut.split(':').map(Number);
+    const totalMinutes = (outH * 60 + outM) - (inH * 60 + inM);
+    this.hoursWorked = Math.round((totalMinutes / 60) * 100) / 100;
+    if (this.hoursWorked > 9) {
+      this.overtimeHours = Math.round((this.hoursWorked - 9) * 100) / 100;
+    }
+  }
 });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);

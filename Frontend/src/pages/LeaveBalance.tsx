@@ -1,120 +1,156 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 import { Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
   ArcElement,
-  Title,
   Tooltip,
   Legend,
 } from "chart.js";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+interface LeaveBalanceData {
+  id: string;
+  leaveType: string;
+  totalAllotted: number;
+  used: number;
+  available: number;
+  year: number;
+}
+
+const COLORS = [
+  "rgba(37, 99, 235, 0.7)",
+  "rgba(59, 130, 246, 0.7)",
+  "rgba(96, 165, 250, 0.7)",
+  "rgba(147, 197, 253, 0.7)",
+  "rgba(191, 219, 254, 0.7)",
+  "rgba(30, 64, 175, 0.7)",
+  "rgba(29, 78, 216, 0.7)",
+];
 
 const LeaveBalance: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [balances, setBalances] = useState<LeaveBalanceData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
+  const userProfile = JSON.parse(localStorage.getItem("userProfile") || "{}");
 
-  const leaveData = [
-    { type: "Paid Leave", available: 12 },
-    { type: "Casual Leave", available: 12 },
-    { type: "Sick Leave", available: 12 },
-    { type: "Maternity Leave", available: 180 },
-    { type: "Paternity Leave", available: 15 },
-  ];
-
-  const colors = [
-    "rgba(255, 99, 132, 0.6)",
-    "rgba(54, 162, 235, 0.6)",
-    "rgba(255, 206, 86, 0.6)",
-    "rgba(75, 192, 192, 0.6)",
-    "rgba(153, 102, 255, 0.6)",
-  ];
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const userId = userProfile.id;
+        if (!userId) { setLoading(false); return; }
+        const res = await axios.get(
+          `http://localhost:5000/leaverequests/balance/${userId}?year=${new Date().getFullYear()}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setBalances(res.data);
+      } catch (err) {
+        // silent
+      } finally { setLoading(false); }
+    };
+    fetchBalance();
+  }, []);
 
   const chartData = {
-    labels: leaveData.map((leave) => leave.type),
+    labels: balances.map(b => b.leaveType),
     datasets: [
       {
-        label: "Available Leaves",
-        data: leaveData.map((leave) => leave.available),
-        backgroundColor: colors,
+        label: "Available",
+        data: balances.map(b => b.available),
+        backgroundColor: COLORS.slice(0, balances.length),
+        borderWidth: 0,
       },
     ],
   };
+
+  const totalAllotted = balances.reduce((sum, b) => sum + b.totalAllotted, 0);
+  const totalUsed = balances.reduce((sum, b) => sum + b.used, 0);
+  const totalAvailable = balances.reduce((sum, b) => sum + b.available, 0);
 
   return (
     <div className="flex flex-col bg-gray-100 min-h-screen">
       <DashboardSidebar isCollapsed={isCollapsed} />
       <DashboardNavbar toggleSidebar={toggleSidebar} />
-
-      <div
-        className={`flex flex-col flex-grow w-full transition-all duration-300 ${
-          isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"
-        }`}
-      >
+      <div className={`flex flex-col flex-grow w-full transition-all duration-300 ${isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"}`}>
         <div className="pt-28 px-5 pb-5 flex-grow">
-          <h2 className="text-xl  text-blue-600 font-bold mb-4"></h2>
-          <div className="flex flex-row justify-between p-5 flex-grow">
-            <div className="w-1/2 pr-2">
-              <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th
-                      className="border px-4 py-2 text-left"
-                      style={{ pointerEvents: "none" }}
-                    >
-                      Leave Type
-                    </th>
-                    <th
-                      className="border px-4 py-2 text-left"
-                      style={{ pointerEvents: "none" }}
-                    >
-                      Available
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leaveData.map((leave, index) => (
-                    <tr
-                      key={leave.type}
-                      className={
-                        index % 2 === 0
-                          ? "bg-gray-100 hover:bg-gray-200"
-                          : "hover:bg-gray-200"
-                      }
-                    >
-                      <td className="border px-4 py-2">{leave.type}</td>
-                      <td className="border px-4 py-2">{leave.available}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div
-              className="w-1/2 pl-2"
-              style={{ width: "300px", height: "300px" }}
-            >
-              <Pie data={chartData} options={{ responsive: true }} />
-            </div>
-          </div>
-        </div>
 
+          <h2 className="text-2xl font-light text-gray-900 mb-6">
+            Leave Balance — {userProfile.firstname} {userProfile.lastname}
+          </h2>
+
+          {loading ? (
+            <p className="text-gray-500">Loading...</p>
+          ) : balances.length === 0 ? (
+            <p className="text-gray-500">No leave balance data found for {new Date().getFullYear()}.</p>
+          ) : (
+            <>
+              {/* Summary cards */}
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="bg-white rounded-lg border border-gray-200 p-5">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider">Total Allotted</p>
+                  <p className="text-2xl font-light text-gray-900 mt-1">{totalAllotted}</p>
+                </div>
+                <div className="bg-white rounded-lg border border-gray-200 p-5">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider">Used</p>
+                  <p className="text-2xl font-light text-gray-900 mt-1">{totalUsed}</p>
+                </div>
+                <div className="bg-white rounded-lg border border-gray-200 p-5">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider">Available</p>
+                  <p className="text-2xl font-light text-blue-600 mt-1">{totalAvailable}</p>
+                </div>
+              </div>
+
+              {/* Table + Chart */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Table */}
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Leave Type</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Allotted</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Used</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Available</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {balances.map((b) => (
+                        <tr key={b.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm text-gray-800">{b.leaveType}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{b.totalAllotted}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{b.used}</td>
+                          <td className="px-4 py-3 text-sm font-medium text-blue-600">{b.available}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pie Chart */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6 flex items-center justify-center">
+                  <div style={{ width: "280px", height: "280px" }}>
+                    <Pie
+                      data={chartData}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          legend: { position: "bottom", labels: { padding: 16, font: { size: 12 } } },
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
         <Footer />
       </div>
     </div>

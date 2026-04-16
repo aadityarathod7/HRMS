@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import axios from "axios";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
@@ -15,12 +16,25 @@ const EmployeeRegistration = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [managers, setManagers] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     firstname: "", lastname: "", dob: "", bloodGroup: "", branch: "", dateOfJoining: "",
     gender: "", address: "", contactNumber: "", userName: "", password: "", roles: [] as string[], email: "",
+    department: "", designation: "", reportingManager: "", employmentType: "FULLTIME",
+    ctc: "", panNumber: "", aadharNumber: "", bankAccountNumber: "", bankName: "", ifscCode: "",
+    emergencyContactName: "", emergencyContactNumber: ""
   });
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    axios.get("http://localhost:5000/departments/active", { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => setDepartments(res.data)).catch(() => {});
+    axios.get("http://localhost:5000/user/all", { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => setManagers(res.data)).catch(() => {});
+  }, []);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -94,7 +108,45 @@ const EmployeeRegistration = () => {
                       {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
                   </div>
+                  <div>
+                    <label className={labelClass}>Department</label>
+                    <select name="department" value={formData.department} onChange={handleChange} required className={inputClass}>
+                      <option value="">Select</option>
+                      {departments.map((d: any) => <option key={d.id} value={d.id}>{d.departmentName}</option>)}
+                    </select>
+                  </div>
+                  <div><label className={labelClass}>Designation</label><input type="text" name="designation" value={formData.designation} onChange={handleChange} required className={inputClass} placeholder="e.g. Software Engineer" /></div>
+                  <div>
+                    <label className={labelClass}>Reporting Manager</label>
+                    <select name="reportingManager" value={formData.reportingManager} onChange={handleChange} className={inputClass}>
+                      <option value="">Select</option>
+                      {managers.map((m: any) => <option key={m.id} value={m.id}>{m.firstname} {m.lastname} ({m.employeeId})</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className={labelClass}>Employment Type</label>
+                    <select name="employmentType" value={formData.employmentType} onChange={handleChange} required className={inputClass}>
+                      <option value="FULLTIME">Full Time</option><option value="PARTTIME">Part Time</option><option value="CONTRACT">Contract</option>
+                    </select>
+                  </div>
+                  <div><label className={labelClass}>CTC (Annual)</label><input type="number" name="ctc" value={formData.ctc} onChange={handleChange} className={inputClass} placeholder="e.g. 1200000" /></div>
                 </div>
+
+                <h3 className="text-sm font-medium text-gray-700 mt-6 mb-3">Bank & ID Details</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  <div><label className={labelClass}>PAN Number</label><input type="text" name="panNumber" value={formData.panNumber} onChange={handleChange} className={inputClass} placeholder="ABCDE1234F" /></div>
+                  <div><label className={labelClass}>Aadhar Number</label><input type="text" name="aadharNumber" value={formData.aadharNumber} onChange={handleChange} className={inputClass} placeholder="1234 5678 9012" /></div>
+                  <div><label className={labelClass}>Bank Account No.</label><input type="text" name="bankAccountNumber" value={formData.bankAccountNumber} onChange={handleChange} className={inputClass} placeholder="Account number" /></div>
+                  <div><label className={labelClass}>Bank Name</label><input type="text" name="bankName" value={formData.bankName} onChange={handleChange} className={inputClass} placeholder="e.g. HDFC Bank" /></div>
+                  <div><label className={labelClass}>IFSC Code</label><input type="text" name="ifscCode" value={formData.ifscCode} onChange={handleChange} className={inputClass} placeholder="e.g. HDFC0001234" /></div>
+                </div>
+
+                <h3 className="text-sm font-medium text-gray-700 mt-6 mb-3">Emergency Contact</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  <div><label className={labelClass}>Contact Name</label><input type="text" name="emergencyContactName" value={formData.emergencyContactName} onChange={handleChange} className={inputClass} placeholder="Full name" /></div>
+                  <div><label className={labelClass}>Contact Number</label><input type="text" name="emergencyContactNumber" value={formData.emergencyContactNumber} onChange={handleChange} className={inputClass} placeholder="Phone number" /></div>
+                </div>
+
                 <div className="mt-5">
                   <label className={labelClass}>Address</label>
                   <input type="text" name="address" value={formData.address} onChange={handleChange} required className={inputClass} placeholder="Full address" />

@@ -10,18 +10,21 @@ import { toast } from "react-toastify";
 import { KeyboardArrowDown } from "@mui/icons-material";
 
 type LeaveDto = {
-  leaveRequestId: number;
-  userId: number;
-  reportingManagerId: number;
+  id: string;
+  userId: any;
+  reportingManagerId: any;
   leaveStartDate: string;
   leaveEndDate: string;
   leaveType: string;
   leaveStatus: string;
+  numberOfDays: number;
+  approvedBy: any;
+  rejectionReason: string;
 };
 
 const EmployeeLeaveManagement: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [users, setUsers] = useState<UserDto[]>([]);
+  const [users, setUsers] = useState<LeaveDto[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [showInactive, setShowInactive] = useState(false);
   const [selectedLeaveType, setSelectedLeaveType] = useState("sick");
@@ -419,25 +422,22 @@ const EmployeeLeaveManagement: React.FC = () => {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Leave Request ID
+                  Employee
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Employee ID
+                  Manager
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Reporting Manager ID
+                  Start Date
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Leave Start Date
+                  End Date
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Leave End Date
+                  Type
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Leave Type
-                </th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Leave Status
+                  Status
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Actions
@@ -449,15 +449,14 @@ const EmployeeLeaveManagement: React.FC = () => {
                 users.map((Leave, index) => {
                   return (
                     <tr
-                      key={`${Leave.leaveRequestId}-${index}`}
+                      key={`${Leave.id}-${index}`}
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
                       <td className="px-4 py-3 text-gray-800 text-sm">
-                        {Leave.leaveRequestId}
+                        {typeof Leave.userId === 'object' ? `${Leave.userId.firstname} ${Leave.userId.lastname}` : Leave.userId}
                       </td>
-                      <td className="px-4 py-3 text-gray-800 text-sm">{Leave.userId}</td>
                       <td className="px-4 py-3 text-gray-800 text-sm">
-                        {Leave.reportingManagerId}
+                        {typeof Leave.reportingManagerId === 'object' ? `${Leave.reportingManagerId.firstname} ${Leave.reportingManagerId.lastname}` : Leave.reportingManagerId}
                       </td>
                       <td className="px-4 py-3 text-gray-800 text-sm">
                         {new Date(Leave.leaveStartDate).toLocaleDateString()}
@@ -470,7 +469,7 @@ const EmployeeLeaveManagement: React.FC = () => {
                       <td className="px-4 py-3">
                         <div className="flex space-x-3">
                           <Link
-                            to={`/view-Leave/${Leave.leaveRequestId}`}
+                            to={`/view-Leave/${Leave.id}`}
                             className="text-blue-600 hover:text-blue-800 transition-colors duration-150"
                             title="View"
                           >
@@ -478,7 +477,7 @@ const EmployeeLeaveManagement: React.FC = () => {
                           </Link>
                           <button
                             onClick={() =>
-                              handleApproveLeave(Leave.leaveRequestId)
+                              handleApproveLeave(Leave.id)
                             }
                             className="text-blue-600 hover:text-blue-800 text-sm"
                             title="Approve"
@@ -487,7 +486,7 @@ const EmployeeLeaveManagement: React.FC = () => {
                           </button>
                           <button
                             onClick={() =>
-                              handleRejectLeave(Leave.leaveRequestId)
+                              handleRejectLeave(Leave.id)
                             }
                             className="text-gray-500 hover:text-gray-700 text-sm"
                             title="Reject"

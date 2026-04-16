@@ -36,6 +36,7 @@ app.use('/Leaves', require('./routes/leaves'));
 app.use('/timesheets', require('./routes/timesheet'));
 app.use('/attendance', require('./routes/attendance'));
 app.use('/payroll', require('./routes/payroll'));
+app.use('/dashboard', require('./routes/dashboard'));
 
 // Error handler
 app.use(errorHandler);

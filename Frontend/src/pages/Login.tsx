@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
 import { toast } from "react-toastify";
-import "./Login.css";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 
 const Login = () => {
@@ -34,6 +33,7 @@ const Login = () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("creatorName", userName);
         localStorage.setItem("roles", JSON.stringify(data.roles || []));
+        localStorage.setItem("userProfile", JSON.stringify(data.user || {}));
 
         toast.success("Login successful!");
         setTimeout(() => {

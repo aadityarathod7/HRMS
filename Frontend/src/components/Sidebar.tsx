@@ -93,79 +93,46 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
     navigate("/payroll-management");
   };
 
-  const menuItems = [
-    { icon: Home, label: "Home", onClick: handleHomeClick },
+  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
+  const isManager = userRoles.includes("MANAGER");
+
+  const allMenuItems = [
+    { icon: Home, label: "Home", onClick: handleHomeClick, roles: "ALL" },
     {
-      icon: UserCog,
-      label: "Employee Management",
-      onClick: handleEmployeeManagementClick,
-      submenu: [
-        {
-          icon: Users,
-          label: "EmployeeList",
-          onClick: handleEmployeeListClick,
-        },
-      ],
+      icon: UserCog, label: "Employee Management", onClick: handleEmployeeManagementClick,
+      roles: "ADMIN_HR",
+      submenu: [{ icon: Users, label: "Employee List", onClick: handleEmployeeListClick }],
       isOpen: isEmployeeManagementOpen,
     },
+    { icon: UserCog, label: "Role Management", onClick: handleRoleManagementClick, roles: "ADMIN_HR" },
+    { icon: Users, label: "Department Management", onClick: handleDepartmentManagementClick, roles: "ADMIN_HR" },
     {
-      icon: UserCog,
-      label: "Role Management",
-      onClick: handleRoleManagementClick,
-    },
-    {
-      icon: Users,
-      label: "Department Management",
-      onClick: handleDepartmentManagementClick,
-    },
-    {
-      icon: FileText,
-      label: "Leave Management",
-      onClick: handleLeaveManagementClick,
+      icon: FileText, label: "Leave Management", onClick: handleLeaveManagementClick,
+      roles: "ALL",
       submenu: [
-        {
-          icon: Users,
-          label: "Apply Leave",
-          onClick: () => navigate("/leave-application"),
-        },
-        {
-          icon: Users,
-          label: "Manage Leaves",
-          onClick: () => navigate("/leave-management"),
-        },
-        {
-          icon: Users,
-          label: "Employee Leaves",
-          onClick: () => navigate("/employee-leave-management"),
-        },
+        { icon: Users, label: "Apply Leave", onClick: () => navigate("/leave-application") },
+        ...(isAdminOrHR || isManager ? [
+          { icon: Users, label: "Manage Leaves", onClick: () => navigate("/leave-management") },
+          { icon: Users, label: "Employee Leaves", onClick: () => navigate("/employee-leave-management") },
+        ] : []),
+        { icon: Users, label: "Leave Balance", onClick: () => navigate("/leave-balance") },
       ],
       isOpen: isLeaveManagementOpen,
     },
-    {
-      icon: Home,
-      label: "Project Management",
-      onClick: handleProjectManagementClick,
-    },
-    {
-      icon: Clock,
-      label: "Timesheet Management",
-      onClick: handleTimeSheetManagementClick,
-    },
-    {
-      icon: Users,
-      label: "Attendance Management",
-      onClick: handleAttendanceManagementClick,
-    },
-    {
-      icon: DollarSign,
-      label: "Payroll Management",
-      onClick: handlePayRoleManagementClick,
-    },
-    { icon: FileText, label: "Documents", onClick: handleDocumentsClick },
-    // { icon: Users, label: "Team", onClick: handleTeamClick },
-    { icon: Settings, label: "Settings", onClick: handleSettingsClick },
-    { icon: LogOut, label: "Logout", onClick: handleLogout },
+    { icon: Home, label: "Project Management", onClick: handleProjectManagementClick, roles: "ALL" },
+    { icon: Clock, label: "Timesheet", onClick: handleTimeSheetManagementClick, roles: "ALL" },
+    { icon: Users, label: "Attendance", onClick: handleAttendanceManagementClick, roles: "ALL" },
+    { icon: DollarSign, label: "Payroll", onClick: handlePayRoleManagementClick, roles: "ADMIN_HR" },
+    { icon: FileText, label: "Documents", onClick: handleDocumentsClick, roles: "ALL" },
+    { icon: LogOut, label: "Logout", onClick: handleLogout, roles: "ALL" },
   ];
+
+  const menuItems = allMenuItems.filter(item => {
+    if (item.roles === "ALL") return true;
+    if (item.roles === "ADMIN_HR") return isAdminOrHR;
+    return false;
+  });
   return (
     <div
       className={`fixed left-0 top-20 h-[calc(100vh-5rem)] bg-gradient-to-b from-gray-50 to-blue-50 backdrop-blur-md border-r border-gray-200 sidebar-transition ${

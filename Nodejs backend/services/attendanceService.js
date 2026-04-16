@@ -20,7 +20,7 @@ const getAttendanceByStatus = async (status) => {
 };
 
 const getAttendanceByUser = async (userId) => {
-  return await Attendance.find({ userId }).sort({ date: -1 });
+  return await Attendance.find({ userId }).populate('userId', 'firstname lastname userName').sort({ date: -1 });
 };
 
 const getAttendanceByDate = async (date) => {

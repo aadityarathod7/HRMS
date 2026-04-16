@@ -10,7 +10,7 @@ router.post('/login', async (req, res, next) => {
   try {
     const { userName, password } = req.body;
 
-    const user = await User.findOne({ userName }).populate('roles');
+    const user = await User.findOne({ userName }).populate('roles').populate('department', 'departmentName');
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -23,16 +23,25 @@ router.post('/login', async (req, res, next) => {
     const roles = user.roles.map(r => r.role);
 
     const token = jwt.sign(
-      {
-        id: user._id,
-        username: user.userName,
-        roles
-      },
+      { id: user._id, username: user.userName, roles },
       process.env.JWT_SECRET,
-      { expiresIn: '30h' }
+      { expiresIn: '8h' }
     );
 
-    res.json({ token, roles });
+    res.json({
+      token,
+      roles,
+      user: {
+        id: user._id,
+        employeeId: user.employeeId,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        department: user.department,
+        designation: user.designation,
+        profilePicture: user.profilePicture
+      }
+    });
   } catch (error) {
     next(error);
   }

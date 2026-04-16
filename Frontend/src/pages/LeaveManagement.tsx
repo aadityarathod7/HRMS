@@ -11,7 +11,7 @@ import { KeyboardArrowDown } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 type LeaveDto = {
-  leaveRequestId: number;
+  id: string;
   userId: number;
   reportingManagerId: number;
   leaveStartDate: string;
@@ -262,7 +262,7 @@ const LeaveManagement: React.FC = () => {
         );
 
         if (response.status === 204) {
-          setUsers(users.filter((user) => user.leaveRequestId !== id));
+          setUsers(users.filter((user) => user.id !== id));
         } else {
           throw new Error("Failed to delete Leave request");
         }
@@ -447,11 +447,11 @@ const LeaveManagement: React.FC = () => {
                 users.map((Leave, index) => {
                   return (
                     <tr
-                      key={`${Leave.leaveRequestId}-${index}`}
+                      key={`${Leave.id}-${index}`}
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
                       <td className="px-4 py-3 text-gray-800 text-sm">
-                        {Leave.leaveRequestId}
+                        {Leave.id}
                       </td>
                       <td className="px-4 py-3 text-gray-800 text-sm">
                         {new Date(Leave.leaveStartDate).toLocaleDateString()}
@@ -464,7 +464,7 @@ const LeaveManagement: React.FC = () => {
                       <td className="px-4 py-3">
                         <div className="flex space-x-3">
                           <Link
-                            to={`/view-Leave/${Leave.leaveRequestId}`}
+                            to={`/view-Leave/${Leave.id}`}
                             className="text-blue-600 hover:text-blue-800 transition-colors duration-150"
                             title="View"
                           >
@@ -472,7 +472,7 @@ const LeaveManagement: React.FC = () => {
                           </Link>
                           {selectedStatus === "PENDING" && (
                             <button
-                              onClick={() => isAdminOrHR && handleDelete(Leave.leaveRequestId)}
+                              onClick={() => isAdminOrHR && handleDelete(Leave.id)}
                               className="text-gray-500 hover:text-gray-700 text-sm"
                               title="Delete"
                             >

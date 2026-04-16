@@ -1,50 +1,77 @@
 const express = require('express');
 const router = express.Router();
-const leaveRequestService = require('../services/leaveRequestService');
+const leaveService = require('../services/leaveRequestService');
 const { authenticate, authorize } = require('../middleware/auth');
 
 router.post('/submit', authenticate, async (req, res, next) => {
-  try { res.status(201).json(await leaveRequestService.createLeaveRequest(req.body)); }
+  try { res.status(201).json(await leaveService.createLeaveRequest(req.body)); }
   catch (error) { next(error); }
 });
 
 router.put('/update/:id', authenticate, async (req, res, next) => {
-  try { res.json(await leaveRequestService.updateLeaveRequest(req.params.id, req.body)); }
+  try { res.json(await leaveService.updateLeaveRequest(req.params.id, req.body)); }
+  catch (error) { next(error); }
+});
+
+router.put('/approve/:id', authenticate, authorize('ADMIN', 'HR', 'MANAGER'), async (req, res, next) => {
+  try { res.json(await leaveService.approveLeaveRequest(req.params.id, req.user.id)); }
+  catch (error) { next(error); }
+});
+
+router.put('/reject/:id', authenticate, authorize('ADMIN', 'HR', 'MANAGER'), async (req, res, next) => {
+  try { res.json(await leaveService.rejectLeaveRequest(req.params.id, req.user.id, req.body.rejectionReason)); }
+  catch (error) { next(error); }
+});
+
+router.put('/cancel/:id', authenticate, async (req, res, next) => {
+  try { res.json(await leaveService.cancelLeaveRequest(req.params.id)); }
   catch (error) { next(error); }
 });
 
 router.delete('/delete/:id', authenticate, authorize('ADMIN', 'HR'), async (req, res, next) => {
-  try { await leaveRequestService.deleteLeaveRequest(req.params.id); res.status(204).send(); }
+  try { await leaveService.deleteLeaveRequest(req.params.id); res.status(204).send(); }
+  catch (error) { next(error); }
+});
+
+router.get('/balance/:userId', authenticate, async (req, res, next) => {
+  try {
+    const year = req.query.year || new Date().getFullYear();
+    res.json(await leaveService.getLeaveBalance(req.params.userId, year));
+  } catch (error) { next(error); }
+});
+
+router.get('/user/:userId', authenticate, async (req, res, next) => {
+  try { res.json(await leaveService.getLeavesByUser(req.params.userId)); }
   catch (error) { next(error); }
 });
 
 router.get('/approved', authenticate, async (req, res, next) => {
-  try { res.json(await leaveRequestService.getApprovedLeaves()); }
+  try { res.json(await leaveService.getApprovedLeaves()); }
   catch (error) { next(error); }
 });
 
 router.get('/pending', authenticate, async (req, res, next) => {
-  try { res.json(await leaveRequestService.getPendingLeaves()); }
+  try { res.json(await leaveService.getPendingLeaves()); }
   catch (error) { next(error); }
 });
 
 router.get('/rejected', authenticate, async (req, res, next) => {
-  try { res.json(await leaveRequestService.getRejectedLeaves()); }
+  try { res.json(await leaveService.getRejectedLeaves()); }
   catch (error) { next(error); }
 });
 
 router.get('/status/:status', authenticate, async (req, res, next) => {
-  try { res.json(await leaveRequestService.getLeavesByStatus(req.params.status)); }
+  try { res.json(await leaveService.getLeavesByStatus(req.params.status)); }
   catch (error) { next(error); }
 });
 
 router.get('/:id', authenticate, async (req, res, next) => {
-  try { res.json(await leaveRequestService.getLeaveRequestById(req.params.id)); }
+  try { res.json(await leaveService.getLeaveRequestById(req.params.id)); }
   catch (error) { next(error); }
 });
 
 router.get('/', authenticate, async (req, res, next) => {
-  try { res.json(await leaveRequestService.getAllLeaveRequests()); }
+  try { res.json(await leaveService.getAllLeaveRequests()); }
   catch (error) { next(error); }
 });
 

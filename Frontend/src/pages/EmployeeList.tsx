@@ -178,30 +178,14 @@ const EmployeeList: React.FC = () => {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Full Name
-                </th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Username
-                </th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Email
-                </th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Branch
-                </th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Date of Joining
-                </th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Contact Number
-                </th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Roles
-                </th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
-                  Created By
-                </th>
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Emp ID</th>
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Name</th>
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Department</th>
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Designation</th>
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Email</th>
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Contact</th>
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Joining Date</th>
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Status</th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Actions
                 </th>
@@ -214,40 +198,19 @@ const EmployeeList: React.FC = () => {
                     key={user.id}
                     className="hover:bg-gray-50 transition-colors duration-150"
                   >
-                    <td className="px-4 py-3 text-gray-800 text-sm">
-                      {`${user.firstname || "No First Name"} ${
-                        user.lastname || ""
-                      }`.trim()}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 text-sm">
-                      {user.userName || "No Username"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 text-sm">
-                      {user.email || "No Email"}
-                    </td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{user.employeeId || "-"}</td>
+                    <td className="px-4 py-3 text-gray-800 text-sm">{`${user.firstname || ""} ${user.lastname || ""}`.trim() || "-"}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{user.department?.departmentName || "-"}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{user.designation || "-"}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{user.email || "-"}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{user.contactNumber || "-"}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{user.dateOfJoining ? new Date(user.dateOfJoining).toLocaleDateString() : "-"}</td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {user.branch || "No Branch"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 text-sm">
-                      {user.dateOfJoining ? new Date(user.dateOfJoining).toLocaleDateString() : "No Date of Joining"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 text-sm">
-                      {user.contactNumber || "No Contact Number"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 text-sm">
-                      {user.roles && user.roles.length > 0
-                        ? user.roles
-                            .map(
-                              (roleObj) =>
-                                roleLabels[roleObj.role] || roleObj.role
-                            )
-                            .join(", ")
-                        : "No Roles"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 text-sm">
-                      {user.createdBy || "No Creator"}
+                      <span className={`px-2 py-0.5 text-xs rounded ${
+                        user.status === 'ACTIVE' ? 'bg-blue-100 text-blue-700' :
+                        user.status === 'PROBATION' ? 'bg-blue-50 text-blue-600' :
+                        'bg-blue-200 text-blue-900'
+                      }`}>{user.status || (user.isActive ? 'ACTIVE' : 'INACTIVE')}</span>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex space-x-3">
