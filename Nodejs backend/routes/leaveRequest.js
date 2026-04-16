@@ -40,6 +40,39 @@ router.get('/balance/:userId', authenticate, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+// PUT /leaverequests/balance/update — Assign/update leave balance (HR/Admin only)
+router.put('/balance/update', authenticate, authorize('ADMIN', 'HR'), async (req, res, next) => {
+  try {
+    const { userId, leaveType, totalAllotted, year } = req.body;
+    if (!userId || !leaveType || totalAllotted === undefined) {
+      return res.status(400).json({ message: 'userId, leaveType, and totalAllotted are required' });
+    }
+    const LeaveBalance = require('../models/LeaveBalance');
+    const balanceYear = year || new Date().getFullYear();
+    let balance = await LeaveBalance.findOne({ userId, leaveType, year: balanceYear });
+    if (balance) {
+      balance.totalAllotted = totalAllotted;
+      balance.available = totalAllotted - balance.used;
+      await balance.save();
+    } else {
+      balance = await LeaveBalance.create({ userId, leaveType, totalAllotted, used: 0, available: totalAllotted, year: balanceYear });
+    }
+    res.json(balance);
+  } catch (error) { next(error); }
+});
+
+// GET /leaverequests/balance/all — Get all employees' leave balances (HR/Admin)
+router.get('/balance/all/:year?', authenticate, authorize('ADMIN', 'HR'), async (req, res, next) => {
+  try {
+    const LeaveBalance = require('../models/LeaveBalance');
+    const year = req.params.year || new Date().getFullYear();
+    const balances = await LeaveBalance.find({ year })
+      .populate('userId', 'firstname lastname employeeId department')
+      .sort({ userId: 1, leaveType: 1 });
+    res.json(balances);
+  } catch (error) { next(error); }
+});
+
 router.get('/user/:userId', authenticate, async (req, res, next) => {
   try { res.json(await leaveService.getLeavesByUser(req.params.userId)); }
   catch (error) { next(error); }
