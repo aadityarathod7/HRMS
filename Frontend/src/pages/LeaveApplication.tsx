@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
-import "./LeaveApplication.css";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
+import Footer from "@/components/Footer";
+
+const LEAVE_TYPES = ["CASUAL", "SICK", "ANNUAL", "MATERNITY", "PATERNITY"];
 
 const LeaveApplication = () => {
   const [loading, setLoading] = useState(false);
@@ -16,181 +17,122 @@ const LeaveApplication = () => {
     description: "",
   });
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
-  const handleleaveRegistration = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    const requestBody = {
-      userId: formData.userId,
-      reportingManagerId: formData.reportingManagerId,
-      leaveStartDate: formData.leaveStartDate,
-      leaveEndDate: formData.leaveEndDate,
-      leaveType: formData.leaveType,
-      description: formData.description,
-    };
-
     try {
       const token = localStorage.getItem("token");
-      console.log("Sending request with body:", requestBody);
-
-      const response = await fetch(
-        "http://localhost:5000/leaverequests/submit",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
-
+      const response = await fetch("http://localhost:5000/leaverequests/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(formData),
+      });
       if (response.status === 201) {
-        const data = await response.json();
-        toast.success("leave created successfully!");
-        setFormData({
-          userId: null,
-          reportingManagerId: null,
-          leaveStartDate: "",
-          leaveEndDate: "",
-          leaveType: "",
-          description: "",
-        });
+        toast.success("Leave application submitted!");
+        setFormData({ userId: "", reportingManagerId: "", leaveStartDate: "", leaveEndDate: "", leaveType: "", description: "" });
       } else {
         const errorData = await response.text();
-        console.error("Error Response:", errorData);
-        toast.error(errorData || "Failed to create leave");
+        toast.error(errorData || "Failed to submit leave");
       }
     } catch (error) {
-      console.error("Error creating leave:", error);
-      toast.error("Failed to create leave. Please try again.");
+      toast.error("Failed to submit. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex">
-      <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
-      <div
-        className={`flex-1 ${
-          isCollapsed ? "ml-8" : "ml-60"
-        } mt-10 flex justify-center items-center`}
-      >
-        <Navbar toggleSidebar={toggleSidebar} />
-        <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6">
-          <div className="space-y-1 text-center mb-4">
-            <h2 className="text-3xl font-light tracking-tight text-gray-900">
-              Leave Application
-            </h2>
-          </div>
-          <form onSubmit={handleleaveRegistration}>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="text"
-                  name="userId"
-                  value={formData.userId}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>User ID</label>
-              </div>
-            </div>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="text"
-                  name="reportingManagerId"
-                  value={formData.reportingManagerId}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>Reporting Manager ID</label>
-              </div>
-            </div>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="date"
-                  name="leaveStartDate"
-                  value={formData.leaveStartDate}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>Leave Start Date</label>
-              </div>
-            </div>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="date"
-                  name="leaveEndDate"
-                  value={formData.leaveEndDate}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>Leave End Date</label>
-              </div>
-            </div>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="text"
-                  name="leaveType"
-                  value={formData.leaveType}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>Leave Type</label>
-              </div>
-            </div>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="text"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>Description</label>
-              </div>
-            </div>
+    <div className="flex flex-col bg-gray-100 min-h-screen">
+      <Sidebar isCollapsed={isCollapsed} />
+      <Navbar toggleSidebar={toggleSidebar} />
+      <div className={`flex flex-col flex-grow transition-all duration-300 ${isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"}`}>
+        <div className="pt-28 px-5 pb-5 flex-grow flex justify-center items-start">
+          <div className="w-full">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
+              <h2 className="text-2xl font-light tracking-tight text-gray-900 mb-8">
+                Leave Application
+              </h2>
 
-            <div className="mt-6">
-              <Button
-                type="submit"
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-all duration-300"
-                disabled={loading}
-              >
-                {loading ? "Registering..." : "Apply Leave"}
-              </Button>
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  <div>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">User ID</label>
+                    <input
+                      type="text" name="userId" value={formData.userId} onChange={handleChange} required
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      placeholder="Enter user ID"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Reporting Manager ID</label>
+                    <input
+                      type="text" name="reportingManagerId" value={formData.reportingManagerId} onChange={handleChange} required
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      placeholder="Enter manager ID"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Start Date</label>
+                    <input
+                      type="date" name="leaveStartDate" value={formData.leaveStartDate} onChange={handleChange} required
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">End Date</label>
+                    <input
+                      type="date" name="leaveEndDate" value={formData.leaveEndDate} onChange={handleChange} required
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Leave Type</label>
+                    <select
+                      name="leaveType" value={formData.leaveType} onChange={handleChange} required
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="">Select type</option>
+                      {LEAVE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Description</label>
+                  <textarea
+                    name="description" value={formData.description} onChange={handleChange} required rows={3}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+                    placeholder="Reason for leave..."
+                  />
+                </div>
+
+                <div className="mt-6 flex gap-3">
+                  <button
+                    type="submit"
+                    className="bg-blue-600 text-white px-6 py-2.5 rounded-md hover:bg-blue-500 transition text-sm"
+                    disabled={loading}
+                  >
+                    {loading ? "Submitting..." : "Submit Application"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ userId: "", reportingManagerId: "", leaveStartDate: "", leaveEndDate: "", leaveType: "", description: "" })}
+                    className="border border-gray-300 text-gray-600 bg-white px-6 py-2.5 rounded-md hover:bg-gray-50 transition text-sm"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
+        <Footer />
       </div>
     </div>
   );

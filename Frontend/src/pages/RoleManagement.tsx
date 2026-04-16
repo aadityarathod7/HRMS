@@ -302,21 +302,15 @@ const RoleManagement: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 min-h-screen p-5">
+    <div className="flex flex-col bg-gray-100 min-h-screen">
       <DashboardSidebar isCollapsed={isCollapsed} />
       <DashboardNavbar toggleSidebar={toggleSidebar} />
 
-      <div className={`mt-5 flex justify-end w-full gap-4`}>
+      <div className={`pt-28 flex justify-end w-full gap-4 px-6`}>
         <div className="flex gap-2">
-          <label
-            htmlFor="userStatus"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Role Status
-          </label>
-          <div className="relative mt-20">
+          <div className="relative">
             <select
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:bg-blue-500 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+              className="border border-blue-600 text-blue-600 bg-white px-5 py-2 rounded-md appearance-none pr-10 hover:bg-blue-50 transition text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               value={showInactive ? "inactive" : "active"}
               onChange={handleStatusChange}
             >
@@ -330,7 +324,7 @@ const RoleManagement: React.FC = () => {
         </div>
         {isAdminOrHR && (
           <Link to="/roleregistration">
-            <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
+            <button className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm">
               Add Role
             </button>
           </Link>
@@ -338,30 +332,30 @@ const RoleManagement: React.FC = () => {
       </div>
 
       <div
-        className={`mr-10 w-full max-w-6xl transition-all duration-300 ${
-          isCollapsed ? "ml-40" : "ml-80"
+        className={`transition-all duration-300 px-6 ${
+          isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"
         }`}
       >
         <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200 mt-5">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Role ID
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Role Name
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Description
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Created By
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Created Date
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Actions
                 </th>
               </tr>
@@ -375,12 +369,12 @@ const RoleManagement: React.FC = () => {
                       key={role.id}
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
-                      <td className="p-3 text-gray-700">{role.id}</td>
-                      <td className="p-3 text-gray-700">{role.role}</td>
-                      <td className="p-3 text-gray-700">{role.description}</td>
-                      <td className="p-3 text-gray-700">{role.createdBy}</td>
-                      <td className="p-3 text-gray-700">{role.createdDate}</td>
-                      <td className="p-3">
+                      <td className="px-4 py-3 text-gray-800 text-sm">{role.id}</td>
+                      <td className="px-4 py-3 text-gray-800 text-sm">{role.role}</td>
+                      <td className="px-4 py-3 text-gray-800 text-sm">{role.description}</td>
+                      <td className="px-4 py-3 text-gray-800 text-sm">{role.createdBy}</td>
+                      <td className="px-4 py-3 text-gray-800 text-sm">{role.createdDate ? new Date(role.createdDate).toLocaleDateString() : "-"}</td>
+                      <td className="px-4 py-3">
                         <div className="flex space-x-3">
                           <Link
                             to={`/view-role/${role.id}`}
@@ -392,10 +386,10 @@ const RoleManagement: React.FC = () => {
                           {showInactive ? (
                             <button
                               onClick={() => isAdminOrHR && handleActivateRole(role.id)}
-                              className="text-green-600 hover:text-green-800 transition-colors duration-150"
+                              className="text-blue-600 hover:text-blue-800 text-sm"
                               title="Activate"
                             >
-                              <CheckCircle />
+                              Activate
                             </button>
                           ) : (
                             <button
@@ -406,10 +400,10 @@ const RoleManagement: React.FC = () => {
                                 );
                                 handleDeactivateRole(role.id);
                               }}
-                              className="text-red-600 hover:text-red-800 transition-colors duration-150"
+                              className="text-gray-500 hover:text-gray-700 text-sm"
                               title="Deactivate"
                             >
-                              <RemoveCircleOutline />
+                              Deactivate
                             </button>
                           )}
                         </div>

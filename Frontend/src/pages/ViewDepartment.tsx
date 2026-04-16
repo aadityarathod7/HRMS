@@ -88,21 +88,21 @@ const ViewDepartment: React.FC = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="bg-blue-50 shadow-lg rounded-lg p-8 w-1/2 ml-40 mt-20 mb-20">
-        <DashboardSidebar isCollapsed={isCollapsed} />
-        <DashboardNavbar toggleSidebar={toggleSidebar} />
+    <div className="flex flex-col bg-gray-100 min-h-screen">
+      <DashboardSidebar isCollapsed={isCollapsed} />
+      <DashboardNavbar toggleSidebar={toggleSidebar} />
+      <div className={`flex flex-col flex-grow transition-all duration-300 ${isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"}`}><div className="pt-28 px-5 pb-5 flex-grow flex justify-center items-start"><div className="w-full max-w-2xl mb-20"><div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
         <div className="flex justify-end mb-4">
           {isEditing ? (
             <>
               <button
-                className="bg-green-600 text-white px-4 py-2 rounded"
+                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 transition text-sm"
                 onClick={handleSaveDepartment}
               >
                 Save
               </button>
               <button
-                className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+                className="border border-gray-300 text-gray-600 bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition text-sm ml-2"
                 onClick={() => setIsEditing(false)}
               >
                 Cancel
@@ -110,14 +110,14 @@ const ViewDepartment: React.FC = () => {
             </>
           ) : (
             <button
-              className="bg-blue-600 text-white px-4 py-2 rounded"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 transition text-sm"
               onClick={() => isAdminOrHR && setIsEditing(true)}
             >
               Edit
             </button>
           )}
           <button
-            className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+            className="border border-gray-300 text-gray-600 bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition text-sm ml-2"
             onClick={() => navigate(-1)}
           >
             Back
@@ -188,6 +188,9 @@ const ViewDepartment: React.FC = () => {
         ) : (
           <p>No department details available.</p>
         )}
+      </div>
+      </div>
+      </div>
       </div>
     </div>
   );

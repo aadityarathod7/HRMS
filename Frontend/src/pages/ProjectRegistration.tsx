@@ -1,202 +1,80 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import "./ProjectRegistration.css";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
+import Footer from "@/components/Footer";
+
+const inputClass = "w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500";
+const labelClass = "block text-xs text-gray-500 uppercase tracking-wider mb-1.5";
 
 const ProjectRegistration = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
-  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    teamMembers: "",
-    startDate: "",
-    endDate: "",
-    status: "ACTIVE",
-  });
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const [formData, setFormData] = useState({ name: "", description: "", teamMembers: "", startDate: "", endDate: "", status: "ACTIVE" });
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
-  const handleprojectRegistration = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    // Constructing the new project object
-    const newProject = {
-      // projectId: "P12345", // You may want to generate this dynamically
-      name: formData.name,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-      description: formData.description,
-      teamMembers: formData.teamMembers,
-      status: formData.status,
-    };
-
     try {
       const token = localStorage.getItem("token");
-      console.log("Sending request with body:", newProject);
-
       const response = await fetch("http://localhost:5000/project/create", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newProject),
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(formData),
       });
-
       if (response.ok) {
-        const data = await response.json();
         toast.success("Project created successfully!");
-        console.log("Created Project:", data);
-        setFormData({
-          name: "",
-          description: "",
-          teamMembers: "",
-          startDate: "",
-          endDate: "",
-          status: "ACTIVE", // Reset to default status
-        });
+        navigate("/project-management");
       } else {
-        const errorData = await response.text();
-        console.error("Error Response:", errorData);
-        toast.error(errorData || "Failed to create project");
+        const err = await response.text();
+        toast.error(err || "Failed to create project");
       }
     } catch (error) {
-      console.error("Error creating project:", error);
       toast.error("Failed to create project. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
-    <div className="min-h-screen flex">
-      <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
-      <div
-        className={`flex-1 ${
-          isCollapsed ? "ml-8" : "ml-60"
-        } mt-10 flex justify-center items-center`}
-      >
-        <Navbar toggleSidebar={toggleSidebar} />
-        <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6">
-          <div className="space-y-1 text-center mb-4">
-            <h2 className="text-3xl font-light tracking-tight text-gray-900">
-              Project Registration
-            </h2>
+    <div className="flex flex-col bg-gray-100 min-h-screen">
+      <Sidebar isCollapsed={isCollapsed} />
+      <Navbar toggleSidebar={toggleSidebar} />
+      <div className={`flex flex-col flex-grow transition-all duration-300 ${isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"}`}>
+        <div className="pt-28 px-5 pb-5 flex-grow flex justify-center items-start">
+          <div className="w-full">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
+              <h2 className="text-2xl font-light tracking-tight text-gray-900 mb-8">Create Project</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  <div className="sm:col-span-2"><label className={labelClass}>Project Name</label><input type="text" name="name" value={formData.name} onChange={handleChange} required className={inputClass} placeholder="e.g. HRMS Portal" /></div>
+                  <div><label className={labelClass}>Start Date</label><input type="date" name="startDate" value={formData.startDate} onChange={handleChange} required className={inputClass} /></div>
+                  <div><label className={labelClass}>End Date</label><input type="date" name="endDate" value={formData.endDate} onChange={handleChange} required className={inputClass} /></div>
+                  <div>
+                    <label className={labelClass}>Status</label>
+                    <select name="status" value={formData.status} onChange={handleChange} required className={inputClass}>
+                      <option value="ACTIVE">Active</option><option value="COMPLETED">Completed</option><option value="ONHOLD">On Hold</option><option value="INACTIVE">Inactive</option>
+                    </select>
+                  </div>
+                  <div><label className={labelClass}>Team Members</label><input type="text" name="teamMembers" value={formData.teamMembers} onChange={handleChange} required className={inputClass} placeholder="Comma separated names" /></div>
+                </div>
+                <div className="mt-5">
+                  <label className={labelClass}>Description</label>
+                  <textarea name="description" value={formData.description} onChange={handleChange} required rows={3} className={`${inputClass} resize-none`} placeholder="Project description..." />
+                </div>
+                <div className="mt-6 flex gap-3">
+                  <button type="submit" className="bg-blue-600 text-white px-6 py-2.5 rounded-md hover:bg-blue-500 transition text-sm" disabled={loading}>{loading ? "Creating..." : "Create Project"}</button>
+                  <button type="button" onClick={() => navigate(-1)} className="border border-gray-300 text-gray-600 bg-white px-6 py-2.5 rounded-md hover:bg-gray-50 transition text-sm">Cancel</button>
+                </div>
+              </form>
+            </div>
           </div>
-          <form onSubmit={handleprojectRegistration}>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>Project Name</label>
-              </div>
-            </div>
-            <div className="mt-6"></div>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="text"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>Description</label>
-              </div>
-            </div>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="text"
-                  name="teamMembers"
-                  value={formData.teamMembers}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>Team Members</label>
-              </div>
-            </div>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>Start Date</label>
-              </div>
-            </div>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="date"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>End Date</label>
-              </div>
-            </div>
-            <div className="mt-6">
-              <div className="txt_field">
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                >
-                   <option value="ACTIVE">Active</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="ONHOLD">On Hold</option>
-              <option value="INACTIVE">Inactive</option>
-                </select>
-                <span></span>
-                <label>Status</label>
-              </div>
-            </div>
-            <div className="mt-6">
-              <Button
-                type="submit"
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-all duration-300"
-                disabled={loading}
-              >
-                {loading ? "Registering..." : "Register project"}
-              </Button>
-            </div>
-          </form>
         </div>
+        <Footer />
       </div>
     </div>
   );

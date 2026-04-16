@@ -108,7 +108,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 
   return (
     <>
-      <nav className="h-20 backdrop-blur-sm bg-white/80 border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
+      <nav className="h-20 backdrop-blur-sm bg-white/80 border-b border-gray-200 fixed top-0 left-0 right-0 z-[60]">
         <div className="h-full px-4 mx-auto flex items-center justify-between">
           {/* Left: Hamburger + Logo */}
           <div className="flex items-center gap-4">
@@ -220,7 +220,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
             {/* CTA Button - matching website style */}
             <Button
               onClick={handleLogout}
-              className="ml-2 hidden sm:inline-flex bg-blue-600 hover:bg-blue-500 text-white font-light rounded-md px-4 py-2 text-sm"
+              className="ml-2 hidden sm:inline-flex bg-blue-600 hover:bg-blue-500 text-white rounded-md px-4 py-2 text-sm"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Logout

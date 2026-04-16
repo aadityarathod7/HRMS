@@ -223,6 +223,7 @@ const DepartmentManagement: React.FC = () => {
           `http://localhost:5000/departments/deactivate/${id}`,
           {
             method: "PATCH",
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }
         );
 
@@ -245,6 +246,7 @@ const DepartmentManagement: React.FC = () => {
           `http://localhost:5000/departments/activate/${id}`,
           {
             method: "PUT",
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }
         );
 
@@ -305,21 +307,15 @@ const DepartmentManagement: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 min-h-screen p-5">
+    <div className="flex flex-col bg-gray-100 min-h-screen">
       <DashboardSidebar isCollapsed={isCollapsed} />
       <DashboardNavbar toggleSidebar={toggleSidebar} />
 
-      <div className={`mt-5 flex justify-end w-full gap-4`}>
+      <div className={`pt-28 flex justify-end w-full gap-4 px-6`}>
         <div className="flex gap-2">
-          <label
-            htmlFor="userStatus"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Department Status
-          </label>
-          <div className="relative mt-20">
+          <div className="relative">
             <select
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:bg-blue-500 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+              className="border border-blue-600 text-blue-600 bg-white px-5 py-2 rounded-md appearance-none pr-10 hover:bg-blue-50 transition text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               value={showInactive ? "inactive" : "active"}
               onChange={handleStatusChange}
             >
@@ -333,7 +329,7 @@ const DepartmentManagement: React.FC = () => {
         </div>
         {isAdminOrHR && (
           <Link to="/department-registration">
-            <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
+            <button className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm">
               Add Department
             </button>
           </Link>
@@ -341,30 +337,30 @@ const DepartmentManagement: React.FC = () => {
       </div>
 
       <div
-        className={`mr-10 w-full max-w-6xl transition-all duration-300 ${
-          isCollapsed ? "ml-40" : "ml-80"
+        className={`transition-all duration-300 px-6 ${
+          isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"
         }`}
       >
         <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200 mt-5">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Department ID
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Department Name
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Contact Person
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Created By
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Created Date
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Actions
                 </th>
               </tr>
@@ -377,22 +373,22 @@ const DepartmentManagement: React.FC = () => {
                       key={department.departmentId}
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
-                      <td className="p-3 text-gray-700">
+                      <td className="px-4 py-3 text-gray-800 text-sm">
                         {department.departmentId}
                       </td>
-                      <td className="p-3 text-gray-700">
+                      <td className="px-4 py-3 text-gray-800 text-sm">
                         {department.departmentName}
                       </td>
-                      <td className="p-3 text-gray-700">
+                      <td className="px-4 py-3 text-gray-800 text-sm">
                         {department.contactPerson}
                       </td>
-                      <td className="p-3 text-gray-700">
+                      <td className="px-4 py-3 text-gray-800 text-sm">
                         {department.createdBy || "Unknown"}
                       </td>
-                      <td className="p-3 text-gray-700">
-                        {department.createdDate}
+                      <td className="px-4 py-3 text-gray-800 text-sm">
+                        {department.createdDate ? new Date(department.createdDate).toLocaleDateString() : "-"}
                       </td>
-                      <td className="p-3">
+                      <td className="px-4 py-3">
                         <div className="flex space-x-3">
                           <Link
                             to={`/view-department/${department.departmentId}`}
@@ -408,10 +404,10 @@ const DepartmentManagement: React.FC = () => {
                                   department.departmentId
                                 )
                               }
-                              className="text-green-600 hover:text-green-800 transition-colors duration-150"
+                              className="text-blue-600 hover:text-blue-800 text-sm"
                               title="Activate"
                             >
-                              <CheckCircle />
+                              Activate
                             </button>
                           ) : (
                             <button
@@ -420,10 +416,10 @@ const DepartmentManagement: React.FC = () => {
                                   department.departmentId
                                 );
                               }}
-                              className="text-red-600 hover:text-red-800 transition-colors duration-150"
+                              className="text-gray-500 hover:text-gray-700 text-sm"
                               title="Deactivate"
                             >
-                              <RemoveCircleOutline />
+                              Deactivate
                             </button>
                           )}
                         </div>

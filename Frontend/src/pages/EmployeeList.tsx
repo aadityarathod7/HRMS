@@ -27,8 +27,10 @@ const EmployeeList: React.FC = () => {
     const username = localStorage.getItem("username"); // Retrieve username from local storage
     console.log("Username from local storage:", username); // Debugging log
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/user/all?isActive=${isActive ? 1 : 0}`
+        `http://localhost:5000/user/all?isActive=${isActive ? 1 : 0}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -72,10 +74,12 @@ const EmployeeList: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to deactivate this employee?")) {
       try {
+        const token = localStorage.getItem("token");
         const response = await fetch(
           `http://localhost:5000/user/deactivate/${id}`,
           {
             method: "PUT",
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
 
@@ -95,10 +99,12 @@ const EmployeeList: React.FC = () => {
   const handleActivate = async (id: number) => {
     if (window.confirm("Are you sure you want to activate this employee?")) {
       try {
+        const token = localStorage.getItem("token");
         const response = await fetch(
           `http://localhost:5000/user/activate/${id}`,
           {
             method: "PUT",
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
 
@@ -130,15 +136,15 @@ const EmployeeList: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 min-h-screen p-5">
+    <div className="flex flex-col bg-gray-100 min-h-screen">
       <DashboardSidebar isCollapsed={isCollapsed} />
       <DashboardNavbar toggleSidebar={toggleSidebar} />
 
-      <div className={`mt-5 flex justify-end w-full gap-4`}>
+      <div className={`pt-28 flex justify-end w-full gap-4 px-6`}>
         <div className="flex gap-2">
-          <div className="relative mt-20">
+          <div className="relative">
             <select
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:bg-blue-500 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+              className="border border-blue-600 text-blue-600 bg-white px-5 py-2 rounded-md appearance-none pr-10 hover:bg-blue-50 transition text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               value={showInactive ? "inactive" : "active"}
               onChange={(e) => {
                 const isActive = e.target.value === "active";
@@ -156,7 +162,7 @@ const EmployeeList: React.FC = () => {
         </div>
         {isAdminOrHR && (
           <Link to="/employeeregistration">
-            <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
+            <button className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm">
               Register Employee
             </button>
           </Link>
@@ -164,39 +170,39 @@ const EmployeeList: React.FC = () => {
       </div>
 
       <div
-        className={`mr-10 w-full max-w-6xl transition-all duration-300 ${
-          isCollapsed ? "ml-40" : "ml-80"
+        className={`transition-all duration-300 px-6 ${
+          isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"
         }`}
       >
         <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200 mt-5">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Full Name
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Username
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Email
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Branch
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Date of Joining
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Contact Number
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Roles
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Created By
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Actions
                 </th>
               </tr>
@@ -208,29 +214,29 @@ const EmployeeList: React.FC = () => {
                     key={user.id}
                     className="hover:bg-gray-50 transition-colors duration-150"
                   >
-                    <td className="p-3 text-gray-700">
+                    <td className="px-4 py-3 text-gray-800 text-sm">
                       {`${user.firstname || "No First Name"} ${
                         user.lastname || ""
                       }`.trim()}
                     </td>
-                    <td className="p-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 text-sm">
                       {user.userName || "No Username"}
                     </td>
-                    <td className="p-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 text-sm">
                       {user.email || "No Email"}
                     </td>
-                    <td className="p-3">
+                    <td className="px-4 py-3">
                       <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                         {user.branch || "No Branch"}
                       </span>
                     </td>
-                    <td className="p-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 text-sm">
                       {user.dateOfJoining ? new Date(user.dateOfJoining).toLocaleDateString() : "No Date of Joining"}
                     </td>
-                    <td className="p-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 text-sm">
                       {user.contactNumber || "No Contact Number"}
                     </td>
-                    <td className="p-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 text-sm">
                       {user.roles && user.roles.length > 0
                         ? user.roles
                             .map(
@@ -240,10 +246,10 @@ const EmployeeList: React.FC = () => {
                             .join(", ")
                         : "No Roles"}
                     </td>
-                    <td className="p-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 text-sm">
                       {user.createdBy || "No Creator"}
                     </td>
-                    <td className="p-3">
+                    <td className="px-4 py-3">
                       <div className="flex space-x-3">
                         <Link
                           to={`/view-Employee/${user.id}`}
@@ -255,18 +261,18 @@ const EmployeeList: React.FC = () => {
                         {isAdminOrHR && (showInactive ? (
                           <button
                             onClick={() => handleActivate(user.id)}
-                            className="text-green-600 hover:text-green-800 transition-colors duration-150"
+                            className="text-blue-600 hover:text-blue-800 text-sm"
                             title="Activate"
                           >
-                            <CheckCircle />
+                            Activate
                           </button>
                         ) : (
                           <button
                             onClick={() => handleDelete(user.id)}
-                            className="text-red-600 hover:text-red-800 transition-colors duration-150"
+                            className="text-gray-500 hover:text-gray-700 text-sm"
                             title="Deactivate"
                           >
-                            <RemoveCircleOutline />
+                            Deactivate
                           </button>
                         ))}
                       </div>

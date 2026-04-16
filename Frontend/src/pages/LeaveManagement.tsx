@@ -280,6 +280,7 @@ const LeaveManagement: React.FC = () => {
           `http://localhost:5000/Leaves/activate/${id}`,
           {
             method: "PUT",
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }
         );
 
@@ -384,21 +385,15 @@ const LeaveManagement: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 min-h-screen p-5">
+    <div className="flex flex-col bg-gray-100 min-h-screen">
       <DashboardSidebar isCollapsed={isCollapsed} />
       <DashboardNavbar toggleSidebar={toggleSidebar} />
 
-      <div className={`mt-5 flex justify-end w-full gap-4`}>
+      <div className={`pt-28 flex justify-end w-full gap-4 px-6`}>
         <div className="flex gap-2">
-          <label
-            htmlFor="userStatus"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Leave Status
-          </label>
-          <div className="relative mt-20">
+          <div className="relative">
             <select
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+              className="border border-blue-600 text-blue-600 bg-white px-5 py-2 rounded-md appearance-none pr-10 hover:bg-blue-50 transition text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               value={selectedStatus}
               onChange={handleStatusChange}
             >
@@ -412,37 +407,37 @@ const LeaveManagement: React.FC = () => {
           </div>
         </div>
         <Link to="/leave-balance">
-          <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
+          <button className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm">
             Leave Balance
           </button>
         </Link>
       </div>
 
       <div
-        className={`mr-10 w-full max-w-6xl transition-all duration-300 ${
-          isCollapsed ? "ml-40" : "ml-80"
+        className={`transition-all duration-300 px-6 ${
+          isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"
         }`}
       >
         <div className="overflow-x-auto rounded-lg shadow-lg border border-gray-200 mt-5">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Leave Request ID
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Leave Start Date
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Leave End Date
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Leave Type
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Leave Status
                 </th>
-                <th className="p-3 font-medium text-gray-700 text-left">
+                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                   Actions
                 </th>
               </tr>
@@ -455,18 +450,18 @@ const LeaveManagement: React.FC = () => {
                       key={`${Leave.leaveRequestId}-${index}`}
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
-                      <td className="p-3 text-gray-700">
+                      <td className="px-4 py-3 text-gray-800 text-sm">
                         {Leave.leaveRequestId}
                       </td>
-                      <td className="p-3 text-gray-700">
-                        {Leave.leaveStartDate}
+                      <td className="px-4 py-3 text-gray-800 text-sm">
+                        {new Date(Leave.leaveStartDate).toLocaleDateString()}
                       </td>
-                      <td className="p-3 text-gray-700">
-                        {Leave.leaveEndDate}
+                      <td className="px-4 py-3 text-gray-800 text-sm">
+                        {new Date(Leave.leaveEndDate).toLocaleDateString()}
                       </td>
-                      <td className="p-3 text-gray-700">{Leave.leaveType}</td>
-                      <td className="p-3 text-gray-700">{Leave.leaveStatus}</td>
-                      <td className="p-3">
+                      <td className="px-4 py-3 text-gray-800 text-sm">{Leave.leaveType}</td>
+                      <td className="px-4 py-3 text-gray-800 text-sm">{Leave.leaveStatus}</td>
+                      <td className="px-4 py-3">
                         <div className="flex space-x-3">
                           <Link
                             to={`/view-Leave/${Leave.leaveRequestId}`}
@@ -478,7 +473,7 @@ const LeaveManagement: React.FC = () => {
                           {selectedStatus === "PENDING" && (
                             <button
                               onClick={() => isAdminOrHR && handleDelete(Leave.leaveRequestId)}
-                              className="text-red-600 hover:text-red-800 transition-colors duration-150"
+                              className="text-gray-500 hover:text-gray-700 text-sm"
                               title="Delete"
                             >
                               <DeleteIcon />

@@ -21,6 +21,27 @@ router.get('/get-file-content/:id', authenticate, async (req, res, next) => {
   catch (error) { next(error); }
 });
 
+// Serve raw file for viewing/downloading (supports token as query param for iframe/img)
+router.get('/download/:id', async (req, res, next) => {
+  // Support token from query param for embedded viewers
+  if (req.query.token && !req.headers.authorization) {
+    req.headers.authorization = `Bearer ${req.query.token}`;
+  }
+  return authenticate(req, res, async () => {
+  try {
+    const UploadedFile = require('../models/UploadedFile');
+    const fileRecord = await UploadedFile.findById(req.params.id);
+    if (!fileRecord) return res.status(404).json({ message: 'File not found' });
+    const filePath = path.join(__dirname, '..', 'uploads', fileRecord.fileName);
+    const fs = require('fs');
+    if (!fs.existsSync(filePath)) return res.status(404).json({ message: 'File not found on disk' });
+    res.setHeader('Content-Type', fileRecord.fileType);
+    res.setHeader('Content-Disposition', `inline; filename="${fileRecord.fileName}"`);
+    fs.createReadStream(filePath).pipe(res);
+  } catch (error) { next(error); }
+  });
+});
+
 router.put('/update/:fileId', authenticate, authorize('ADMIN', 'HR'), async (req, res, next) => {
   try { res.json({ message: await fileService.updateFileContent(req.params.fileId, req.body.newContent) }); }
   catch (error) { next(error); }

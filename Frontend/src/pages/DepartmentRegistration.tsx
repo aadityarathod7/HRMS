@@ -1,126 +1,65 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import "./DepartmentRegistration.css";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
+import Footer from "@/components/Footer";
+
+const inputClass = "w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500";
+const labelClass = "block text-xs text-gray-500 uppercase tracking-wider mb-1.5";
 
 const DepartmentRegistration = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
-  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
-  const [formData, setFormData] = useState({
-    department: "",
-    contactPerson: "",
-  });
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [formData, setFormData] = useState({ department: "", contactPerson: "" });
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
-  const handleDepartmentRegistration = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    const requestBody = {
-      departmentName: formData.department,
-      contactPerson: formData.contactPerson,
-      createdBy: "",
-      updatedBy: "",
-    };
-
     try {
       const token = localStorage.getItem("token");
-      console.log("Sending request with body:", requestBody);
-
       const response = await fetch("http://localhost:5000/departments/create", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(requestBody),
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ departmentName: formData.department, contactPerson: formData.contactPerson }),
       });
-
       if (response.status === 201) {
-        const data = await response.json();
         toast.success("Department created successfully!");
-        setFormData({ department: "", contactPerson: "" });
+        navigate("/department-management");
       } else {
-        const errorData = await response.text();
-        console.error("Error Response:", errorData);
-        toast.error(errorData || "Failed to create department");
+        const err = await response.text();
+        toast.error(err || "Failed to create department");
       }
     } catch (error) {
-      console.error("Error creating department:", error);
       toast.error("Failed to create department. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
-    <div className="min-h-screen flex">
-      <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
-      <div
-        className={`flex-1 ${
-          isCollapsed ? "ml-8" : "ml-60"
-        } mt-10 flex justify-center items-center`}
-      >
-        <Navbar toggleSidebar={toggleSidebar} />
-        <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6">
-          <div className="space-y-1 text-center mb-4">
-            <h2 className="text-3xl font-light tracking-tight text-gray-900">
-              Department Registration
-            </h2>
+    <div className="flex flex-col bg-gray-100 min-h-screen">
+      <Sidebar isCollapsed={isCollapsed} />
+      <Navbar toggleSidebar={toggleSidebar} />
+      <div className={`flex flex-col flex-grow transition-all duration-300 ${isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"}`}>
+        <div className="pt-28 px-5 pb-5 flex-grow flex justify-center items-start">
+          <div className="w-full max-w-2xl">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
+              <h2 className="text-2xl font-light tracking-tight text-gray-900 mb-8">Department Registration</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div><label className={labelClass}>Department Name</label><input type="text" value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} required className={inputClass} placeholder="e.g. Engineering" /></div>
+                  <div><label className={labelClass}>Contact Person</label><input type="text" value={formData.contactPerson} onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })} required className={inputClass} placeholder="e.g. John Doe" /></div>
+                </div>
+                <div className="mt-6 flex gap-3">
+                  <button type="submit" className="bg-blue-600 text-white px-6 py-2.5 rounded-md hover:bg-blue-500 transition text-sm" disabled={loading}>{loading ? "Creating..." : "Create Department"}</button>
+                  <button type="button" onClick={() => navigate(-1)} className="border border-gray-300 text-gray-600 bg-white px-6 py-2.5 rounded-md hover:bg-gray-50 transition text-sm">Cancel</button>
+                </div>
+              </form>
+            </div>
           </div>
-          <form onSubmit={handleDepartmentRegistration}>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="text"
-                  name="department"
-                  value={formData.department}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>Department Name</label>
-              </div>
-            </div>
-            <div className="mt-6">
-              <div className="txt_field">
-                <input
-                  type="text"
-                  name="contactPerson"
-                  value={formData.contactPerson}
-                  onChange={handleChange}
-                  required
-                  className="w-full h-40px bg-transparent"
-                />
-                <span></span>
-                <label>Contact Person</label>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <Button
-                type="submit"
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-all duration-300"
-                disabled={loading}
-              >
-                {loading ? "Registering..." : "Register Department"}
-              </Button>
-            </div>
-          </form>
         </div>
+        <Footer />
       </div>
     </div>
   );

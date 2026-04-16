@@ -105,14 +105,14 @@ const TimeSheetManagement: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 min-h-screen">
+    <div className="flex flex-col bg-gray-100 min-h-screen">
       <DashboardSidebar isCollapsed={isCollapsed} />
       <DashboardNavbar toggleSidebar={toggleSidebar} />
-      <div className={`flex flex-col flex-grow w-full max-w-6xl transition-all duration-300 ${isCollapsed ? "ml-40" : "ml-80"}`}>
-        <div className="p-5 flex-grow">
-          <div className="flex justify-end gap-4 mt-24 mb-5">
+      <div className={`flex flex-col flex-grow w-full transition-all duration-300 ${isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"}`}>
+        <div className="pt-28 px-5 pb-5 flex-grow">
+          <div className="flex justify-end gap-4 mb-5">
             <select
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="border border-blue-600 text-blue-600 bg-white px-5 py-2 rounded-md appearance-none pr-10 hover:bg-blue-50 transition text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
             >
@@ -122,7 +122,7 @@ const TimeSheetManagement: React.FC = () => {
               <option value="REJECTED">Rejected</option>
             </select>
             {isAdminOrHR && (
-              <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-500 transition">
+              <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm">
                 {showForm ? "Cancel" : "Add Timesheet"}
               </button>
             )}
@@ -131,7 +131,7 @@ const TimeSheetManagement: React.FC = () => {
           {showForm && isAdminOrHR && (
             <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow border border-gray-200 p-6 mb-5">
               <h3 className="text-lg font-light text-gray-900 mb-4">Add Timesheet Entry</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Employee</label>
                   <select required value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -160,7 +160,7 @@ const TimeSheetManagement: React.FC = () => {
                 </div>
               </div>
               <div className="mt-4 flex justify-end">
-                <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-500 transition">Submit</button>
+                <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm">Submit</button>
               </div>
             </form>
           )}
@@ -169,33 +169,33 @@ const TimeSheetManagement: React.FC = () => {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="p-3 font-medium text-gray-700 text-left">Employee</th>
-                  <th className="p-3 font-medium text-gray-700 text-left">Date</th>
-                  <th className="p-3 font-medium text-gray-700 text-left">Project</th>
-                  <th className="p-3 font-medium text-gray-700 text-left">Hours</th>
-                  <th className="p-3 font-medium text-gray-700 text-left">Task</th>
-                  <th className="p-3 font-medium text-gray-700 text-left">Status</th>
-                  <th className="p-3 font-medium text-gray-700 text-left">Actions</th>
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Employee</th>
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Date</th>
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Project</th>
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Hours</th>
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Task</th>
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Status</th>
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {loading ? (
-                  <tr><td colSpan={7} className="p-5 text-center text-gray-500">Loading...</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400 text-sm">Loading...</td></tr>
                 ) : timesheets.length === 0 ? (
-                  <tr><td colSpan={7} className="p-5 text-center text-gray-500">No timesheet entries found</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400 text-sm">No timesheet entries found</td></tr>
                 ) : timesheets.map((entry) => (
                   <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="p-3 text-gray-700">{typeof entry.userId === 'object' ? `${entry.userId.firstname} ${entry.userId.lastname}` : entry.userId}</td>
-                    <td className="p-3 text-gray-600">{new Date(entry.date).toLocaleDateString()}</td>
-                    <td className="p-3 text-gray-600">{typeof entry.project === 'object' && entry.project ? entry.project.name : "N/A"}</td>
-                    <td className="p-3 text-gray-600">{entry.hoursWorked}h</td>
-                    <td className="p-3 text-gray-600">{entry.taskDescription || "-"}</td>
-                    <td className="p-3">{getStatusBadge(entry.status)}</td>
-                    <td className="p-3">
+                    <td className="px-4 py-3 text-gray-800 text-sm">{typeof entry.userId === 'object' ? `${entry.userId.firstname} ${entry.userId.lastname}` : entry.userId}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{new Date(entry.date).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{typeof entry.project === 'object' && entry.project ? entry.project.name : "N/A"}</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{entry.hoursWorked}h</td>
+                    <td className="px-4 py-3 text-gray-600 text-sm">{entry.taskDescription || "-"}</td>
+                    <td className="px-4 py-3">{getStatusBadge(entry.status)}</td>
+                    <td className="px-4 py-3">
                       {entry.status === "PENDING" && isAdminOrHR && (
                         <div className="flex gap-2">
-                          <button onClick={() => handleApprove(entry.id)} className="text-green-600 hover:text-green-800" title="Approve"><CheckCircle fontSize="small" /></button>
-                          <button onClick={() => handleReject(entry.id)} className="text-red-600 hover:text-red-800" title="Reject"><Close fontSize="small" /></button>
+                          <button onClick={() => handleApprove(entry.id)} className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-500 transition">Approve</button>
+                          <button onClick={() => handleReject(entry.id)} className="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs hover:bg-gray-300 transition">Reject</button>
                         </div>
                       )}
                     </td>

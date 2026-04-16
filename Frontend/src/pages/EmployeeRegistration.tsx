@@ -1,372 +1,115 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "react-toastify";
-import "./EmployeeRegistration.css";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
+import Footer from "@/components/Footer";
 
-const AVAILABLE_ROLES = [
-  { value: "ROLE_USER", label: "User" },
-  { value: "ROLE_ADMIN", label: "Admin" },
-];
-
-const AVAILABLE_BRANCH = [
-  { value: "IT", label: "Information Technology" },
-  { value: "HR", label: "Human Resources" },
-  { value: "BA", label: "Business Analysis" },
-  { value: "FINANCE", label: "Finance" },
-  { value: "OPERATIONS", label: "Operations" },
-  { value: "MARKETING", label: "Marketing" },
-];
-
-const roleLabels = {
-  ROLE_USER: "User",
-  ROLE_ADMIN: "Admin",
-  // Add other roles as needed
-};
+const BRANCHES = ["IT", "HR", "BA", "FINANCE", "OPERATIONS", "MARKETING", "DESIGN", "QA", "SALES"];
+const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const ROLES = ["ADMIN", "HR", "MANAGER", "EMPLOYEE", "INTERN"];
+const inputClass = "w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500";
+const labelClass = "block text-xs text-gray-500 uppercase tracking-wider mb-1.5";
 
 const EmployeeRegistration = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
-  const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [formData, setFormData] = useState({
-    firstname: "",
-    lastname: "",
-    dob: "",
-    bloodGroup: "",
-    branch: "",
-    dateOfJoining: "",
-    gender: "",
-    address: "",
-    contactNumber: "",
-    userName: "",
-    password: "",
-    roles: [
-      { value: "ROLE_USER", label: "User" },
-      { value: "ROLE_ADMIN", label: "Admin" },
-    ],
-    email: "",
+    firstname: "", lastname: "", dob: "", bloodGroup: "", branch: "", dateOfJoining: "",
+    gender: "", address: "", contactNumber: "", userName: "", password: "", roles: [] as string[], email: "",
   });
 
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
-  const handleEmployeeRegistration = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    const username = localStorage.getItem("username");
-
-    const requestBody = {
-      ...formData,
-      roles: formData.roles.length > 0 ? formData.roles : ["ROLE_USER"],
-      createdBy: username,
-    };
-
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:5000/user/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ...formData, createdBy: localStorage.getItem("username") }),
       });
-
       if (response.ok) {
-        toast.success("Employee Registered");
-        setFormData({
-          firstname: "",
-          lastname: "",
-          dob: "",
-          bloodGroup: "",
-          branch: "",
-          dateOfJoining: "",
-          gender: "",
-          address: "",
-          contactNumber: "",
-          userName: "",
-          password: "",
-          roles: [],
-          email: "",
-        });
+        toast.success("Employee registered successfully");
         navigate("/employeelist");
       } else {
-        const errorMessage = await response.text();
-        setErrorMessage(errorMessage);
-        toast.error("Signup failed. Please try again.");
+        const err = await response.text();
+        toast.error(err || "Registration failed");
       }
     } catch (error) {
-      setErrorMessage("An error occurred. Please try again.");
       toast.error("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
-    <div className="min-h-screen flex">
-      <style jsx>{`
-        .txt_field input:focus,
-        .txt_field select:focus {
-          outline: none;
-          box-shadow: none;
-        }
-
-        .txt_field input:-webkit-autofill,
-        .txt_field input:-webkit-autofill:hover,
-        .txt_field input:-webkit-autofill:focus {
-          -webkit-box-shadow: 0 0 0px 1000px white inset;
-        }
-      `}</style>
-      <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
-      <div
-        className={`flex-1 ${
-          isCollapsed ? "ml-8" : "ml-60"
-        } mt-10 flex justify-center items-center`}
-      >
-        <Navbar toggleSidebar={toggleSidebar} />
-        <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6">
-          <div className="space-y-1 text-center mb-4">
-            <h2 className="text-3xl font-light tracking-tight text-gray-900">
-              Employee Registration
-            </h2>
+    <div className="flex flex-col bg-gray-100 min-h-screen">
+      <Sidebar isCollapsed={isCollapsed} />
+      <Navbar toggleSidebar={toggleSidebar} />
+      <div className={`flex flex-col flex-grow transition-all duration-300 ${isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"}`}>
+        <div className="pt-28 px-5 pb-5 flex-grow flex justify-center items-start">
+          <div className="w-full">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
+              <h2 className="text-2xl font-light tracking-tight text-gray-900 mb-8">Employee Registration</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  <div><label className={labelClass}>First Name</label><input type="text" name="firstname" value={formData.firstname} onChange={handleChange} required className={inputClass} placeholder="John" /></div>
+                  <div><label className={labelClass}>Last Name</label><input type="text" name="lastname" value={formData.lastname} onChange={handleChange} required className={inputClass} placeholder="Doe" /></div>
+                  <div><label className={labelClass}>Email</label><input type="email" name="email" value={formData.email} onChange={handleChange} required className={inputClass} placeholder="john@sanvii.com" /></div>
+                  <div><label className={labelClass}>Contact Number</label><input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required className={inputClass} placeholder="9876543210" /></div>
+                  <div><label className={labelClass}>Username</label><input type="text" name="userName" value={formData.userName} onChange={handleChange} required className={inputClass} placeholder="john.doe" /></div>
+                  <div><label className={labelClass}>Password</label><input type="password" name="password" value={formData.password} onChange={handleChange} required className={inputClass} placeholder="Min 6 characters" /></div>
+                  <div><label className={labelClass}>Date of Birth</label><input type="date" name="dob" value={formData.dob} onChange={handleChange} required className={inputClass} /></div>
+                  <div><label className={labelClass}>Date of Joining</label><input type="date" name="dateOfJoining" value={formData.dateOfJoining} onChange={handleChange} required className={inputClass} /></div>
+                  <div>
+                    <label className={labelClass}>Gender</label>
+                    <select name="gender" value={formData.gender} onChange={handleChange} required className={inputClass}>
+                      <option value="">Select</option>
+                      <option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={labelClass}>Blood Group</label>
+                    <select name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} required className={inputClass}>
+                      <option value="">Select</option>
+                      {BLOOD_GROUPS.map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className={labelClass}>Branch</label>
+                    <select name="branch" value={formData.branch} onChange={handleChange} required className={inputClass}>
+                      <option value="">Select</option>
+                      {BRANCHES.map(b => <option key={b} value={b}>{b}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className={labelClass}>Role</label>
+                    <select name="roles" value={formData.roles[0] || ""} onChange={(e) => setFormData({ ...formData, roles: [e.target.value] })} required className={inputClass}>
+                      <option value="">Select</option>
+                      {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="mt-5">
+                  <label className={labelClass}>Address</label>
+                  <input type="text" name="address" value={formData.address} onChange={handleChange} required className={inputClass} placeholder="Full address" />
+                </div>
+                <div className="mt-6 flex gap-3">
+                  <button type="submit" className="bg-blue-600 text-white px-6 py-2.5 rounded-md hover:bg-blue-500 transition text-sm" disabled={loading}>
+                    {loading ? "Registering..." : "Register Employee"}
+                  </button>
+                  <button type="button" onClick={() => navigate(-1)} className="border border-gray-300 text-gray-600 bg-white px-6 py-2.5 rounded-md hover:bg-gray-50 transition text-sm">Cancel</button>
+                </div>
+              </form>
+            </div>
           </div>
-          <form onSubmit={handleEmployeeRegistration}>
-            <div className="grid grid-cols-2 gap-x-6">
-              {/* First Column */}
-              <div>
-                <div className="txt_field">
-                  <input
-                    type="text"
-                    name="firstname"
-                    value={formData.firstname}
-                    onChange={handleChange}
-                    required
-                  />
-                  <span></span>
-                  <label>First Name</label>
-                </div>
-
-                <div className="txt_field">
-                  <input
-                    type="text"
-                    name="dob"
-                    value={formData.dob}
-                    onFocus={(e) => (e.target.type = "date")}
-                    onBlur={(e) => {
-                      if (!e.target.value) {
-                        e.target.type = "text";
-                      }
-                    }}
-                    onChange={handleChange}
-                    required
-                  />
-                  <span></span>
-                  <label>Date Of Birth</label>
-                </div>
-
-                <div className="txt_field">
-                  <select
-                    name="bloodGroup"
-                    value={formData.bloodGroup}
-                    onChange={handleChange}
-                    required
-                    className="w-full h-40px bg-transparent"
-                  >
-                    <option value=""></option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-                  </select>
-                  <span></span>
-                  <label>Blood Group</label>
-                </div>
-
-                <div className="txt_field">
-                  <input
-                    type="text"
-                    name="dateOfJoining"
-                    value={formData.dateOfJoining}
-                    onFocus={(e) => (e.target.type = "date")}
-                    onBlur={(e) => {
-                      if (!e.target.value) {
-                        e.target.type = "text";
-                      }
-                    }}
-                    onChange={handleChange}
-                    required
-                  />
-                  <span></span>
-                  <label>Date of Joining</label>
-                </div>
-
-                <div className="txt_field">
-                  <input
-                    type="text"
-                    name="userName"
-                    value={formData.userName}
-                    onChange={handleChange}
-                    required
-                  />
-                  <span></span>
-                  <label>Username</label>
-                </div>
-
-                <div className="txt_field">
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    required
-                  />
-                  <span></span>
-                  <label>Address</label>
-                </div>
-              </div>
-
-              {/* Second Column */}
-              <div>
-                <div className="txt_field">
-                  <input
-                    type="text"
-                    name="lastname"
-                    value={formData.lastname}
-                    onChange={handleChange}
-                    required
-                  />
-                  <span></span>
-                  <label>Last Name</label>
-                </div>
-
-                <div className="txt_field">
-                  <input
-                    type="text"
-                    name="contactNumber"
-                    value={formData.contactNumber}
-                    onChange={handleChange}
-                    required
-                  />
-                  <span></span>
-                  <label>Contact Number</label>
-                </div>
-
-                <div className="txt_field">
-                  <select
-                    name="branch"
-                    value={formData.branch}
-                    onChange={handleChange}
-                    required
-                    className="w-full h-40px bg-transparent"
-                  >
-                    <option value=""></option>
-                    {AVAILABLE_BRANCH.map((dept) => (
-                      <option key={dept.value} value={dept.value}>
-                        {dept.label}
-                      </option>
-                    ))}
-                  </select>
-                  <span></span>
-                  <label>Department</label>
-                </div>
-                <div className="txt_field">
-                  <select
-                    name="roles"
-                    value={formData.roles[0] || ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        roles: [e.target.value],
-                      })
-                    }
-                    required
-                    className="w-full h-40px bg-transparent"
-                  >
-                    <option value=""></option>
-                    {AVAILABLE_ROLES.map((role) => (
-                      <option key={role.value} value={role.value}>
-                        {role.label}
-                      </option>
-                    ))}
-                  </select>
-                  <span></span>
-                  <label>Role</label>
-                </div>
-
-                <div className="txt_field">
-                  <select
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    required
-                    className="w-full h-40px bg-transparent"
-                  >
-                    <option value=""></option>
-                    <option value="MALE">Male</option>
-                    <option value="FEMALE">Female</option>
-                    <option value="OTHER">Other</option>
-                  </select>
-                  <span></span>
-                  <label>Gender</label>
-                </div>
-
-                <div className="txt_field">
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                  />
-                  <span></span>
-                  <label>Password</label>
-                </div>
-
-                <div className="txt_field">
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                  <label>Email</label>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <Button
-                type="submit"
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-all duration-300"
-                disabled={loading}
-              >
-                {loading ? "Signing up..." : "Register Employee"}
-              </Button>
-            </div>
-          </form>
-          {errorMessage && (
-            <div className="text-red-500 mt-4">{errorMessage}</div>
-          )}
         </div>
+        <Footer />
       </div>
     </div>
   );

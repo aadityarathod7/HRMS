@@ -11,16 +11,16 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 min-h-screen">
+    <div className="flex flex-col bg-gray-100 min-h-screen">
       <DashboardSidebar isCollapsed={isCollapsed} />
       <DashboardNavbar toggleSidebar={toggleSidebar} />
 
       <div
-        className={`flex flex-col flex-grow w-full max-w-6xl transition-all duration-300 ${
-          isCollapsed ? "ml-40" : "ml-80"
+        className={`flex flex-col flex-grow w-full transition-all duration-300 ${
+          isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"
         }`}
       >
-        <div className="p-5 flex-grow">
+        <div className="pt-28 px-5 pb-5 flex-grow">
         
         </div>
 

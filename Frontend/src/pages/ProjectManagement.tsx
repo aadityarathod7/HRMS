@@ -219,6 +219,7 @@ const ProjectManagement: React.FC = () => {
           `http://localhost:5000/project/deactivate/${id}`,
           {
             method: "PATCH",
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }
         );
 
@@ -241,6 +242,7 @@ const ProjectManagement: React.FC = () => {
           `http://localhost:5000/project/activate/${id}`,
           {
             method: "PUT",
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }
         );
 
@@ -369,21 +371,15 @@ const ProjectManagement: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 min-h-screen p-5">
+    <div className="flex flex-col bg-gray-100 min-h-screen">
       <DashboardSidebar isCollapsed={isCollapsed} />
       <DashboardNavbar toggleSidebar={toggleSidebar} />
 
-      <div className={`mt-5 flex justify-end w-full gap-4`}>
+      <div className={`pt-28 flex justify-end w-full gap-4 px-6`}>
         <div className="flex gap-2">
-          <label
-            htmlFor="userStatus"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Project Status
-          </label>
-          <div className="relative mt-20">
+          <div className="relative">
             <select
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg appearance-none pr-10 hover:bg-blue-500 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+              className="border border-blue-600 text-blue-600 bg-white px-5 py-2 rounded-md appearance-none pr-10 hover:bg-blue-50 transition text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               value={selectedStatus}
               onChange={handleStatusChange}
             >
@@ -399,7 +395,7 @@ const ProjectManagement: React.FC = () => {
         </div>
         {isAdminOrHR && (
           <Link to="/project-registration">
-            <button className="bg-blue-600 text-white px-6 py-3 mt-20 rounded-lg hover:bg-blue-500 transition duration-300">
+            <button className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm">
               Add Project
             </button>
           </Link>
@@ -407,8 +403,8 @@ const ProjectManagement: React.FC = () => {
       </div>
 
       <div
-        className={`mr-10 w-full max-w-6xl transition-all duration-300 ${
-          isCollapsed ? "ml-40" : "ml-80"
+        className={`transition-all duration-300 px-6 ${
+          isCollapsed ? "pl-20 pr-6" : "pl-72 pr-6"
         }`}
       >
         {loading ? (
@@ -418,22 +414,22 @@ const ProjectManagement: React.FC = () => {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="p-3 font-medium text-gray-700 text-left">
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     Project ID
                   </th>
-                  <th className="p-3 font-medium text-gray-700 text-left">
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     Project Name
                   </th>
-                  <th className="p-3 font-medium text-gray-700 text-left">
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     Start Date
                   </th>
-                  <th className="p-3 font-medium text-gray-700 text-left">
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     End Date
                   </th>
-                  <th className="p-3 font-medium text-gray-700 text-left">
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     Status
                   </th>
-                  <th className="p-3 font-medium text-gray-700 text-left">
+                  <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     Actions
                   </th>
                 </tr>
@@ -445,20 +441,20 @@ const ProjectManagement: React.FC = () => {
                       key={project.projectId}
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
-                      <td className="p-3 text-gray-700">{project.projectId}</td>
-                      <td className="p-3 text-gray-700">{project.name}</td>
-                      <td className="p-3 text-gray-700">
+                      <td className="px-4 py-3 text-gray-800 text-sm">{project.projectId}</td>
+                      <td className="px-4 py-3 text-gray-800 text-sm">{project.name}</td>
+                      <td className="px-4 py-3 text-gray-800 text-sm">
                         {new Date(project.startDate).toLocaleDateString()}
                       </td>
-                      <td className="p-3 text-gray-700">
+                      <td className="px-4 py-3 text-gray-800 text-sm">
                         {new Date(project.endDate).toLocaleDateString()}
                       </td>
-                      <td className="p-3 text-gray-700">
+                      <td className="px-4 py-3 text-gray-800 text-sm">
                         
                       <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                         
                         {project.status} </span></td>
-                      <td className="p-3 text-gray-700 flex space-x-2">
+                      <td className="px-4 py-3 text-gray-800 text-sm flex space-x-2">
                         <button
                           className="bg-transparent hover:bg-gray-200 rounded-full p-2"
                           onClick={() => handleView(project.projectId)}
@@ -469,10 +465,10 @@ const ProjectManagement: React.FC = () => {
                           onClick={() =>
                             handleDeactivateproject(project.projectId)
                           }
-                          className="text-red-600 hover:text-red-800 transition-colors duration-150"
+                          className="text-gray-500 hover:text-gray-700 text-sm"
                           title="Deactivate"
                         >
-                          <RemoveCircleOutline />
+                          Deactivate
                         </button>
                       </td>
                     </tr>
