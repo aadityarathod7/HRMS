@@ -1,5 +1,6 @@
 const LeaveRequest = require('../models/LeaveRequest');
-const { broadcast } = require('../config/socket');
+const User = require('../models/User');
+const { notifyLeaveAction } = require('../config/socket');
 
 const updateLeaveStatus = async (leaveRequestId, status) => {
   if (!leaveRequestId || !status) {
@@ -14,11 +15,14 @@ const updateLeaveStatus = async (leaveRequestId, status) => {
   const updated = await leave.save();
 
   try {
-    broadcast({
-      type: 'STATUS_UPDATE',
-      message: `Leave request ${leaveRequestId} has been ${status}`,
-      data: updated
-    });
+    const emp = await User.findById(leave.userId).select('firstname lastname');
+    const name = emp ? `${emp.firstname} ${emp.lastname}` : 'Employee';
+    const action = status === 'APPROVED' ? 'approved' : status === 'REJECTED' ? 'rejected' : status.toLowerCase();
+    notifyLeaveAction(
+      { type: 'STATUS_UPDATE', message: `${name}'s leave has been ${action}` },
+      leave.userId,
+      leave.reportingManagerId
+    );
   } catch (e) {}
 
   return `Leave request status updated to ${status}`;

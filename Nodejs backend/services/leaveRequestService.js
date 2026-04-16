@@ -1,6 +1,14 @@
 const LeaveRequest = require('../models/LeaveRequest');
 const LeaveBalance = require('../models/LeaveBalance');
-const { broadcast } = require('../config/socket');
+const User = require('../models/User');
+const { notifyLeaveAction } = require('../config/socket');
+
+const getUserName = async (userId) => {
+  try {
+    const user = await User.findById(userId).select('firstname lastname');
+    return user ? `${user.firstname} ${user.lastname}` : 'Unknown';
+  } catch (e) { return 'Unknown'; }
+};
 
 const createLeaveRequest = async (data) => {
   // Check leave balance (skip for LOP)
@@ -21,7 +29,14 @@ const createLeaveRequest = async (data) => {
   const leave = new LeaveRequest({ ...data, leaveStatus: 'PENDING', createdDate: new Date() });
   const saved = await leave.save();
 
-  try { broadcast({ type: 'NEW_LEAVE_REQUEST', message: `New leave request from ${data.userId}`, data: saved }); } catch (e) {}
+  try {
+    const name = await getUserName(data.userId);
+    notifyLeaveAction(
+      { type: 'NEW_LEAVE_REQUEST', message: `${name} applied for ${saved.leaveType} leave (${saved.numberOfDays} days)` },
+      null, // don't notify the employee who submitted
+      data.reportingManagerId // notify reporting manager + HR/Admin
+    );
+  } catch (e) {}
   return saved;
 };
 
@@ -47,7 +62,14 @@ const approveLeaveRequest = async (leaveId, approvedById) => {
     }
   }
 
-  try { broadcast({ type: 'LEAVE_APPROVED', message: `Leave ${leaveId} approved`, data: leave }); } catch (e) {}
+  try {
+    const name = await getUserName(leave.userId);
+    notifyLeaveAction(
+      { type: 'LEAVE_APPROVED', message: `${name}'s ${leave.leaveType} leave has been approved` },
+      leave.userId, // notify the employee whose leave was approved
+      leave.reportingManagerId // notify manager + HR/Admin
+    );
+  } catch (e) {}
   return leave;
 };
 
@@ -62,7 +84,14 @@ const rejectLeaveRequest = async (leaveId, rejectedById, rejectionReason) => {
   leave.updatedDate = new Date();
   await leave.save();
 
-  try { broadcast({ type: 'LEAVE_REJECTED', message: `Leave ${leaveId} rejected`, data: leave }); } catch (e) {}
+  try {
+    const name = await getUserName(leave.userId);
+    notifyLeaveAction(
+      { type: 'LEAVE_REJECTED', message: `${name}'s ${leave.leaveType} leave has been rejected` },
+      leave.userId, // notify the employee whose leave was rejected
+      leave.reportingManagerId // notify manager + HR/Admin
+    );
+  } catch (e) {}
   return leave;
 };
 

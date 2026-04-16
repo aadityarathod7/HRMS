@@ -78,13 +78,21 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
   useEffect(() => {
     let socket: WebSocket;
     try {
-      socket = new WebSocket("ws://localhost:5000/leaveNotification");
+      const wsToken = localStorage.getItem("token");
+      socket = new WebSocket(`ws://localhost:5000/leaveNotification?token=${wsToken}`);
       socket.onmessage = (event) => {
         let msg = event.data;
-        try { const parsed = JSON.parse(msg); msg = parsed.message || msg; } catch (e) {}
-        setNotifications(prev => [{ message: msg, timestamp: new Date().toLocaleTimeString(), type: "info" }, ...prev]);
+        let type = "info";
+        try {
+          const parsed = JSON.parse(msg);
+          type = parsed.type || "info";
+          msg = parsed.message || msg;
+        } catch (e) {}
+        setNotifications(prev => [{ message: msg, timestamp: new Date().toLocaleTimeString(), type }, ...prev]);
         setUnreadCount(prev => prev + 1);
+        toast.success(msg);
       };
+      socket.onerror = () => {};
     } catch (e) {}
     return () => { try { socket?.close(); } catch (e) {} };
   }, []);
