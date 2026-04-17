@@ -40,6 +40,7 @@ const Documents: React.FC = () => {
   const [files, setFiles] = useState<FileData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [documentNames, setDocumentNames] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -82,6 +83,7 @@ const Documents: React.FC = () => {
     setIsUploading(true);
     const formData = new FormData();
     selectedFiles.forEach(f => formData.append("files", f));
+    documentNames.forEach(name => formData.append("documentNames", name));
     try {
       const token = localStorage.getItem("token");
       await axios.post(`${API_URL}/file/upload`, formData, {
@@ -89,6 +91,7 @@ const Documents: React.FC = () => {
       });
       toast.success("Documents uploaded successfully");
       setSelectedFiles([]);
+      setDocumentNames([]);
       fetchFiles();
     } catch { toast.error("Failed to upload"); }
     finally { setIsUploading(false); }
@@ -161,12 +164,27 @@ const Documents: React.FC = () => {
               )}
             </div>
             {selectedFiles.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3 space-y-2">
                 {selectedFiles.map((f, i) => (
-                  <span key={i} className="bg-gray-50 border border-gray-200 rounded text-xs px-2 py-1 text-gray-600 flex items-center gap-1">
-                    <FileText size={11} /> {f.name}
-                    <button onClick={() => setSelectedFiles(p => p.filter((_, j) => j !== i))} className="text-gray-400 hover:text-red-500 ml-1">×</button>
-                  </span>
+                  <div key={i} className="flex items-center gap-3 bg-gray-50 rounded-lg px-3 py-2">
+                    <FileText size={14} className="text-gray-400 flex-shrink-0" />
+                    <span className="text-xs text-gray-500 truncate w-32">{f.name}</span>
+                    <input
+                      type="text"
+                      placeholder="Document name (e.g. Aadhar Card)"
+                      value={documentNames[i] || ""}
+                      onChange={e => {
+                        const updated = [...documentNames];
+                        updated[i] = e.target.value;
+                        setDocumentNames(updated);
+                      }}
+                      className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                    <button onClick={() => {
+                      setSelectedFiles(p => p.filter((_, j) => j !== i));
+                      setDocumentNames(p => p.filter((_, j) => j !== i));
+                    }} className="text-gray-400 hover:text-red-500 text-lg leading-none">×</button>
+                  </div>
                 ))}
               </div>
             )}
@@ -217,7 +235,10 @@ const Documents: React.FC = () => {
                         )}
                       </td>
                     )}
-                    <td className="px-4 py-3 text-sm text-gray-700 max-w-[200px] truncate">{file.fileName}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700 max-w-[200px]">
+                      <p className="truncate">{(file as any).documentName || file.fileName}</p>
+                      {(file as any).documentName && <p className="text-[10px] text-gray-400 truncate">{file.fileName}</p>}
+                    </td>
                     <td className="px-4 py-3"><span className="px-2 py-0.5 text-[11px] rounded bg-blue-50 text-blue-700">{file.fileType?.split("/").pop()}</span></td>
                     <td className="px-4 py-3 text-sm text-gray-500">{formatSize(file.fileSize)}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">{new Date(file.createdDate).toLocaleDateString("en-GB")}</td>
@@ -234,7 +255,7 @@ const Documents: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <Link to={`/view/${file.id}`} className="text-blue-500 hover:text-blue-700"><Visibility fontSize="small" /></Link>
+                        <a href={`${API_URL}/file/download/${file.id}`} target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-700"><Visibility fontSize="small" /></a>
                         {isAdminOrHR && file.status === "PENDING" && (
                           <>
                             <button onClick={() => handleApprove(file.id)} className="text-emerald-600 hover:text-emerald-800" title="Approve"><CheckCircle size={16} /></button>

@@ -1,24 +1,41 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
-const fileService = require('../services/fileService');
 const { authenticate, authorize } = require('../middleware/auth');
 const UploadedFile = require('../models/UploadedFile');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => { cb(null, path.join(__dirname, '..', 'uploads')); },
-  filename: (req, file, cb) => { cb(null, `${Date.now()}-${file.originalname}`); }
+// Use memory storage — store file buffer in MongoDB (no disk needed)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB max
 });
-const upload = multer({ storage });
 
-// Upload — any authenticated user can upload their own documents
+// Upload — any authenticated user
 router.post('/upload', authenticate, upload.array('files'), async (req, res, next) => {
   try {
     const uploadedBy = req.user.userName;
     const userId = req.user.id;
-    const result = await fileService.saveFiles(req.files, uploadedBy, userId);
-    res.status(201).json(result);
+    const documentNames = req.body.documentNames
+      ? (Array.isArray(req.body.documentNames) ? req.body.documentNames : [req.body.documentNames])
+      : [];
+
+    const savedFiles = [];
+    for (let i = 0; i < req.files.length; i++) {
+      const file = req.files[i];
+      const record = new UploadedFile({
+        uploadedBy,
+        userId,
+        fileName: file.originalname,
+        documentName: documentNames[i] || file.originalname,
+        fileType: file.mimetype,
+        fileSize: file.size,
+        fileData: file.buffer,
+        status: 'PENDING'
+      });
+      await record.save();
+      savedFiles.push({ id: record._id, fileName: record.fileName, documentName: record.documentName, fileSize: record.fileSize });
+    }
+    res.status(201).json(savedFiles);
   } catch (error) { next(error); }
 });
 
@@ -26,22 +43,60 @@ router.post('/upload', authenticate, upload.array('files'), async (req, res, nex
 router.get('/filter', authenticate, async (req, res, next) => {
   try {
     const isAdminOrHR = req.user.roles.some(r => ['ADMIN', 'HR'].includes(r));
-    const query = isAdminOrHR ? req.query : { ...req.query, userId: req.user.id };
-    res.json(await fileService.getFilteredFiles(query));
+    const { fileName, startDate, endDate, userId: queryUserId, page = 0, size = 10 } = req.query;
+
+    const filter = {};
+    if (!isAdminOrHR) filter.userId = req.user.id;
+    else if (queryUserId) filter.userId = queryUserId;
+    if (fileName) filter.$or = [
+      { fileName: { $regex: fileName, $options: 'i' } },
+      { documentName: { $regex: fileName, $options: 'i' } }
+    ];
+    if (startDate || endDate) {
+      filter.createdDate = {};
+      if (startDate) filter.createdDate.$gte = new Date(startDate);
+      if (endDate) filter.createdDate.$lte = new Date(endDate);
+    }
+
+    const skip = parseInt(page) * parseInt(size);
+    const [content, totalElements] = await Promise.all([
+      UploadedFile.find(filter)
+        .select('-fileData') // Don't send binary data in list
+        .populate('userId', 'firstname lastname employeeId')
+        .populate('reviewedBy', 'firstname lastname')
+        .sort({ createdDate: -1 })
+        .skip(skip).limit(parseInt(size)),
+      UploadedFile.countDocuments(filter)
+    ]);
+
+    res.json({ content, totalElements, totalPages: Math.ceil(totalElements / parseInt(size)), number: parseInt(page), size: parseInt(size) });
   } catch (error) { next(error); }
 });
 
-// Get my files
-router.get('/my', authenticate, async (req, res, next) => {
+// Download file by id
+router.get('/download/:id', authenticate, async (req, res, next) => {
   try {
-    const files = await UploadedFile.find({ userId: req.user.id })
-      .populate('reviewedBy', 'firstname lastname')
-      .sort({ createdDate: -1 });
-    res.json(files);
+    const file = await UploadedFile.findById(req.params.id);
+    if (!file) return res.status(404).json({ message: 'File not found' });
+    if (!file.fileData) return res.status(404).json({ message: 'File data not found' });
+
+    res.setHeader('Content-Type', file.fileType);
+    res.setHeader('Content-Disposition', `inline; filename="${file.fileName}"`);
+    res.send(file.fileData);
   } catch (error) { next(error); }
 });
 
-// Approve document — HR/Admin only
+// Get file content (text files)
+router.get('/get-file-content/:id', authenticate, async (req, res, next) => {
+  try {
+    const file = await UploadedFile.findById(req.params.id);
+    if (!file || !file.fileData) return res.status(404).json({ message: 'File not found' });
+    const content = file.fileData.toString('utf-8');
+    res.json({ content });
+  } catch (error) { next(error); }
+});
+
+// Approve — HR/Admin only
 router.put('/approve/:id', authenticate, authorize('ADMIN', 'HR'), async (req, res, next) => {
   try {
     const file = await UploadedFile.findById(req.params.id);
@@ -51,11 +106,11 @@ router.put('/approve/:id', authenticate, authorize('ADMIN', 'HR'), async (req, r
     file.reviewedAt = new Date();
     file.rejectionReason = undefined;
     await file.save();
-    res.json(file);
+    res.json({ id: file._id, status: file.status });
   } catch (error) { next(error); }
 });
 
-// Reject document — HR/Admin only
+// Reject — HR/Admin only
 router.put('/reject/:id', authenticate, authorize('ADMIN', 'HR'), async (req, res, next) => {
   try {
     const file = await UploadedFile.findById(req.params.id);
@@ -65,49 +120,21 @@ router.put('/reject/:id', authenticate, authorize('ADMIN', 'HR'), async (req, re
     file.reviewedAt = new Date();
     file.rejectionReason = req.body.reason || 'Rejected by HR';
     await file.save();
-    res.json(file);
+    res.json({ id: file._id, status: file.status });
   } catch (error) { next(error); }
 });
 
-router.get('/get-file-content/:id', authenticate, async (req, res, next) => {
-  try { res.json({ content: await fileService.getFileContent(req.params.id) }); }
-  catch (error) { next(error); }
-});
-
-// Download
-router.get('/download/:id', async (req, res, next) => {
-  if (req.query.token && !req.headers.authorization) {
-    req.headers.authorization = `Bearer ${req.query.token}`;
-  }
-  return authenticate(req, res, async () => {
-    try {
-      const fileRecord = await UploadedFile.findById(req.params.id);
-      if (!fileRecord) return res.status(404).json({ message: 'File not found' });
-      const filePath = path.join(__dirname, '..', 'uploads', fileRecord.fileName);
-      const fs = require('fs');
-      if (!fs.existsSync(filePath)) return res.status(404).json({ message: 'File not found on disk' });
-      res.setHeader('Content-Type', fileRecord.fileType);
-      res.setHeader('Content-Disposition', `inline; filename="${fileRecord.fileName}"`);
-      fs.createReadStream(filePath).pipe(res);
-    } catch (error) { next(error); }
-  });
-});
-
-router.put('/update/:fileId', authenticate, authorize('ADMIN', 'HR'), async (req, res, next) => {
-  try { res.json({ message: await fileService.updateFileContent(req.params.fileId, req.body.newContent) }); }
-  catch (error) { next(error); }
-});
-
+// Delete
 router.delete('/delete/:id', authenticate, async (req, res, next) => {
   try {
     const file = await UploadedFile.findById(req.params.id);
     if (!file) return res.status(404).json({ message: 'File not found' });
-    // Only owner or HR/Admin can delete
     const isAdminOrHR = req.user.roles.some(r => ['ADMIN', 'HR'].includes(r));
     if (!isAdminOrHR && file.userId?.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized' });
     }
-    res.json({ message: await fileService.deleteFileById(req.params.id) });
+    await UploadedFile.findByIdAndDelete(req.params.id);
+    res.json({ message: 'File deleted successfully' });
   } catch (error) { next(error); }
 });
 
