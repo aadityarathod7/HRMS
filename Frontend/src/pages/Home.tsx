@@ -115,14 +115,14 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
       </div>
 
       {/* Day headers */}
-      <div className="grid grid-cols-7 mb-1">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 4 }}>
         {["Su","Mo","Tu","We","Th","Fr","Sa"].map((d, i) => (
-          <div key={i} className="text-center text-[10px] font-medium text-gray-400 pb-2">{d}</div>
+          <div key={i} style={{ textAlign: "center", fontSize: 10, fontWeight: 500, color: "#9ca3af", paddingBottom: 6 }}>{d}</div>
         ))}
       </div>
 
       {/* Day cells */}
-      <div className="grid grid-cols-7 gap-y-2">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", rowGap: 6 }}>
         {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} />)}
         {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
           const entry = dayMap[day];
@@ -133,25 +133,35 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
           const tooltipText = entry ? entry.label : weekend ? "Weekend" : null;
 
           return (
-            <div key={day} className="relative flex justify-center"
+            <div key={day}
+              style={{ position: "relative", display: "flex", justifyContent: "center" }}
               onMouseEnter={() => tooltipText ? setTooltip({ day, label: tooltipText }) : null}
               onMouseLeave={() => setTooltip(null)}>
-              <div
-                className="w-10 h-10 flex items-center justify-center rounded-lg text-xs transition-all"
-                style={{
-                  backgroundColor: c?.bg || "transparent",
-                  color: c?.color || (isToday ? "#111827" : "#6b7280"),
-                  fontWeight: isToday ? 700 : 400,
-                  boxShadow: isToday ? "inset 0 0 0 1.5px #9ca3af" : "none",
-                }}
-              >
+              <div style={{
+                width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center",
+                borderRadius: 8, fontSize: 12, transition: "all 0.15s",
+                backgroundColor: c?.bg || "transparent",
+                color: c?.color || (isToday ? "#111827" : "#6b7280"),
+                fontWeight: isToday ? 700 : 400,
+                boxShadow: isToday ? "inset 0 0 0 1.5px #9ca3af" : "none",
+              }}>
                 {day}
               </div>
               {tooltip?.day === day && tooltipText && (
-                <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-                  <div className="bg-gray-800 text-white text-[10px] px-2 py-1 rounded-md whitespace-nowrap shadow-lg">
+                <div style={{
+                  position: "absolute", bottom: "calc(100% + 6px)", left: "50%", transform: "translateX(-50%)",
+                  zIndex: 20, pointerEvents: "none",
+                }}>
+                  <div style={{
+                    backgroundColor: "#1f2937", color: "#fff", fontSize: 10, padding: "4px 8px",
+                    borderRadius: 6, whiteSpace: "nowrap", boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                  }}>
                     {tooltip.label}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
+                    <div style={{
+                      position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)",
+                      borderWidth: 4, borderStyle: "solid",
+                      borderColor: "#1f2937 transparent transparent transparent",
+                    }} />
                   </div>
                 </div>
               )}
@@ -161,11 +171,11 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-4 pt-4 border-t border-gray-100">
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 12px", marginTop: 16, paddingTop: 12, borderTop: "1px solid #f3f4f6" }}>
         {LEGEND.map(l => (
-          <div key={l.label} className="flex items-center gap-1">
-            <div className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: l.bg, border: `1px solid ${l.color}22` }} />
-            <span className="text-[10px] text-gray-500">{l.label}</span>
+          <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ width: 10, height: 10, borderRadius: 3, flexShrink: 0, backgroundColor: l.bg, border: `1px solid ${l.color}33` }} />
+            <span style={{ fontSize: 10, color: "#6b7280" }}>{l.label}</span>
           </div>
         ))}
       </div>
