@@ -108,10 +108,10 @@ const LeaveApplication = () => {
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Start Date</label>
-                    <DateInput value={formData.leaveStartDate} onChange={(v) => setFormData({...formData, leaveStartDate: v})} required className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    <DateInput value={formData.leaveStartDate} onChange={(v) => setFormData({...formData, leaveStartDate: v, leaveEndDate: formData.leaveEndDate || v})} required className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">End Date</label>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">End Date <span className="text-gray-400 normal-case">(same as start for 1 day)</span></label>
                     <DateInput value={formData.leaveEndDate} onChange={(v) => setFormData({...formData, leaveEndDate: v})} required className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                   </div>
                   <div>
