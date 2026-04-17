@@ -64,7 +64,7 @@ const App: React.FC = () => {
               return null;
             }}
             position="bottom-right"
-            autoClose={3000}
+            autoClose={5000}
           />
           <BrowserRouter>
             <Routes>

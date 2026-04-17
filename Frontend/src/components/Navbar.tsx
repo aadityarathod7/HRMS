@@ -74,12 +74,18 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
     setSearchQuery("");
   };
 
-  // WebSocket notifications with auto-reconnect
+  // WebSocket notifications — single connection, no auto-reconnect spam
   useEffect(() => {
     let socket: WebSocket | null = null;
-    let reconnectTimer: any = null;
+    let closed = false;
 
     const connect = () => {
+      if (closed) return;
+      // Close existing socket before creating new one
+      if (socket && socket.readyState <= 1) {
+        try { socket.close(); } catch (e) {}
+      }
+
       try {
         socket = new WebSocket("ws://localhost:5000/leaveNotification");
 
@@ -87,38 +93,27 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
           try {
             const parsed = JSON.parse(event.data);
             const myRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
-            const myProfile = JSON.parse(localStorage.getItem("userProfile") || "{}");
-            // Get user ID from profile or decode from JWT token
-            let myId = myProfile.id;
+            let myId = JSON.parse(localStorage.getItem("userProfile") || "{}").id;
             if (!myId) {
-              try {
-                const token = localStorage.getItem("token");
-                if (token) myId = JSON.parse(atob(token.split(".")[1])).id;
-              } catch (e) {}
+              try { const t = localStorage.getItem("token"); if (t) myId = JSON.parse(atob(t.split(".")[1])).id; } catch (e) {}
             }
 
-            // Filter: only show if notification is for my role or for me specifically
-            const forRoles = parsed.forRoles || [];
-            const forUser = parsed.forUser;
-            const forAll = parsed.forAll || false;
+            const { forRoles = [], forUser, forAll } = parsed;
+            const matchesRole = forRoles.length > 0 && myRoles.some(r => forRoles.includes(r));
+            const matchesUser = forUser && myId && forUser === myId;
+            if (!forAll && !matchesRole && !matchesUser) return;
 
-            const isForMyRole = forRoles.length > 0 && myRoles.some(r => forRoles.includes(r));
-            const isForMe = forUser && myId && forUser === myId;
-
-            if (!forAll && !isForMyRole && !isForMe) return; // Not for me, ignore
-
-            const msg = parsed.message || event.data;
+            // Pick the right message: personal for user, informational for role
+            const msg = matchesUser && parsed.userMessage ? parsed.userMessage : parsed.roleMessage || parsed.message || event.data;
             setNotifications(prev => [{ message: msg, timestamp: new Date().toLocaleTimeString(), type: parsed.type || "info" }, ...prev]);
             setUnreadCount(prev => prev + 1);
-            toast.success(msg);
           } catch (e) {}
         };
 
         socket.onclose = () => {
-          // Auto-reconnect after 3 seconds
-          reconnectTimer = setTimeout(() => {
-            if (localStorage.getItem("token")) connect();
-          }, 3000);
+          if (!closed && localStorage.getItem("token")) {
+            setTimeout(connect, 5000);
+          }
         };
 
         socket.onerror = () => {};
@@ -128,7 +123,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
     connect();
 
     return () => {
-      clearTimeout(reconnectTimer);
+      closed = true;
       try { socket?.close(); } catch (e) {}
     };
   }, []);

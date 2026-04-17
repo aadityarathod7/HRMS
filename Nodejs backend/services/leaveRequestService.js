@@ -60,8 +60,7 @@ const approveLeaveRequest = async (leaveId, approvedById) => {
 
   try {
     const name = await getUserName(leave.userId);
-    notifyLeaveAction({ type: 'LEAVE_APPROVED', message: `Your ${leave.leaveType} leave has been approved`, forUser: leave.userId?.toString() });
-    notifyLeaveAction({ type: 'LEAVE_APPROVED', message: `${name}'s ${leave.leaveType} leave has been approved`, forRoles: ['HR', 'ADMIN'] });
+    notifyLeaveAction({ type: 'LEAVE_APPROVED', forUser: leave.userId?.toString(), userMessage: `Your ${leave.leaveType} leave has been approved`, forRoles: ['HR', 'ADMIN'], roleMessage: `${name}'s ${leave.leaveType} leave has been approved` });
   } catch (e) {}
   return leave;
 };
@@ -79,8 +78,7 @@ const rejectLeaveRequest = async (leaveId, rejectedById, rejectionReason) => {
 
   try {
     const name = await getUserName(leave.userId);
-    notifyLeaveAction({ type: 'LEAVE_REJECTED', message: `Your ${leave.leaveType} leave has been rejected`, forUser: leave.userId?.toString() });
-    notifyLeaveAction({ type: 'LEAVE_REJECTED', message: `${name}'s ${leave.leaveType} leave has been rejected`, forRoles: ['HR', 'ADMIN'] });
+    notifyLeaveAction({ type: 'LEAVE_REJECTED', forUser: leave.userId?.toString(), userMessage: `Your ${leave.leaveType} leave has been rejected`, forRoles: ['HR', 'ADMIN'], roleMessage: `${name}'s ${leave.leaveType} leave has been rejected` });
   } catch (e) {}
   return leave;
 };

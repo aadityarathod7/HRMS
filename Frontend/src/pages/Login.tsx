@@ -35,10 +35,8 @@ const Login = () => {
         localStorage.setItem("roles", JSON.stringify(data.roles || []));
         localStorage.setItem("userProfile", JSON.stringify(data.user || {}));
 
-        toast.success("Login successful!");
-        setTimeout(() => {
-          navigate("/home");
-        }, 1500);
+        navigate("/home");
+        setTimeout(() => toast.success("Login successful!"), 50);
       } else {
         const errorMessage = await response.text();
         setErrorMessage(errorMessage);
