@@ -439,14 +439,17 @@ const Home: React.FC = () => {
                   {/* Stat cards */}
                   <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
                     {[
-                      { icon: Users, label: "Active Employees", value: stats.activeEmployees || 0, sub: `${stats.totalEmployees || 0} total`, path: "/employeelist", iconBg: "#eff6ff", iconColor: "#2563eb" },
-                      { icon: UserCheck, label: "New Joiners", value: stats.newJoiners || 0, sub: "This month", path: null, iconBg: "#f0fdf4", iconColor: "#16a34a" },
-                      { icon: Calendar, label: "On Leave Today", value: stats.onLeaveToday || 0, sub: "Employees", path: null, iconBg: "#fffbeb", iconColor: "#d97706" },
-                      { icon: FileText, label: "Pending Leaves", value: stats.pendingLeaves || 0, sub: "Awaiting approval", path: "/leave-management", iconBg: "#fff7ed", iconColor: "#ea580c" },
-                      { icon: Clock, label: "Pending Timesheets", value: stats.pendingTimesheets || 0, sub: "Need review", path: "/time-sheet-management", iconBg: "#faf5ff", iconColor: "#9333ea" },
+                      { icon: Users, label: "Active Employees", value: stats.activeEmployees || 0, sub: `${stats.totalEmployees || 0} total`, path: "/employeelist", iconBg: "#eff6ff", iconColor: "#2563eb", hoverBorder: "#bfdbfe" },
+                      { icon: UserCheck, label: "New Joiners", value: stats.newJoiners || 0, sub: "This month", path: null, iconBg: "#f0fdf4", iconColor: "#16a34a", hoverBorder: "#bbf7d0" },
+                      { icon: Calendar, label: "On Leave Today", value: stats.onLeaveToday || 0, sub: "Employees", path: null, iconBg: "#fffbeb", iconColor: "#d97706", hoverBorder: "#fde68a" },
+                      { icon: FileText, label: "Pending Leaves", value: stats.pendingLeaves || 0, sub: "Awaiting approval", path: "/leave-management", iconBg: "#fff7ed", iconColor: "#ea580c", hoverBorder: "#fed7aa" },
+                      { icon: Clock, label: "Pending Timesheets", value: stats.pendingTimesheets || 0, sub: "Need review", path: "/time-sheet-management", iconBg: "#faf5ff", iconColor: "#9333ea", hoverBorder: "#e9d5ff" },
                     ].map((item, i) => (
                       <div key={i} onClick={() => item.path && navigate(item.path)}
-                        className={`bg-white rounded-xl border border-gray-200 p-4 ${item.path ? "cursor-pointer hover:border-blue-200 hover:shadow-sm transition" : ""}`}>
+                        className={`bg-white rounded-xl border border-gray-200 p-4 ${item.path ? "cursor-pointer hover:shadow-sm transition" : ""}`}
+                        style={{ borderColor: "#e5e7eb" }}
+                        onMouseEnter={e => item.path && ((e.currentTarget as HTMLDivElement).style.borderColor = item.hoverBorder)}
+                        onMouseLeave={e => ((e.currentTarget as HTMLDivElement).style.borderColor = "#e5e7eb")}>
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-xs text-gray-400 uppercase tracking-wider leading-tight">{item.label}</span>
                           <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: item.iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -515,13 +518,16 @@ const Home: React.FC = () => {
                   {/* Stat cards */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
                     {[
-                      { icon: Users, label: "My Team", value: stats.teamSize || 0, sub: "Direct reports", path: null, iconBg: "#eff6ff", iconColor: "#2563eb" },
-                      { icon: Calendar, label: "Team On Leave", value: stats.teamOnLeave || 0, sub: "Today", path: null, iconBg: "#fffbeb", iconColor: "#d97706" },
-                      { icon: FileText, label: "Pending Leaves", value: stats.pendingLeaves || 0, sub: "Need approval", path: "/employee-leave-management", iconBg: "#fff7ed", iconColor: "#ea580c" },
-                      { icon: Clock, label: "Pending Timesheets", value: stats.pendingTimesheets || 0, sub: "Need review", path: "/time-sheet-management", iconBg: "#faf5ff", iconColor: "#9333ea" },
+                      { icon: Users, label: "My Team", value: stats.teamSize || 0, sub: "Direct reports", path: null, iconBg: "#eff6ff", iconColor: "#2563eb", hoverBorder: "#bfdbfe" },
+                      { icon: Calendar, label: "Team On Leave", value: stats.teamOnLeave || 0, sub: "Today", path: null, iconBg: "#fffbeb", iconColor: "#d97706", hoverBorder: "#fde68a" },
+                      { icon: FileText, label: "Pending Leaves", value: stats.pendingLeaves || 0, sub: "Need approval", path: "/employee-leave-management", iconBg: "#fff7ed", iconColor: "#ea580c", hoverBorder: "#fed7aa" },
+                      { icon: Clock, label: "Pending Timesheets", value: stats.pendingTimesheets || 0, sub: "Need review", path: "/time-sheet-management", iconBg: "#faf5ff", iconColor: "#9333ea", hoverBorder: "#e9d5ff" },
                     ].map((item, i) => (
                       <div key={i} onClick={() => item.path && navigate(item.path)}
-                        className={`bg-white rounded-xl border border-gray-200 p-4 ${item.path ? "cursor-pointer hover:border-blue-200 hover:shadow-sm transition" : ""}`}>
+                        className={`bg-white rounded-xl border border-gray-200 p-4 ${item.path ? "cursor-pointer hover:shadow-sm transition" : ""}`}
+                        style={{ borderColor: "#e5e7eb" }}
+                        onMouseEnter={e => item.path && ((e.currentTarget as HTMLDivElement).style.borderColor = item.hoverBorder)}
+                        onMouseLeave={e => ((e.currentTarget as HTMLDivElement).style.borderColor = "#e5e7eb")}>
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-xs text-gray-400 uppercase tracking-wider">{item.label}</span>
                           <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: item.iconBg, display: "flex", alignItems: "center", justifyContent: "center" }}>
