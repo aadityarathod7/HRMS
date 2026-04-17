@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
-import { Users, FileText, Clock, DollarSign, Calendar, UserCheck, UserX, Briefcase, TrendingUp, Gift, CalendarDays } from "lucide-react";
+import { Users, FileText, Clock, DollarSign, Calendar, UserCheck, UserX, Briefcase, TrendingUp, Gift } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -12,6 +12,7 @@ const Home: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [attendanceRecords, setAttendanceRecords] = useState<any[]>([]);
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const navigate = useNavigate();
 
@@ -27,6 +28,16 @@ const Home: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStats(res.data);
+
+        // Fetch attendance for current month (employee only)
+        const roles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+        const myProfile = JSON.parse(localStorage.getItem("userProfile") || "{}");
+        if (!roles.some(r => ["ADMIN", "HR", "MANAGER"].includes(r)) && myProfile.id) {
+          const attRes = await axios.get(`${API_URL}/attendance/user/${myProfile.id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setAttendanceRecords(attRes.data || []);
+        }
       } catch (err) {
         if (axios.isAxiosError(err) && err.response?.status === 401) navigate("/login");
       } finally { setLoading(false); }
@@ -258,6 +269,73 @@ const Home: React.FC = () => {
                       ))}
                     </div>
                   </div>
+
+                  {/* Attendance Calendar */}
+                  {attendanceRecords.length > 0 && (() => {
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = now.getMonth();
+                    const firstDay = new Date(year, month, 1).getDay();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const monthName = now.toLocaleString("en", { month: "long" });
+
+                    const statusMap: Record<string, string> = {};
+                    attendanceRecords.forEach((r: any) => {
+                      const d = new Date(r.date);
+                      if (d.getMonth() === month && d.getFullYear() === year) {
+                        statusMap[d.getDate()] = r.status;
+                      }
+                    });
+
+                    const dotColor: Record<string, string> = {
+                      PRESENT: "bg-emerald-500",
+                      WFH: "bg-blue-500",
+                      ABSENT: "bg-red-400",
+                      HALF_DAY: "bg-amber-400",
+                      ON_LEAVE: "bg-purple-400",
+                    };
+                    const bgColor: Record<string, string> = {
+                      PRESENT: "bg-emerald-50 text-emerald-700",
+                      WFH: "bg-blue-50 text-blue-700",
+                      ABSENT: "bg-red-50 text-red-600",
+                      HALF_DAY: "bg-amber-50 text-amber-700",
+                      ON_LEAVE: "bg-purple-50 text-purple-700",
+                    };
+
+                    return (
+                      <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">
+                        <div className="flex justify-between items-center mb-4">
+                          <p className="text-sm font-medium text-gray-700">Attendance — {monthName} {year}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {Object.entries(dotColor).map(([s, c]) => (
+                              <span key={s} className="flex items-center gap-1 text-[10px] text-gray-500">
+                                <span className={`w-2 h-2 rounded-full ${c}`} /> {s.replace("_", " ")}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-7 gap-1 mb-1">
+                          {["S","M","T","W","T","F","S"].map((d, i) => (
+                            <div key={i} className="text-center text-[10px] text-gray-400 font-medium pb-1">{d}</div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-7 gap-1">
+                          {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} />)}
+                          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
+                            const status = statusMap[day];
+                            const isToday = day === now.getDate();
+                            return (
+                              <div key={day} className={`relative flex items-center justify-center rounded-lg h-8 text-xs font-light transition
+                                ${status ? bgColor[status] : isToday ? "bg-gray-100" : "text-gray-500"}
+                                ${isToday ? "ring-1 ring-gray-400 font-medium" : ""}`}>
+                                {day}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   <div className="grid grid-cols-1 mb-6">
                     {/* Payslip */}
