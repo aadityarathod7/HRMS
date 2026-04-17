@@ -11,9 +11,13 @@ const getUserName = async (userId) => {
 };
 
 const createLeaveRequest = async (data) => {
+  if (!data.leaveStartDate || !data.leaveEndDate) {
+    throw { status: 400, message: 'Leave start date and end date are required' };
+  }
   // Check leave balance (skip for LOP)
   if (data.leaveType !== 'LOP') {
     const year = new Date(data.leaveStartDate).getFullYear();
+    if (isNaN(year)) throw { status: 400, message: 'Invalid leave start date' };
     const balance = await LeaveBalance.findOne({ userId: data.userId, leaveType: data.leaveType, year });
     if (!balance) throw { status: 400, message: `No ${data.leaveType} balance found for this year` };
 
