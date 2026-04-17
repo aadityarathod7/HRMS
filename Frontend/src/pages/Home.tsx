@@ -287,49 +287,56 @@ const Home: React.FC = () => {
                       }
                     });
 
-                    const bgColor: Record<string, string> = {
-                      PRESENT: "bg-emerald-50 text-emerald-700",
-                      WFH: "bg-blue-50 text-blue-700",
-                      ABSENT: "bg-red-50 text-red-600",
-                      HALF_DAY: "bg-amber-50 text-amber-700",
-                      ON_LEAVE: "bg-purple-50 text-purple-700",
-                    };
 
                     return (
-                      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4 w-64">
+                      <div style={{ width: 196 }} className="bg-white rounded-xl border border-gray-200 p-3 mb-4">
                         {/* Month header */}
                         <div className="flex justify-between items-center mb-2">
-                          <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{monthName}</p>
-                          <p className="text-xs text-gray-400">{year}</p>
+                          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1 }} className="text-gray-700 uppercase">{monthName}</p>
+                          <p style={{ fontSize: 10 }} className="text-gray-400">{year}</p>
                         </div>
-                        {/* Day headers */}
-                        <div className="grid grid-cols-7 mb-1">
+                        {/* Day headers + cells using inline style grid to avoid CSS override */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
                           {["Su","Mo","Tu","We","Th","Fr","Sa"].map((d, i) => (
-                            <div key={i} className="text-center text-[9px] text-gray-400 font-medium py-0.5">{d}</div>
+                            <div key={i} style={{ fontSize: 8, textAlign: "center", color: "#9ca3af", paddingBottom: 3 }}>{d}</div>
                           ))}
-                        </div>
-                        {/* Day cells */}
-                        <div className="grid grid-cols-7 gap-px">
-                          {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} className="h-6" />)}
+                          {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} style={{ height: 22 }} />)}
                           {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
                             const status = statusMap[day];
                             const isToday = day === now.getDate();
+                            const colorMap: Record<string, { bg: string; color: string }> = {
+                              PRESENT: { bg: "#d1fae5", color: "#065f46" },
+                              WFH: { bg: "#dbeafe", color: "#1e40af" },
+                              ABSENT: { bg: "#fee2e2", color: "#b91c1c" },
+                              HALF_DAY: { bg: "#fef3c7", color: "#92400e" },
+                              ON_LEAVE: { bg: "#ede9fe", color: "#5b21b6" },
+                            };
+                            const c = status ? colorMap[status] : null;
                             return (
                               <div key={day} title={status?.replace("_", " ") || ""}
-                                className={`h-6 w-6 mx-auto flex items-center justify-center rounded text-[10px] font-light
-                                  ${status ? bgColor[status] : "text-gray-500"}
-                                  ${isToday ? "ring-1 ring-gray-700 font-semibold" : ""}`}>
+                                style={{
+                                  height: 22, width: 22, margin: "0 auto", display: "flex",
+                                  alignItems: "center", justifyContent: "center", borderRadius: 4,
+                                  fontSize: 10, fontWeight: isToday ? 700 : 400,
+                                  backgroundColor: c?.bg || (isToday ? "#f3f4f6" : "transparent"),
+                                  color: c?.color || (isToday ? "#111827" : "#6b7280"),
+                                  outline: isToday ? "1.5px solid #9ca3af" : "none",
+                                }}>
                                 {day}
                               </div>
                             );
                           })}
                         </div>
                         {/* Mini legend */}
-                        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 pt-3 border-t border-gray-100">
-                          {Object.entries(bgColor).map(([s, c]) => (
-                            <span key={s} className={`flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded ${c}`}>
-                              {s.replace("_", " ")}
-                            </span>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 8, paddingTop: 8, borderTop: "1px solid #f3f4f6" }}>
+                          {[
+                            { label: "Present", bg: "#d1fae5", color: "#065f46" },
+                            { label: "WFH", bg: "#dbeafe", color: "#1e40af" },
+                            { label: "Absent", bg: "#fee2e2", color: "#b91c1c" },
+                            { label: "Half Day", bg: "#fef3c7", color: "#92400e" },
+                            { label: "On Leave", bg: "#ede9fe", color: "#5b21b6" },
+                          ].map(l => (
+                            <span key={l.label} style={{ fontSize: 9, padding: "1px 5px", borderRadius: 4, backgroundColor: l.bg, color: l.color }}>{l.label}</span>
                           ))}
                         </div>
                       </div>
