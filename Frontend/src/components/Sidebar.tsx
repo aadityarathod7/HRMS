@@ -144,7 +144,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
               variant="ghost"
               className={`justify-start w-full transition-colors ${
                 isActive || isParentActive
-                  ? "bg-blue-100 text-blue-700 font-medium"
+                  ? "bg-blue-50 text-blue-600 font-medium"
                   : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
               }`}
               onClick={item.onClick}
@@ -177,7 +177,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                       variant="ghost"
                       className={`justify-start w-full pl-6 transition-colors ${
                         isSubActive
-                          ? "bg-blue-100 text-blue-700 font-medium"
+                          ? "bg-blue-50 text-blue-600 font-medium"
                           : "text-gray-600 hover:bg-blue-50 hover:text-blue-700"
                       }`}
                       onClick={subItem.onClick}
