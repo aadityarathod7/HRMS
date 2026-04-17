@@ -88,63 +88,85 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
     }
   }
 
+  const LEGEND = [
+    { label: "Present", ...ATT_COLORS.PRESENT },
+    { label: "WFH",     ...ATT_COLORS.WFH },
+    { label: "Absent",  ...ATT_COLORS.ABSENT },
+    { label: "Half Day",...ATT_COLORS.HALF_DAY },
+    { label: "On Leave",...ATT_COLORS.ON_LEAVE },
+    { label: "Holiday", ...ATT_COLORS.HOLIDAY },
+  ];
+
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 relative">
-      <div className="flex justify-between items-center mb-3">
-        <button onClick={prevMonth} style={{ fontSize: 16, color: "#6b7280", background: "none", border: "none", cursor: "pointer", padding: "2px 6px", lineHeight: 1 }}>‹</button>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: "#374151" }}>{monthName.toUpperCase()} {viewYear}</p>
-        <button onClick={nextMonth} style={{ fontSize: 16, color: "#6b7280", background: "none", border: "none", cursor: "pointer", padding: "2px 6px", lineHeight: 1 }}>›</button>
+    <div className="bg-white rounded-xl border border-gray-200 p-5 select-none">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={prevMonth}
+          className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition text-base font-medium"
+        >‹</button>
+        <p className="text-sm font-semibold text-gray-700 tracking-wide">
+          {monthName} {viewYear}
+        </p>
+        <button
+          onClick={nextMonth}
+          className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition text-base font-medium"
+        >›</button>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
+
+      {/* Day headers */}
+      <div className="grid grid-cols-7 mb-1">
         {["Su","Mo","Tu","We","Th","Fr","Sa"].map((d, i) => (
-          <div key={i} style={{ fontSize: 8, textAlign: "center", color: "#9ca3af", paddingBottom: 3 }}>{d}</div>
+          <div key={i} className="text-center text-[10px] font-medium text-gray-400 pb-2">{d}</div>
         ))}
-        {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} style={{ height: 22 }} />)}
+      </div>
+
+      {/* Day cells */}
+      <div className="grid grid-cols-7 gap-y-2">
+        {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} />)}
         {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
           const entry = dayMap[day];
           const dateObj = new Date(viewYear, viewMonth, day);
           const weekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
           const isToday = day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
           const c = entry ? ATT_COLORS[entry.status] : weekend ? ATT_COLORS.WEEKEND : null;
-          const hasTooltip = !!entry || weekend;
-          const tooltipText = entry ? entry.label : "Weekend";
+          const tooltipText = entry ? entry.label : weekend ? "Weekend" : null;
+
           return (
-            <div key={day}
-              onMouseEnter={() => hasTooltip ? setTooltip({ day, label: tooltipText }) : null}
-              onMouseLeave={() => setTooltip(null)}
-              style={{
-                height: 22, width: 22, margin: "0 auto", display: "flex",
-                alignItems: "center", justifyContent: "center", borderRadius: 4,
-                fontSize: 10, fontWeight: isToday ? 700 : 400,
-                backgroundColor: c?.bg || (isToday ? "#f3f4f6" : "transparent"),
-                color: c?.color || (isToday ? "#111827" : "#6b7280"),
-                outline: isToday ? "1.5px solid #9ca3af" : "none",
-                position: "relative", cursor: hasTooltip ? "default" : "default",
-              }}>
-              {day}
-              {tooltip?.day === day && (
-                <div style={{
-                  position: "absolute", bottom: 26, left: "50%", transform: "translateX(-50%)",
-                  backgroundColor: "#1f2937", color: "#fff", fontSize: 9, padding: "3px 7px",
-                  borderRadius: 4, whiteSpace: "nowrap", zIndex: 10, pointerEvents: "none",
-                }}>
-                  {tooltip.label}
+            <div key={day} className="relative flex justify-center"
+              onMouseEnter={() => tooltipText ? setTooltip({ day, label: tooltipText }) : null}
+              onMouseLeave={() => setTooltip(null)}>
+              <div
+                className="w-10 h-10 flex items-center justify-center rounded-lg text-xs transition-all"
+                style={{
+                  backgroundColor: c?.bg || "transparent",
+                  color: c?.color || (isToday ? "#111827" : "#6b7280"),
+                  fontWeight: isToday ? 700 : 400,
+                  boxShadow: isToday ? "inset 0 0 0 1.5px #9ca3af" : "none",
+                }}
+              >
+                {day}
+              </div>
+              {tooltip?.day === day && tooltipText && (
+                <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                  <div className="bg-gray-800 text-white text-[10px] px-2 py-1 rounded-md whitespace-nowrap shadow-lg">
+                    {tooltip.label}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
+                  </div>
                 </div>
               )}
             </div>
           );
         })}
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 8, paddingTop: 8, borderTop: "1px solid #f3f4f6" }}>
-        {[
-          { label: "Present", ...ATT_COLORS.PRESENT },
-          { label: "WFH", ...ATT_COLORS.WFH },
-          { label: "Absent", ...ATT_COLORS.ABSENT },
-          { label: "Half Day", ...ATT_COLORS.HALF_DAY },
-          { label: "On Leave", ...ATT_COLORS.ON_LEAVE },
-          { label: "Holiday", ...ATT_COLORS.HOLIDAY },
-        ].map(l => (
-          <span key={l.label} style={{ fontSize: 9, padding: "1px 5px", borderRadius: 4, backgroundColor: l.bg, color: l.color }}>{l.label}</span>
+
+      {/* Legend */}
+      <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-4 pt-4 border-t border-gray-100">
+        {LEGEND.map(l => (
+          <div key={l.label} className="flex items-center gap-1">
+            <div className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: l.bg, border: `1px solid ${l.color}22` }} />
+            <span className="text-[10px] text-gray-500">{l.label}</span>
+          </div>
         ))}
       </div>
     </div>
