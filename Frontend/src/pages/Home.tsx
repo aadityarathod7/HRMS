@@ -17,6 +17,7 @@ const ATT_COLORS: Record<string, { bg: string; color: string }> = {
 };
 
 const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
+  const [tooltip, setTooltip] = React.useState<{ day: number; status: string } | null>(null);
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
@@ -26,12 +27,23 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
 
   const statusMap: Record<number, string> = {};
   records.forEach((r: any) => {
-    const d = new Date(r.date);
-    if (d.getMonth() === month && d.getFullYear() === year) statusMap[d.getDate()] = r.status;
+    // Parse as local date to avoid UTC timezone shifting
+    const dateStr = r.date?.split("T")[0]; // "2026-04-14"
+    if (!dateStr) return;
+    const [y, m, d] = dateStr.split("-").map(Number);
+    if (m - 1 === month && y === year) statusMap[d] = r.status;
   });
 
+  const tooltipLabel: Record<string, string> = {
+    PRESENT: "Present",
+    WFH: "Work From Home",
+    ABSENT: "Absent",
+    HALF_DAY: "Half Day",
+    ON_LEAVE: "On Leave",
+  };
+
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 relative">
       <div className="flex justify-between items-center mb-3">
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1 }} className="text-gray-700 uppercase">{monthName}</p>
         <p style={{ fontSize: 10 }} className="text-gray-400">{year}</p>
@@ -46,16 +58,30 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
           const isToday = day === now.getDate();
           const c = status ? ATT_COLORS[status] : null;
           return (
-            <div key={day} title={status?.replace("_", " ") || ""}
+            <div key={day}
+              onMouseEnter={() => status ? setTooltip({ day, status }) : null}
+              onMouseLeave={() => setTooltip(null)}
               style={{
                 height: 22, width: 22, margin: "0 auto", display: "flex",
                 alignItems: "center", justifyContent: "center", borderRadius: 4,
                 fontSize: 10, fontWeight: isToday ? 700 : 400,
+                cursor: status ? "default" : "default",
                 backgroundColor: c?.bg || (isToday ? "#f3f4f6" : "transparent"),
                 color: c?.color || (isToday ? "#111827" : "#6b7280"),
                 outline: isToday ? "1.5px solid #9ca3af" : "none",
+                position: "relative",
               }}>
               {day}
+              {/* Tooltip */}
+              {tooltip?.day === day && (
+                <div style={{
+                  position: "absolute", bottom: 26, left: "50%", transform: "translateX(-50%)",
+                  backgroundColor: "#1f2937", color: "#fff", fontSize: 9, padding: "3px 7px",
+                  borderRadius: 4, whiteSpace: "nowrap", zIndex: 10, pointerEvents: "none",
+                }}>
+                  {tooltipLabel[status] || status}
+                </div>
+              )}
             </div>
           );
         })}
