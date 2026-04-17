@@ -88,16 +88,24 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
             const parsed = JSON.parse(event.data);
             const myRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
             const myProfile = JSON.parse(localStorage.getItem("userProfile") || "{}");
-            const myId = myProfile.id;
+            // Get user ID from profile or decode from JWT token
+            let myId = myProfile.id;
+            if (!myId) {
+              try {
+                const token = localStorage.getItem("token");
+                if (token) myId = JSON.parse(atob(token.split(".")[1])).id;
+              } catch (e) {}
+            }
 
             // Filter: only show if notification is for my role or for me specifically
             const forRoles = parsed.forRoles || [];
             const forUser = parsed.forUser;
+            const forAll = parsed.forAll || false;
 
             const isForMyRole = forRoles.length > 0 && myRoles.some(r => forRoles.includes(r));
             const isForMe = forUser && myId && forUser === myId;
 
-            if (!isForMyRole && !isForMe) return; // Not for me, ignore
+            if (!forAll && !isForMyRole && !isForMe) return; // Not for me, ignore
 
             const msg = parsed.message || event.data;
             setNotifications(prev => [{ message: msg, timestamp: new Date().toLocaleTimeString(), type: parsed.type || "info" }, ...prev]);

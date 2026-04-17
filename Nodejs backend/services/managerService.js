@@ -38,12 +38,15 @@ const updateLeaveStatus = async (leaveRequestId, status) => {
     }
   }
 
-  // Send notification
+  // Send notifications
   try {
     const emp = await User.findById(leave.userId).select('firstname lastname');
     const name = emp ? `${emp.firstname} ${emp.lastname}` : 'Employee';
     const action = status === 'APPROVED' ? 'approved' : status === 'REJECTED' ? 'rejected' : status.toLowerCase();
-    notifyLeaveAction({ type: 'STATUS_UPDATE', message: `Your ${leave.leaveType} leave has been ${action}`, forUser: leave.userId?.toString(), forRoles: ['HR', 'ADMIN'] });
+    // Notify the employee
+    notifyLeaveAction({ type: 'STATUS_UPDATE', message: `Your ${leave.leaveType} leave has been ${action}`, forUser: leave.userId?.toString() });
+    // Notify HR/Admin (different message)
+    notifyLeaveAction({ type: 'STATUS_UPDATE', message: `${name}'s ${leave.leaveType} leave has been ${action}`, forRoles: ['HR', 'ADMIN'] });
   } catch (e) {}
 
   return `Leave request status updated to ${status}`;

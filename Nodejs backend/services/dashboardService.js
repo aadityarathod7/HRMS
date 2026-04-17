@@ -3,6 +3,7 @@ const LeaveRequest = require('../models/LeaveRequest');
 const LeaveBalance = require('../models/LeaveBalance');
 const Attendance = require('../models/Attendance');
 const Payroll = require('../models/Payroll');
+const eventService = require('./eventService');
 const Timesheet = require('../models/Timesheet');
 const Department = require('../models/Department');
 
@@ -52,13 +53,16 @@ const getAdminStats = async () => {
     return bday >= today && bday <= next7Days;
   }).map(u => ({ name: `${u.firstname} ${u.lastname}`, date: u.dob, department: u.department?.departmentName }));
 
+  const upcomingEvents = await eventService.getUpcomingEvents(7);
+
   return {
     totalEmployees, activeEmployees, newJoiners,
     pendingLeaves, onLeaveToday,
     attendanceToday: { present: presentToday, absent: absentToday, wfh: wfhToday },
     departmentHeadcount: deptHeadcount,
     pendingTimesheets,
-    upcomingBirthdays
+    upcomingBirthdays,
+    upcomingEvents
   };
 };
 
@@ -81,11 +85,14 @@ const getManagerStats = async (managerId) => {
   // Also get manager's own employee data
   const myStats = await getEmployeeStats(managerId);
 
+  const upcomingEvents = await eventService.getUpcomingEvents(7);
+
   return {
     teamSize: teamMembers.length,
     teamMembers: teamMembers.map(m => ({ id: m._id, name: `${m.firstname} ${m.lastname}` })),
     pendingLeaves, teamOnLeave, pendingTimesheets,
     teamAttendanceToday: teamAttendance,
+    upcomingEvents,
     ...myStats
   };
 };
@@ -121,7 +128,8 @@ const getEmployeeStats = async (userId) => {
       year: latestPayroll.year,
       netSalary: latestPayroll.netSalary,
       status: latestPayroll.status
-    } : null
+    } : null,
+    upcomingEvents: await eventService.getUpcomingEvents(7)
   };
 };
 

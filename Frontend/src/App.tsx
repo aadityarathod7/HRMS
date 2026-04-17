@@ -38,6 +38,7 @@ import AttendanceManagement from "./pages/AttendanceManagement";
 import PayrollManagement from "./pages/PayrollManagement";
 import Documents from "./pages/Documents";
 import View from "./pages/View";
+import Events from "./pages/Events";
 
 const queryClient = new QueryClient();
 const ADMIN_HR = ["ADMIN", "HR"];
@@ -83,6 +84,7 @@ const App: React.FC = () => {
               <Route path="/attendance-management" element={<ProtectedRoute><AttendanceManagement /></ProtectedRoute>} />
               <Route path="/payroll-management" element={<ProtectedRoute><PayrollManagement /></ProtectedRoute>} />
               <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+              <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
               <Route path="/view/:id" element={<ProtectedRoute><View /></ProtectedRoute>} />
 
               {/* Protected — Admin, HR, Manager only */}

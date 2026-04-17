@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Clock,
   DollarSign,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -123,6 +124,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
     { icon: Clock, label: "Timesheet", onClick: handleTimeSheetManagementClick, roles: "ADMIN_HR" },
     { icon: Users, label: "Attendance", onClick: handleAttendanceManagementClick, roles: "ALL" },
     { icon: DollarSign, label: "Payroll", onClick: handlePayRoleManagementClick, roles: "ALL" },
+    { icon: Calendar, label: "Events", onClick: () => navigate("/events"), roles: "ALL" },
     { icon: FileText, label: "Documents", onClick: handleDocumentsClick, roles: "ALL" },
     { icon: LogOut, label: "Logout", onClick: handleLogout, roles: "ALL" },
   ];

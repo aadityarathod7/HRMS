@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
-import { Users, FileText, Clock, DollarSign, Calendar, UserCheck, UserX, Briefcase, TrendingUp, Gift } from "lucide-react";
+import { Users, FileText, Clock, DollarSign, Calendar, UserCheck, UserX, Briefcase, TrendingUp, Gift, CalendarDays } from "lucide-react";
 
 const Home: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -317,6 +317,37 @@ const Home: React.FC = () => {
                     </div>
                   )}
                 </>
+              )}
+              {/* Upcoming Events — All roles */}
+              {stats.upcomingEvents?.length > 0 && (
+                <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm mb-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-xs text-gray-400 uppercase tracking-wider flex items-center gap-2"><Calendar size={14} /> Upcoming Events</h3>
+                    <button onClick={() => navigate("/events")} className="text-xs text-blue-600 hover:text-blue-800">View All</button>
+                  </div>
+                  <div className="space-y-2">
+                    {stats.upcomingEvents.slice(0, 5).map((e: any, i: number) => {
+                      const typeColors: Record<string, string> = {
+                        BIRTHDAY: "bg-amber-50 text-amber-700",
+                        HOLIDAY: "bg-red-50 text-red-600",
+                        COMPANY_EVENT: "bg-blue-50 text-blue-700",
+                        TEAM_EVENT: "bg-purple-50 text-purple-700",
+                        TRAINING: "bg-green-50 text-green-700",
+                        WORK_ANNIVERSARY: "bg-teal-50 text-teal-700",
+                      };
+                      const color = typeColors[e.eventType] || "bg-gray-50 text-gray-600";
+                      return (
+                        <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                          <div className="flex items-center gap-3">
+                            <span className={`px-2 py-0.5 rounded text-[11px] ${color}`}>{e.eventType?.replace("_", " ")}</span>
+                            <span className="text-sm text-gray-800">{e.title}</span>
+                          </div>
+                          <span className="text-xs text-gray-400">{new Date(e.date).toLocaleDateString('en-GB')}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </>
           )}
