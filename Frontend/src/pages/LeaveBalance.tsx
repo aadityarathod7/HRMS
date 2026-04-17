@@ -12,7 +12,14 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const LEAVE_TYPES = ["CASUAL", "SICK", "PRIVILEGE", "COMP_OFF", "MATERNITY", "PATERNITY"];
-const COLORS = ["rgba(37,99,235,0.7)", "rgba(59,130,246,0.7)", "rgba(96,165,250,0.7)", "rgba(147,197,253,0.7)", "rgba(191,219,254,0.7)", "rgba(30,64,175,0.7)"];
+const COLORS = [
+  "#3B82F6", // blue - CASUAL
+  "#10B981", // emerald - SICK
+  "#F59E0B", // amber - PRIVILEGE
+  "#8B5CF6", // violet - COMP_OFF
+  "#F43F5E", // rose - MATERNITY
+  "#06B6D4", // cyan - PATERNITY
+];
 
 const LeaveBalance: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -83,7 +90,13 @@ const LeaveBalance: React.FC = () => {
 
   const chartData = {
     labels: balances.map(b => b.leaveType),
-    datasets: [{ data: balances.map(b => b.available), backgroundColor: COLORS.slice(0, balances.length), borderWidth: 0 }],
+    datasets: [{
+      data: balances.map(b => b.available),
+      backgroundColor: COLORS.slice(0, balances.length),
+      borderWidth: 3,
+      borderColor: "#ffffff",
+      hoverOffset: 6,
+    }],
   };
 
   const totalAllotted = balances.reduce((s, b) => s + b.totalAllotted, 0);
@@ -170,12 +183,15 @@ const LeaveBalance: React.FC = () => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                          {balances.map((b: any) => (
+                          {balances.map((b: any, i: number) => (
                             <tr key={b.id} className="hover:bg-gray-50">
-                              <td className="px-4 py-3 text-sm text-gray-800">{b.leaveType}</td>
+                              <td className="px-4 py-3 text-sm text-gray-800 flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                                {b.leaveType}
+                              </td>
                               <td className="px-4 py-3 text-sm text-gray-600">{b.totalAllotted}</td>
                               <td className="px-4 py-3 text-sm text-gray-600">{b.used}</td>
-                              <td className="px-4 py-3 text-sm font-medium text-blue-600">{b.available}</td>
+                              <td className="px-4 py-3 text-sm font-medium" style={{ color: COLORS[i % COLORS.length] }}>{b.available}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -183,7 +199,26 @@ const LeaveBalance: React.FC = () => {
                     </div>
                     <div className="bg-white rounded-xl border border-gray-100 p-6 flex items-center justify-center shadow-sm">
                       <div style={{ width: "250px", height: "250px" }}>
-                        <Pie data={chartData} options={{ responsive: true, plugins: { legend: { position: "bottom", labels: { padding: 16, font: { size: 12 } } } } }} />
+                        <Pie data={chartData} options={{
+                          responsive: true,
+                          cutout: "50%",
+                          plugins: {
+                            legend: {
+                              position: "bottom",
+                              labels: {
+                                padding: 16,
+                                font: { size: 12, family: "system-ui" },
+                                usePointStyle: true,
+                                pointStyle: "circle",
+                              }
+                            },
+                            tooltip: {
+                              callbacks: {
+                                label: (ctx) => ` ${ctx.label}: ${ctx.parsed} days`
+                              }
+                            }
+                          }
+                        }} />
                       </div>
                     </div>
                   </div>
