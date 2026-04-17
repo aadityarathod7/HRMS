@@ -7,6 +7,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { User, Briefcase, CreditCard, Phone, Shield } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const ViewEmployee: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ const ViewEmployee: React.FC = () => {
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/user/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.get(`${API_URL}/user/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       setUser(res.data);
     } catch (err) { toast.error("Failed to load employee details"); }
     finally { setLoading(false); }
@@ -38,7 +40,7 @@ const ViewEmployee: React.FC = () => {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/user/update/${id}`, {
+      await axios.put(`${API_URL}/user/update/${id}`, {
         ...user,
         roles: user.roles?.map((r: any) => r.role || r) || [],
       }, { headers: { Authorization: `Bearer ${token}` } });

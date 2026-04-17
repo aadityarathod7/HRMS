@@ -7,6 +7,8 @@ import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 import DateInput from "@/components/DateInput";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const BRANCHES = ["IT", "HR", "BA", "FINANCE", "OPERATIONS", "MARKETING", "DESIGN", "QA", "SALES"];
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const ROLES = ["ADMIN", "HR", "MANAGER", "EMPLOYEE", "INTERN"];
@@ -31,9 +33,9 @@ const EmployeeRegistration = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    axios.get(, { headers: { Authorization: `Bearer ${token}` } })
+    axios.get(`${API_URL}/departments/active`, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setDepartments(res.data)).catch(() => {});
-    axios.get(, { headers: { Authorization: `Bearer ${token}` } })
+    axios.get(`${API_URL}/user/all`, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setManagers(res.data)).catch(() => {});
   }, []);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -45,7 +47,7 @@ const EmployeeRegistration = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(, {
+      const response = await fetch(`${API_URL}/user/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ ...formData, createdBy: localStorage.getItem("username") }),

@@ -5,6 +5,8 @@ import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const inputClass = "w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500";
 const labelClass = "block text-xs text-gray-500 uppercase tracking-wider mb-1.5";
 
@@ -20,7 +22,7 @@ const DepartmentRegistration = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(, {
+      const response = await fetch(`${API_URL}/departments/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ departmentName: formData.department, contactPerson: formData.contactPerson }),

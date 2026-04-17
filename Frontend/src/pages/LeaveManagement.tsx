@@ -10,6 +10,8 @@ import { toast } from "react-toastify";
 import { KeyboardArrowDown } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 type LeaveDto = {
   id: string;
   userId: number;
@@ -45,7 +47,7 @@ const LeaveManagement: React.FC = () => {
       }
 
       const response = await axios.get(
-        ,
+        `${API_URL}/leaverequests/pending`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -81,7 +83,7 @@ const LeaveManagement: React.FC = () => {
 
       try {
         const response = await axios.get(
-          ,
+          `${API_URL}/Leaves/inactive`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -112,7 +114,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/activate/${id}`,
+        `${API_URL}/Leaves/activate/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -153,7 +155,7 @@ const LeaveManagement: React.FC = () => {
 
       const response = await axios({
         method: "PATCH",
-        url: `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/deactivate/${LeaveId}`,
+        url: `${API_URL}/Leaves/deactivate/${LeaveId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -174,7 +176,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        ,
+        `${API_URL}/leaverequests/rejected`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -191,7 +193,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        ,
+        `${API_URL}/leaverequests/approved`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -208,7 +210,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        ,
+        `${API_URL}/leaverequests/pending`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -243,7 +245,7 @@ const LeaveManagement: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.delete(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/delete/${id}`,
+          `${API_URL}/leaverequests/delete/${id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -267,7 +269,7 @@ const LeaveManagement: React.FC = () => {
     if (window.confirm("Are you sure you want to activate this Leave?")) {
       try {
         const response = await fetch(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/activate/${id}`,
+          `${API_URL}/Leaves/activate/${id}`,
           {
             method: "PUT",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -310,7 +312,7 @@ const LeaveManagement: React.FC = () => {
       const newLeave = {};
 
       const response = await axios.post(
-        ,
+        `${API_URL}/Leaves/create`,
         newLeave,
         {
           headers: {
@@ -333,7 +335,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.patch(
-        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/approve/${id}`,
+        `${API_URL}/Leaves/approve/${id}`,
         {},
         {
           headers: {
@@ -354,7 +356,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.patch(
-        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/reject/${id}`,
+        `${API_URL}/Leaves/reject/${id}`,
         {},
         {
           headers: {

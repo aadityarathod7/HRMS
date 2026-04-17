@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const ResetPassword = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -32,7 +34,7 @@ const ResetPassword = () => {
 
     try {
       const response = await fetch(
-        ,
+        `${API_URL}/auth/reset-password`,
         {
           method: "POST",
           headers: {

@@ -7,6 +7,8 @@ import DateInput from "@/components/DateInput";
 import { toast } from "react-toastify";
 import { Calendar, List, ChevronLeft, ChevronRight, Gift, Star, Users, Briefcase, BookOpen, Award } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const EVENT_TYPES = ["COMPANY_EVENT", "TEAM_EVENT", "TRAINING", "HOLIDAY", "BIRTHDAY", "WORK_ANNIVERSARY"];
 const ALL_TYPES = ["BIRTHDAY", "HOLIDAY", "COMPANY_EVENT", "TEAM_EVENT", "TRAINING", "WORK_ANNIVERSARY"];
 
@@ -38,7 +40,7 @@ const Events: React.FC = () => {
   const fetchEvents = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/events/all?month=${currentMonth}&year=${currentYear}`, {
+      const res = await axios.get(`${API_URL}/events/all?month=${currentMonth}&year=${currentYear}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setEvents(res.data);
@@ -51,7 +53,7 @@ const Events: React.FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post(, form, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(`${API_URL}/events/create`, form, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Event created");
       setForm({ title: "", description: "", eventType: "COMPANY_EVENT", date: "", endDate: "", time: "", location: "", isAllDay: true });
       setShowForm(false);
@@ -63,7 +65,7 @@ const Events: React.FC = () => {
     if (!window.confirm("Delete this event?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/events/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${API_URL}/events/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Event deleted");
       setSelectedEvent(null);
       fetchEvents();

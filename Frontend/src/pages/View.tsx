@@ -4,6 +4,8 @@ import axios from "axios";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const View: React.FC = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [fileContent, setFileContent] = useState<string | null>(null);
@@ -25,11 +27,11 @@ const View: React.FC = () => {
         const fetchFile = async () => {
             try {
                 // First get file metadata from filter
-                const metaRes = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/file/filter?page=0&size=1`, {
+                const metaRes = await axios.get(`${API_URL}/file/filter?page=0&size=1`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 // Find the file info by checking all files
-                const allFiles = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/file/filter?page=0&size=100`, {
+                const allFiles = await axios.get(`${API_URL}/file/filter?page=0&size=100`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const file = allFiles.data.content?.find((f: any) => f.id === id || f._id === id);
@@ -37,7 +39,7 @@ const View: React.FC = () => {
 
                 if (file && isTextFile(file.fileType)) {
                     // Text files: fetch content as text
-                    const contentRes = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/file/get-file-content/${id}`, {
+                    const contentRes = await axios.get(`${API_URL}/file/get-file-content/${id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
                     setFileContent(contentRes.data.content);
@@ -55,7 +57,7 @@ const View: React.FC = () => {
 
     const handleSaveChanges = async () => {
         try {
-            await axios.put(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/file/update/${id}`, { newContent: editedContent }, {
+            await axios.put(`${API_URL}/file/update/${id}`, { newContent: editedContent }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setFileContent(editedContent);
@@ -65,7 +67,7 @@ const View: React.FC = () => {
         }
     };
 
-    const fileUrl = `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/file/download/${id}?token=${token}`;
+    const fileUrl = `${API_URL}/file/download/${id}?token=${token}`;
 
     return (
         <div className="flex min-h-screen bg-gray-100">

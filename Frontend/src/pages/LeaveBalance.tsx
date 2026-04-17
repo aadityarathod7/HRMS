@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const LEAVE_TYPES = ["CASUAL", "SICK", "PRIVILEGE", "COMP_OFF", "MATERNITY", "PATERNITY"];
@@ -31,7 +33,7 @@ const LeaveBalance: React.FC = () => {
       const token = localStorage.getItem("token");
       const userId = userProfile.id;
       if (!userId) { setLoading(false); return; }
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/balance/${userId}?year=${new Date().getFullYear()}`, {
+      const res = await axios.get(`${API_URL}/leaverequests/balance/${userId}?year=${new Date().getFullYear()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBalances(res.data);
@@ -43,8 +45,8 @@ const LeaveBalance: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const [balRes, userRes] = await Promise.all([
-        axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/balance/all/${new Date().getFullYear()}`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_URL}/leaverequests/balance/all/${new Date().getFullYear()}`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_URL}/user/all`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       setAllBalances(balRes.data);
       setUsers(userRes.data);
@@ -57,7 +59,7 @@ const LeaveBalance: React.FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.put(, {
+      await axios.put(`${API_URL}/leaverequests/balance/update`, {
         userId: assignForm.userId,
         leaveType: assignForm.leaveType,
         totalAllotted: Number(assignForm.totalAllotted),

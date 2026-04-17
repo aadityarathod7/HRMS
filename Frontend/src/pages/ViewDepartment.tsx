@@ -5,6 +5,8 @@ import DashboardSidebar from "@/components/Sidebar";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const ViewDepartment: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [department, setDepartment] = useState<any>(null);
@@ -21,7 +23,7 @@ const ViewDepartment: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/departments/${id}`,
+          `${API_URL}/departments/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -63,7 +65,7 @@ const ViewDepartment: React.FC = () => {
         };
 
         const response = await axios.put(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/departments/update/${id}`,
+          `${API_URL}/departments/update/${id}`,
           updateRequest,
           { headers }
         );

@@ -5,6 +5,8 @@ import DashboardSidebar from "@/components/Sidebar";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const ViewProject: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [project, setProject] = useState<any>(null);
@@ -22,7 +24,7 @@ const ViewProject: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/${id}`,
+          `${API_URL}/project/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -68,7 +70,7 @@ const ViewProject: React.FC = () => {
         };
 
         await axios.put(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/update/${id}`,
+          `${API_URL}/project/update/${id}`,
           updateProjectRequest,
           {
             headers: {
@@ -81,7 +83,7 @@ const ViewProject: React.FC = () => {
         toast.success("Project updated successfully!");
         setIsEditing(false);
         const updatedProject = await axios.get(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/${id}`,
+          `${API_URL}/project/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -103,7 +105,7 @@ const ViewProject: React.FC = () => {
         };
 
         await axios.put(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/deactivate/${project.id}`,
+          `${API_URL}/project/deactivate/${project.id}`,
           {},
           { headers }
         );
@@ -127,7 +129,7 @@ const ViewProject: React.FC = () => {
 
 
         const response = await axios.put(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/activate/${project.id}`,
+          `${API_URL}/project/activate/${project.id}`,
           {},
           { headers }
         );

@@ -12,6 +12,8 @@ import Footer from "@/components/Footer";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const RoleManagement: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [users, setUsers] = useState<UserDto[]>([]);
@@ -37,7 +39,7 @@ const RoleManagement: React.FC = () => {
         return;
       }
 
-      const response = await axios.get(, {
+      const response = await axios.get(`${API_URL}/role/active`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -75,7 +77,7 @@ const RoleManagement: React.FC = () => {
         return;
       }
 
-      const response = await axios.get(, {
+      const response = await axios.get(`${API_URL}/role/inactive`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -116,7 +118,7 @@ const RoleManagement: React.FC = () => {
         }
 
         const response = await axios.put(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/activate/${id}`,
+          `${API_URL}/role/activate/${id}`,
           {},
           {
             headers: {
@@ -166,7 +168,7 @@ const RoleManagement: React.FC = () => {
 
       const response = await axios({
         method: "PATCH",
-        url: `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/deactivate/${roleId}`,
+        url: `${API_URL}/role/deactivate/${roleId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -234,7 +236,7 @@ const RoleManagement: React.FC = () => {
 
     try {
       const response = await axios.post(
-        ,
+        `${API_URL}/role/create`,
         newRole,
         {
           headers: {

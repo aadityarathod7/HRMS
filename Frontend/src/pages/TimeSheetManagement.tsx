@@ -7,6 +7,8 @@ import DateInput from "@/components/DateInput";
 import { CheckCircle, Close } from "@mui/icons-material";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 interface TimesheetEntry {
   id: string;
   userId: { id: string; firstname: string; lastname: string; userName: string } | string;
@@ -35,8 +37,8 @@ const TimeSheetManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const url = selectedStatus === "ALL"
-        ? 
-        : `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/timesheets/status/${selectedStatus}`;
+        ? `${API_URL}/timesheets/all`
+        : `${API_URL}/timesheets/status/${selectedStatus}`;
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setTimesheets(response.data);
     } catch (error) {
@@ -47,8 +49,8 @@ const TimeSheetManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const [usersRes, projectsRes] = await Promise.all([
-        axios.get(, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_URL}/user/all`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_URL}/project/all`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       setUsers(usersRes.data);
       setProjects(projectsRes.data);
@@ -62,7 +64,7 @@ const TimeSheetManagement: React.FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post(, {
+      await axios.post(`${API_URL}/timesheets/create`, {
         userId: form.userId,
         date: form.date,
         hoursWorked: Number(form.hoursWorked),
@@ -80,7 +82,7 @@ const TimeSheetManagement: React.FC = () => {
   const handleApprove = async (id: string) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/timesheets/updateStatus/${id}?status=APPROVED`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${API_URL}/timesheets/updateStatus/${id}?status=APPROVED`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Timesheet approved");
       fetchTimesheets();
     } catch (error) { toast.error("Failed to approve"); }
@@ -89,7 +91,7 @@ const TimeSheetManagement: React.FC = () => {
   const handleReject = async (id: string) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/timesheets/updateStatus/${id}?status=REJECTED`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${API_URL}/timesheets/updateStatus/${id}?status=REJECTED`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Timesheet rejected");
       fetchTimesheets();
     } catch (error) { toast.error("Failed to reject"); }

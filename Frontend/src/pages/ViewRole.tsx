@@ -5,6 +5,8 @@ import DashboardSidebar from "@/components/Sidebar";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const AVAILABLE_ROLES = [
   { value: "ROLE_USER", label: "User" },
   { value: "ROLE_ADMIN", label: "Admin" },
@@ -63,7 +65,7 @@ const ViewRole: React.FC = () => {
     const fetchUserDetails = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/${id}`, {
+        const response = await axios.get(`${API_URL}/role/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -116,7 +118,7 @@ const ViewRole: React.FC = () => {
         };
 
         const response = await axios.put(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/update/${id}`,
+          `${API_URL}/role/update/${id}`,
           updateRoleRequest,
           { headers }
         );
@@ -125,7 +127,7 @@ const ViewRole: React.FC = () => {
         toast.success("Role updated successfully!");
         setIsEditing(false);
         const updatedUser = await axios.get(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/${id}`,
+          `${API_URL}/role/${id}`,
           { headers }
         );
         setUser(updatedUser.data);
@@ -145,7 +147,7 @@ const ViewRole: React.FC = () => {
         };
 
         await axios.put(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/deactivate/${user.id}`,
+          `${API_URL}/role/deactivate/${user.id}`,
           {},
           { headers }
         );
@@ -169,7 +171,7 @@ const ViewRole: React.FC = () => {
 
 
         const response = await axios.put(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/activate/${user.id}`,
+          `${API_URL}/role/activate/${user.id}`,
           {},
           { headers }
         );

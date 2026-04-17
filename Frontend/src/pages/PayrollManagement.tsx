@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import { Download } from "lucide-react";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 interface PayrollEntry {
   id: string;
   userId: { id: string; firstname: string; lastname: string; userName: string } | string;
@@ -46,8 +48,8 @@ const PayrollManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const url = selectedStatus === "ALL"
-        ? 
-        : `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/payroll/status/${selectedStatus}`;
+        ? `${API_URL}/payroll/all`
+        : `${API_URL}/payroll/status/${selectedStatus}`;
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setPayrolls(response.data);
     } catch (err) {} finally { setLoading(false); }
@@ -56,7 +58,7 @@ const PayrollManagement: React.FC = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.get(`${API_URL}/user/all`, { headers: { Authorization: `Bearer ${token}` } });
       setUsers(res.data);
     } catch (err) {}
   };
@@ -68,7 +70,7 @@ const PayrollManagement: React.FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post(, {
+      await axios.post(`${API_URL}/payroll/create`, {
         userId: form.userId,
         month: form.month,
         year: Number(form.year),
@@ -87,7 +89,7 @@ const PayrollManagement: React.FC = () => {
   const handleProcess = async (id: string) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/payroll/updateStatus/${id}?status=PROCESSED`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${API_URL}/payroll/updateStatus/${id}?status=PROCESSED`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Payroll processed");
       fetchPayrolls();
     } catch (error) { toast.error("Failed to process"); }
@@ -96,7 +98,7 @@ const PayrollManagement: React.FC = () => {
   const handleDownloadPayslip = async (id: string) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/payroll/payslip/${id}`, {
+      const response = await axios.get(`${API_URL}/payroll/payslip/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: "blob",
       });
@@ -115,7 +117,7 @@ const PayrollManagement: React.FC = () => {
   const handleMarkPaid = async (id: string) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/payroll/updateStatus/${id}?status=PAID`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${API_URL}/payroll/updateStatus/${id}?status=PAID`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Marked as paid");
       fetchPayrolls();
     } catch (error) { toast.error("Failed to update"); }

@@ -8,6 +8,8 @@ import Footer from "@/components/Footer";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const DepartmentManagement: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [users, setUsers] = useState<UserDto[]>([]);
@@ -29,7 +31,7 @@ const DepartmentManagement: React.FC = () => {
       }
 
       const response = await axios.get(
-        ,
+        `${API_URL}/departments/active`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -65,7 +67,7 @@ const DepartmentManagement: React.FC = () => {
 
       try {
         const response = await axios.get(
-          ,
+          `${API_URL}/departments/inactive`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -99,7 +101,7 @@ const DepartmentManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/departments/activate/${id}`,
+        `${API_URL}/departments/activate/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -144,7 +146,7 @@ const DepartmentManagement: React.FC = () => {
 
       const response = await axios({
         method: "PATCH",
-        url: `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/departments/deactivate/${departmentId}`,
+        url: `${API_URL}/departments/deactivate/${departmentId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -194,7 +196,7 @@ const DepartmentManagement: React.FC = () => {
     ) {
       try {
         const response = await fetch(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/departments/deactivate/${id}`,
+          `${API_URL}/departments/deactivate/${id}`,
           {
             method: "PATCH",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -216,7 +218,7 @@ const DepartmentManagement: React.FC = () => {
     if (window.confirm("Are you sure you want to activate this department?")) {
       try {
         const response = await fetch(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/departments/activate/${id}`,
+          `${API_URL}/departments/activate/${id}`,
           {
             method: "PUT",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -259,7 +261,7 @@ const DepartmentManagement: React.FC = () => {
       const newDepartment = {};
 
       const response = await axios.post(
-        ,
+        `${API_URL}/departments/create`,
         newDepartment,
         {
           headers: {

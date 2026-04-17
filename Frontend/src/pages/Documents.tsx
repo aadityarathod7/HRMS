@@ -9,6 +9,8 @@ import Footer from "@/components/Footer";
 import DateInput from "@/components/DateInput";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 interface FileData {
   id: number;
   fileName: string;
@@ -52,7 +54,7 @@ const Documents: React.FC = () => {
         queryParams.append("endDate", filters.endDate);
       }
       const token = localStorage.getItem("token");
-      const response = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/file/filter?${queryParams.toString()}`, {
+      const response = await axios.get(`${API_URL}/file/filter?${queryParams.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data) {
@@ -72,7 +74,7 @@ const Documents: React.FC = () => {
     if (!window.confirm("Delete this file?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/file/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${API_URL}/file/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("File deleted");
       fetchFiles();
     } catch (err) { toast.error("Failed to delete file"); }
@@ -82,7 +84,7 @@ const Documents: React.FC = () => {
     if (!window.confirm(`Delete ${checkedFiles.length} files?`)) return;
     try {
       const token = localStorage.getItem("token");
-      await Promise.all(checkedFiles.map(id => axios.delete(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/file/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } })));
+      await Promise.all(checkedFiles.map(id => axios.delete(`${API_URL}/file/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } })));
       toast.success("Files deleted");
       setCheckedFiles([]);
       fetchFiles();
@@ -97,7 +99,7 @@ const Documents: React.FC = () => {
     formData.append("uploadedBy", localStorage.getItem("username") || "anonymous");
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(, formData, {
+      const response = await axios.post(`${API_URL}/file/upload`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.status === 200 || response.status === 201) {

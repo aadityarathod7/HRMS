@@ -6,6 +6,8 @@ import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 import DateInput from "@/components/DateInput";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const LEAVE_TYPES = ["CASUAL", "SICK", "PRIVILEGE", "COMP_OFF", "MATERNITY", "PATERNITY", "LOP"];
 
 const LeaveApplication = () => {
@@ -28,11 +30,11 @@ const LeaveApplication = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     // Fetch managers for dropdown
-    axios.get(, { headers: { Authorization: `Bearer ${token}` } })
+    axios.get(`${API_URL}/user/all`, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setManagers(res.data)).catch(() => {});
     // Fetch leave balance
     if (userProfile.id) {
-      axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/balance/${userProfile.id}`, { headers: { Authorization: `Bearer ${token}` } })
+      axios.get(`${API_URL}/leaverequests/balance/${userProfile.id}`, { headers: { Authorization: `Bearer ${token}` } })
         .then(res => setLeaveBalance(res.data)).catch(() => {});
     }
   }, []);
@@ -46,7 +48,7 @@ const LeaveApplication = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(, {
+      const response = await fetch(`${API_URL}/leaverequests/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(formData),

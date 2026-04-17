@@ -5,6 +5,8 @@ import DashboardSidebar from "@/components/Sidebar";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 interface LeaveRequest {
   userId: string;
   reportingManagerId: string;
@@ -31,7 +33,7 @@ const ViewLeave: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/${id}`,
+          `${API_URL}/leaverequests/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -78,7 +80,7 @@ const ViewLeave: React.FC = () => {
         };
 
         const response = await axios.put(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/update/${id}`,
+          `${API_URL}/leaverequests/update/${id}`,
           updateRequest,
           { headers }
         );

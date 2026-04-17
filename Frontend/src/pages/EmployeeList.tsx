@@ -10,6 +10,8 @@ import {
 } from "@mui/icons-material";
 import Footer from "@/components/Footer";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const EmployeeList: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [users, setUsers] = useState<UserDto[]>([]);
@@ -28,7 +30,7 @@ const EmployeeList: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/user/all?isActive=${isActive ? 1 : 0}`,
+        `${API_URL}/user/all?isActive=${isActive ? 1 : 0}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!response.ok) {
@@ -71,7 +73,7 @@ const EmployeeList: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/user/deactivate/${id}`,
+          `${API_URL}/user/deactivate/${id}`,
           {
             method: "PUT",
             headers: { Authorization: `Bearer ${token}` },
@@ -95,7 +97,7 @@ const EmployeeList: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/user/activate/${id}`,
+          `${API_URL}/user/activate/${id}`,
           {
             method: "PUT",
             headers: { Authorization: `Bearer ${token}` },

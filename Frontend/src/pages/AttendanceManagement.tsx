@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import DateInput from "@/components/DateInput";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 interface AttendanceEntry {
   id: string;
   userId: { id: string; firstname: string; lastname: string; userName: string } | string;
@@ -33,8 +35,8 @@ const AttendanceManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const url = selectedStatus === "ALL"
-        ? 
-        : `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/attendance/status/${selectedStatus}`;
+        ? `${API_URL}/attendance/all`
+        : `${API_URL}/attendance/status/${selectedStatus}`;
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setRecords(response.data);
     } catch (err) {} finally { setLoading(false); }
@@ -43,7 +45,7 @@ const AttendanceManagement: React.FC = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.get(`${API_URL}/user/all`, { headers: { Authorization: `Bearer ${token}` } });
       setUsers(res.data);
     } catch (err) {}
   };
@@ -55,7 +57,7 @@ const AttendanceManagement: React.FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post(, form, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(`${API_URL}/attendance/mark`, form, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Attendance marked");
       setForm({ userId: "", date: "", checkIn: "", checkOut: "", status: "PRESENT", notes: "" });
       setShowForm(false);
@@ -67,7 +69,7 @@ const AttendanceManagement: React.FC = () => {
     if (!window.confirm("Delete this attendance record?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/attendance/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${API_URL}/attendance/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Record deleted");
       fetchRecords();
     } catch (error) { toast.error("Failed to delete"); }

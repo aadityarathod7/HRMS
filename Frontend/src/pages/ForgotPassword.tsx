@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -14,7 +16,7 @@ const ForgotPassword = () => {
 
     try {
       const response = await fetch(
-        ,
+        `${API_URL}/auth/forgot-password`,
         {
           method: "POST",
           headers: {
