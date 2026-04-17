@@ -8,29 +8,50 @@ import { Users, FileText, Clock, DollarSign, Calendar, UserCheck, UserX, Briefca
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// Indian national public holidays (YYYY-MM-DD)
-const PUBLIC_HOLIDAYS = new Set([
+// Indian national public holidays with names (YYYY-MM-DD)
+const PUBLIC_HOLIDAYS: Record<string, string> = {
   // 2025
-  "2025-01-26","2025-03-14","2025-04-14","2025-04-18","2025-08-15","2025-10-02","2025-10-20","2025-12-25",
+  "2025-01-26": "Republic Day",
+  "2025-03-14": "Holi",
+  "2025-04-14": "Dr. Ambedkar Jayanti",
+  "2025-04-18": "Good Friday",
+  "2025-08-15": "Independence Day",
+  "2025-10-02": "Gandhi Jayanti",
+  "2025-10-20": "Diwali",
+  "2025-12-25": "Christmas",
   // 2026
-  "2026-01-26","2026-03-03","2026-04-03","2026-04-14","2026-08-15","2026-10-02","2026-11-09","2026-12-25",
-]);
+  "2026-01-26": "Republic Day",
+  "2026-03-03": "Holi",
+  "2026-04-03": "Good Friday",
+  "2026-04-14": "Dr. Ambedkar Jayanti",
+  "2026-08-15": "Independence Day",
+  "2026-10-02": "Gandhi Jayanti",
+  "2026-11-09": "Diwali",
+  "2026-12-25": "Christmas",
+};
 
 const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6;
 
 const ATT_COLORS: Record<string, { bg: string; color: string }> = {
-  PRESENT: { bg: "#d1fae5", color: "#065f46" },
-  WFH: { bg: "#dbeafe", color: "#1e40af" },
-  ABSENT: { bg: "#fee2e2", color: "#b91c1c" },
+  PRESENT:  { bg: "#d1fae5", color: "#065f46" },
+  WFH:      { bg: "#dbeafe", color: "#1e40af" },
+  ABSENT:   { bg: "#fee2e2", color: "#b91c1c" },
   HALF_DAY: { bg: "#fef3c7", color: "#92400e" },
   ON_LEAVE: { bg: "#ede9fe", color: "#5b21b6" },
+  HOLIDAY:  { bg: "#fce7f3", color: "#9d174d" },
+  WEEKEND:  { bg: "#f3f4f6", color: "#9ca3af" },
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  PRESENT: "Present", WFH: "Work From Home", ABSENT: "Absent",
+  HALF_DAY: "Half Day", ON_LEAVE: "On Leave", HOLIDAY: "Holiday", WEEKEND: "Weekend",
 };
 
 const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
   const today = new Date();
   const [viewYear, setViewYear] = React.useState(today.getFullYear());
   const [viewMonth, setViewMonth] = React.useState(today.getMonth());
-  const [tooltip, setTooltip] = React.useState<{ day: number; status: string } | null>(null);
+  const [tooltip, setTooltip] = React.useState<{ day: number; label: string } | null>(null);
 
   const firstDay = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -45,18 +66,27 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
     else setViewMonth(m => m + 1);
   };
 
-  const statusMap: Record<number, string> = {};
+  // Build map: day → { status, label }
+  const dayMap: Record<number, { status: string; label: string }> = {};
+
+  // First add attendance/leave records
   records.forEach((r: any) => {
     const dateStr = r.date?.split("T")[0];
     if (!dateStr) return;
     const [y, m, d] = dateStr.split("-").map(Number);
-    if (m - 1 === viewMonth && y === viewYear) statusMap[d] = r.status;
+    if (m - 1 === viewMonth && y === viewYear) {
+      dayMap[d] = { status: r.status, label: r.label || STATUS_LABEL[r.status] || r.status };
+    }
   });
 
-  const tooltipLabel: Record<string, string> = {
-    PRESENT: "Present", WFH: "Work From Home", ABSENT: "Absent",
-    HALF_DAY: "Half Day", ON_LEAVE: "On Leave",
-  };
+  // Overlay public holidays (don't overwrite existing attendance)
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const holidayName = PUBLIC_HOLIDAYS[dateStr];
+    if (holidayName && !dayMap[d]) {
+      dayMap[d] = { status: "HOLIDAY", label: holidayName };
+    }
+  }
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 relative">
@@ -74,12 +104,16 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
         ))}
         {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} style={{ height: 22 }} />)}
         {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
-          const status = statusMap[day];
+          const entry = dayMap[day];
+          const dateObj = new Date(viewYear, viewMonth, day);
+          const weekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
           const isToday = day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
-          const c = status ? ATT_COLORS[status] : null;
+          const c = entry ? ATT_COLORS[entry.status] : weekend ? ATT_COLORS.WEEKEND : null;
+          const hasTooltip = !!entry || weekend;
+          const tooltipText = entry ? entry.label : "Weekend";
           return (
             <div key={day}
-              onMouseEnter={() => status ? setTooltip({ day, status }) : null}
+              onMouseEnter={() => hasTooltip ? setTooltip({ day, label: tooltipText }) : null}
               onMouseLeave={() => setTooltip(null)}
               style={{
                 height: 22, width: 22, margin: "0 auto", display: "flex",
@@ -88,7 +122,7 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
                 backgroundColor: c?.bg || (isToday ? "#f3f4f6" : "transparent"),
                 color: c?.color || (isToday ? "#111827" : "#6b7280"),
                 outline: isToday ? "1.5px solid #9ca3af" : "none",
-                position: "relative",
+                position: "relative", cursor: hasTooltip ? "default" : "default",
               }}>
               {day}
               {tooltip?.day === day && (
@@ -97,7 +131,7 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
                   backgroundColor: "#1f2937", color: "#fff", fontSize: 9, padding: "3px 7px",
                   borderRadius: 4, whiteSpace: "nowrap", zIndex: 10, pointerEvents: "none",
                 }}>
-                  {tooltipLabel[status] || status}
+                  {tooltip.label}
                 </div>
               )}
             </div>
@@ -111,6 +145,7 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
           { label: "Absent", ...ATT_COLORS.ABSENT },
           { label: "Half Day", ...ATT_COLORS.HALF_DAY },
           { label: "On Leave", ...ATT_COLORS.ON_LEAVE },
+          { label: "Holiday", ...ATT_COLORS.HOLIDAY },
         ].map(l => (
           <span key={l.label} style={{ fontSize: 9, padding: "1px 5px", borderRadius: 4, backgroundColor: l.bg, color: l.color }}>{l.label}</span>
         ))}
@@ -253,7 +288,7 @@ const Home: React.FC = () => {
               const dateStr = d.toISOString().split("T")[0];
               // Only add if not already present in attendance records
               if (!attRecords.some((a: any) => a.date?.startsWith(dateStr))) {
-                leaveRecords.push({ date: dateStr, status: "ON_LEAVE" });
+                leaveRecords.push({ date: dateStr, status: "ON_LEAVE", label: `On Leave — ${leave.leaveType}` });
               }
             }
           });
@@ -270,7 +305,7 @@ const Home: React.FC = () => {
             ]);
             for (let d = new Date(doj); d <= today; d.setDate(d.getDate() + 1)) {
               const dateStr = d.toISOString().split("T")[0];
-              if (!isWeekend(d) && !PUBLIC_HOLIDAYS.has(dateStr) && !allRecordDates.has(dateStr)) {
+              if (!isWeekend(d) && !(dateStr in PUBLIC_HOLIDAYS) && !allRecordDates.has(dateStr)) {
                 autoPresent.push({ date: dateStr, status: "PRESENT" });
               }
             }
