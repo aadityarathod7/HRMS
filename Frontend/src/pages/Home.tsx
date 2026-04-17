@@ -393,16 +393,6 @@ const Home: React.FC = () => {
 
   const formatCurrency = (n: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
 
-  const IconCard = ({ icon: Icon, label, value, sub, color, onClick }: any) => (
-    <div className={`bg-white rounded-xl border border-gray-100 p-4 flex items-start gap-4 shadow-sm hover:shadow-md transition-all ${onClick ? "cursor-pointer" : ""}`} onClick={onClick}>
-      <div className={`p-2.5 rounded-lg ${color}`}><Icon size={20} /></div>
-      <div>
-        <p className="text-2xl font-light text-gray-900">{value}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{label}</p>
-        {sub && <p className="text-[11px] text-gray-400 mt-0.5">{sub}</p>}
-      </div>
-    </div>
-  );
 
   const Badge = ({ status }: { status: string }) => {
     const s: Record<string, string> = {
@@ -443,29 +433,46 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <>
-              {/* ====== ADMIN / HR ====== */}
+              {/* ====== ADMIN ====== */}
               {role === "ADMIN" && (
                 <>
-                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                    <IconCard icon={Users} label="Active Employees" value={stats.activeEmployees || 0} sub={`${stats.totalEmployees || 0} total`} color="bg-blue-50 text-blue-600" onClick={() => navigate("/employeelist")} />
-                    <IconCard icon={UserCheck} label="New Joiners" value={stats.newJoiners || 0} sub="This month" color="bg-green-50 text-green-600" />
-                    <IconCard icon={Calendar} label="On Leave Today" value={stats.onLeaveToday || 0} color="bg-amber-50 text-amber-600" />
-                    <IconCard icon={FileText} label="Pending Leaves" value={stats.pendingLeaves || 0} sub="Awaiting approval" color="bg-orange-50 text-orange-600" onClick={() => navigate("/leave-management")} />
-                    <IconCard icon={Clock} label="Pending Timesheets" value={stats.pendingTimesheets || 0} color="bg-purple-50 text-purple-600" onClick={() => navigate("/time-sheet-management")} />
+                  {/* Stat cards */}
+                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
+                    {[
+                      { icon: Users, label: "Active Employees", value: stats.activeEmployees || 0, sub: `${stats.totalEmployees || 0} total`, path: "/employeelist", iconBg: "#eff6ff", iconColor: "#2563eb" },
+                      { icon: UserCheck, label: "New Joiners", value: stats.newJoiners || 0, sub: "This month", path: null, iconBg: "#f0fdf4", iconColor: "#16a34a" },
+                      { icon: Calendar, label: "On Leave Today", value: stats.onLeaveToday || 0, sub: "Employees", path: null, iconBg: "#fffbeb", iconColor: "#d97706" },
+                      { icon: FileText, label: "Pending Leaves", value: stats.pendingLeaves || 0, sub: "Awaiting approval", path: "/leave-management", iconBg: "#fff7ed", iconColor: "#ea580c" },
+                      { icon: Clock, label: "Pending Timesheets", value: stats.pendingTimesheets || 0, sub: "Need review", path: "/time-sheet-management", iconBg: "#faf5ff", iconColor: "#9333ea" },
+                    ].map((item, i) => (
+                      <div key={i} onClick={() => item.path && navigate(item.path)}
+                        className={`bg-white rounded-xl border border-gray-200 p-4 ${item.path ? "cursor-pointer hover:border-blue-200 hover:shadow-sm transition" : ""}`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-xs text-gray-400 uppercase tracking-wider leading-tight">{item.label}</span>
+                          <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: item.iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <item.icon size={15} style={{ color: item.iconColor }} />
+                          </div>
+                        </div>
+                        <p className="text-2xl font-light text-gray-900">{item.value}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{item.sub}</p>
+                      </div>
+                    ))}
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-                    {/* Attendance */}
-                    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                      <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-4">Attendance Today</h3>
+                  {/* Attendance + Dept Headcount */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-4">Attendance Today</p>
                       <div className="flex justify-around">
                         {[
-                          { label: "Present", val: stats.attendanceToday?.present || 0, icon: UserCheck, color: "text-blue-600 bg-blue-50" },
-                          { label: "WFH", val: stats.attendanceToday?.wfh || 0, icon: Briefcase, color: "text-indigo-600 bg-indigo-50" },
-                          { label: "Absent", val: stats.attendanceToday?.absent || 0, icon: UserX, color: "text-gray-500 bg-gray-50" },
-                        ].map((item) => (
+                          { label: "Present", val: stats.attendanceToday?.present || 0, bg: "#eff6ff", color: "#2563eb", Icon: UserCheck },
+                          { label: "WFH", val: stats.attendanceToday?.wfh || 0, bg: "#eef2ff", color: "#4f46e5", Icon: Briefcase },
+                          { label: "Absent", val: stats.attendanceToday?.absent || 0, bg: "#f9fafb", color: "#6b7280", Icon: UserX },
+                        ].map(item => (
                           <div key={item.label} className="text-center">
-                            <div className={`w-10 h-10 rounded-lg ${item.color} flex items-center justify-center mx-auto mb-2`}><item.icon size={18} /></div>
+                            <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: item.bg, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px" }}>
+                              <item.Icon size={18} style={{ color: item.color }} />
+                            </div>
                             <p className="text-xl font-light text-gray-900">{item.val}</p>
                             <p className="text-[11px] text-gray-400">{item.label}</p>
                           </div>
@@ -473,27 +480,27 @@ const Home: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Department Headcount */}
-                    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm col-span-1 lg:col-span-2">
-                      <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-4">Department Headcount</h3>
-                      <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-white rounded-xl border border-gray-200 p-5 lg:col-span-2">
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-4">Department Headcount</p>
+                      <div className="grid grid-cols-2 gap-2">
                         {(stats.departmentHeadcount || []).map((d: any, i: number) => (
                           <div key={i} className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
                             <span className="text-sm text-gray-700">{d.department}</span>
-                            <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{d.count}</span>
+                            <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{d.count}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   </div>
 
+                  {/* Birthdays */}
                   {stats.upcomingBirthdays?.length > 0 && (
-                    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm mb-6">
-                      <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2"><Gift size={14} /> Upcoming Birthdays</h3>
+                    <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2"><Gift size={13} /> Upcoming Birthdays</p>
                       <div className="flex flex-wrap gap-2">
                         {stats.upcomingBirthdays.map((b: any, i: number) => (
-                          <span key={i} className="bg-amber-50 text-amber-800 px-3 py-1.5 rounded-lg text-sm">
-                            {b.name} · {new Date(b.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                          <span key={i} className="bg-amber-50 text-amber-800 px-3 py-1.5 rounded-lg text-sm border border-amber-100">
+                            🎂 {b.name} · {new Date(b.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
                           </span>
                         ))}
                       </div>
@@ -505,31 +512,45 @@ const Home: React.FC = () => {
               {/* ====== MANAGER ====== */}
               {role === "MANAGER" && (
                 <>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <IconCard icon={Users} label="My Team" value={stats.teamSize || 0} sub="Direct reports" color="bg-blue-50 text-blue-600" />
-                    <IconCard icon={Calendar} label="Team On Leave" value={stats.teamOnLeave || 0} sub="Today" color="bg-amber-50 text-amber-600" />
-                    <IconCard icon={FileText} label="Pending Leaves" value={stats.pendingLeaves || 0} sub="Need approval" color="bg-orange-50 text-orange-600" onClick={() => navigate("/employee-leave-management")} />
-                    <IconCard icon={Clock} label="Pending Timesheets" value={stats.pendingTimesheets || 0} color="bg-purple-50 text-purple-600" onClick={() => navigate("/time-sheet-management")} />
+                  {/* Stat cards */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                    {[
+                      { icon: Users, label: "My Team", value: stats.teamSize || 0, sub: "Direct reports", path: null, iconBg: "#eff6ff", iconColor: "#2563eb" },
+                      { icon: Calendar, label: "Team On Leave", value: stats.teamOnLeave || 0, sub: "Today", path: null, iconBg: "#fffbeb", iconColor: "#d97706" },
+                      { icon: FileText, label: "Pending Leaves", value: stats.pendingLeaves || 0, sub: "Need approval", path: "/employee-leave-management", iconBg: "#fff7ed", iconColor: "#ea580c" },
+                      { icon: Clock, label: "Pending Timesheets", value: stats.pendingTimesheets || 0, sub: "Need review", path: "/time-sheet-management", iconBg: "#faf5ff", iconColor: "#9333ea" },
+                    ].map((item, i) => (
+                      <div key={i} onClick={() => item.path && navigate(item.path)}
+                        className={`bg-white rounded-xl border border-gray-200 p-4 ${item.path ? "cursor-pointer hover:border-blue-200 hover:shadow-sm transition" : ""}`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-xs text-gray-400 uppercase tracking-wider">{item.label}</span>
+                          <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: item.iconBg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <item.icon size={15} style={{ color: item.iconColor }} />
+                          </div>
+                        </div>
+                        <p className="text-2xl font-light text-gray-900">{item.value}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{item.sub}</p>
+                      </div>
+                    ))}
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                    {/* Team */}
-                    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                      <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-3">My Team</h3>
+                  {/* Team members + Team attendance */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">My Team</p>
                       <div className="flex flex-wrap gap-2">
                         {(stats.teamMembers || []).map((m: any) => (
-                          <span key={m.id} className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg text-sm">{m.name}</span>
+                          <span key={m.id} className="bg-blue-50 text-blue-700 border border-blue-100 px-3 py-1.5 rounded-lg text-sm">{m.name}</span>
                         ))}
+                        {!(stats.teamMembers?.length) && <p className="text-sm text-gray-400">No team members</p>}
                       </div>
                     </div>
-
-                    {/* Team Attendance */}
-                    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                      <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-3">Team Attendance Today</h3>
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Team Attendance Today</p>
                       {stats.teamAttendanceToday?.length > 0 ? (
-                        <div className="space-y-2">
+                        <div className="divide-y divide-gray-100">
                           {stats.teamAttendanceToday.map((a: any, i: number) => (
-                            <div key={i} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
+                            <div key={i} className="flex justify-between items-center py-2">
                               <span className="text-sm text-gray-700">{a.userId?.firstname} {a.userId?.lastname}</span>
                               <Badge status={a.status} />
                             </div>
@@ -539,41 +560,43 @@ const Home: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* My Overview */}
+                  {/* My overview */}
                   <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">My Overview</p>
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-                    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                      <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-3">Leave Balance</h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-4">Leave Balance</p>
                       <div className="space-y-3">
                         {(stats.leaveBalance || []).map((lb: any, i: number) => (
                           <div key={i}>
-                            <div className="flex justify-between text-sm mb-1">
+                            <div className="flex justify-between text-sm mb-1.5">
                               <span className="text-gray-600">{lb.leaveType}</span>
-                              <span className="text-gray-900 font-medium">{lb.available}/{lb.totalAllotted}</span>
+                              <span className="text-gray-900 font-medium">{lb.available}<span className="text-gray-400 font-normal">/{lb.totalAllotted}</span></span>
                             </div>
-                            <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-1.5 bg-blue-500 rounded-full" style={{ width: `${(lb.available / lb.totalAllotted) * 100}%` }} /></div>
+                            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-1.5 bg-blue-500 rounded-full" style={{ width: `${Math.min((lb.available / lb.totalAllotted) * 100, 100)}%` }} />
+                            </div>
                           </div>
                         ))}
                       </div>
                     </div>
-                    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                      <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-3">Attendance This Month</h3>
-                      <div className="flex gap-4">
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-4">Attendance This Month</p>
+                      <div className="flex gap-3">
                         {[
-                          { label: "Present", val: stats.attendanceSummary?.present || 0, color: "bg-blue-50 text-blue-600" },
-                          { label: "WFH", val: stats.attendanceSummary?.wfh || 0, color: "bg-indigo-50 text-indigo-600" },
-                          { label: "Absent", val: stats.attendanceSummary?.absent || 0, color: "bg-gray-50 text-gray-500" },
-                        ].map((item) => (
-                          <div key={item.label} className={`${item.color} rounded-lg px-3 py-2 text-center flex-1`}>
-                            <p className="text-lg font-light">{item.val}</p>
-                            <p className="text-[11px]">{item.label}</p>
+                          { label: "Present", val: stats.attendanceSummary?.present || 0, bg: "#eff6ff", color: "#2563eb" },
+                          { label: "WFH", val: stats.attendanceSummary?.wfh || 0, bg: "#eef2ff", color: "#4f46e5" },
+                          { label: "Absent", val: stats.attendanceSummary?.absent || 0, bg: "#f9fafb", color: "#6b7280" },
+                        ].map(item => (
+                          <div key={item.label} className="flex-1 rounded-lg py-3 text-center" style={{ backgroundColor: item.bg }}>
+                            <p className="text-lg font-light" style={{ color: item.color }}>{item.val}</p>
+                            <p className="text-[11px]" style={{ color: item.color }}>{item.label}</p>
                           </div>
                         ))}
                       </div>
                     </div>
                     {stats.latestPayroll && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                        <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-3">Latest Payslip</h3>
+                      <div className="bg-white rounded-xl border border-gray-200 p-5">
+                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Latest Payslip</p>
                         <p className="text-2xl font-light text-gray-900">{formatCurrency(stats.latestPayroll.netSalary)}</p>
                         <p className="text-xs text-gray-400 mt-1">{stats.latestPayroll.month} {stats.latestPayroll.year}</p>
                         <div className="mt-2"><Badge status={stats.latestPayroll.status} /></div>
