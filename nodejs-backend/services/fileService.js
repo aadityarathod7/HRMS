@@ -5,12 +5,13 @@ const UploadedFile = require('../models/UploadedFile');
 
 const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
 
-const saveFiles = async (files, uploadedBy) => {
+const saveFiles = async (files, uploadedBy, userId) => {
   const savedFiles = [];
   for (const file of files) {
     const record = new UploadedFile({
       uploadedBy,
-      fileName: file.originalname,
+      userId,
+      fileName: file.filename || file.originalname,
       fileType: file.mimetype,
       fileSize: file.size
     });
@@ -52,9 +53,10 @@ const updateFileContent = async (fileId, newContent) => {
 };
 
 const getFilteredFiles = async (query) => {
-  const { fileName, uploadedBy, startDate, endDate, page = 0, size = 10, sortBy = 'createdDate', sortDir = 'desc' } = query;
+  const { fileName, uploadedBy, startDate, endDate, userId, page = 0, size = 10, sortBy = 'createdDate', sortDir = 'desc' } = query;
 
   const filter = {};
+  if (userId) filter.userId = userId;
   if (fileName) filter.fileName = { $regex: fileName, $options: 'i' };
   if (uploadedBy) filter.uploadedBy = { $regex: uploadedBy, $options: 'i' };
   if (startDate || endDate) {
@@ -68,7 +70,7 @@ const getFilteredFiles = async (query) => {
   const skip = page * size;
 
   const [content, totalElements] = await Promise.all([
-    UploadedFile.find(filter).sort(sort).skip(skip).limit(size),
+    UploadedFile.find(filter).populate('userId', 'firstname lastname employeeId').populate('reviewedBy', 'firstname lastname').sort(sort).skip(skip).limit(size),
     UploadedFile.countDocuments(filter)
   ]);
 
