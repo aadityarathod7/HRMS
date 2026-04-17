@@ -52,6 +52,7 @@ const TimeSheetManagement: React.FC = () => {
       ]);
       setUsers(usersRes.data);
       setProjects(projectsRes.data);
+    } catch (err) {}
   };
 
   useEffect(() => { fetchTimesheets(); }, [selectedStatus]);

@@ -359,9 +359,6 @@ const RoleManagement: React.FC = () => {
                           ) : (
                             <button
                               onClick={() => {
-                                  "Deactivate button clicked for role:",
-                                  role
-                                );
                                 handleDeactivateRole(role.id);
                               }}
                               className="text-gray-500 hover:text-gray-700 text-sm"
