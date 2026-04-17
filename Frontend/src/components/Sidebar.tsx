@@ -14,7 +14,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useState } from "react";
 
@@ -24,6 +24,7 @@ interface SidebarProps {
 
 const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isEmployeeManagementOpen, setIsEmployeeManagementOpen] =
     useState(false);
   const [isLeaveManagementOpen, setIsLeaveManagementOpen] = useState(false);
@@ -92,34 +93,34 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const isManager = userRoles.includes("MANAGER");
 
   const allMenuItems = [
-    { icon: Home, label: "Home", onClick: handleHomeClick, roles: "ALL" },
+    { icon: Home, label: "Home", onClick: handleHomeClick, roles: "ALL", path: "/home" },
     {
       icon: UserCog, label: "Employee Management", onClick: handleEmployeeManagementClick,
-      roles: "ADMIN_HR",
-      submenu: [{ icon: Users, label: "Employee List", onClick: handleEmployeeListClick }],
+      roles: "ADMIN_HR", path: "/employeelist",
+      submenu: [{ icon: Users, label: "Employee List", onClick: handleEmployeeListClick, path: "/employeelist" }],
       isOpen: isEmployeeManagementOpen,
     },
-    { icon: UserCog, label: "Role Management", onClick: handleRoleManagementClick, roles: "ADMIN_HR" },
-    { icon: Users, label: "Department Management", onClick: handleDepartmentManagementClick, roles: "ADMIN_HR" },
+    { icon: UserCog, label: "Role Management", onClick: handleRoleManagementClick, roles: "ADMIN_HR", path: "/role-management" },
+    { icon: Users, label: "Department Management", onClick: handleDepartmentManagementClick, roles: "ADMIN_HR", path: "/department-management" },
     {
       icon: FileText, label: "Leave Management", onClick: handleLeaveManagementClick,
-      roles: "ALL",
+      roles: "ALL", path: "/leave-application",
       submenu: [
-        { icon: Users, label: "Apply Leave", onClick: () => navigate("/leave-application") },
+        { icon: Users, label: "Apply Leave", onClick: () => navigate("/leave-application"), path: "/leave-application" },
         ...(isAdminOrHR || isManager ? [
-          { icon: Users, label: "Manage Leaves", onClick: () => navigate("/employee-leave-management") },
+          { icon: Users, label: "Manage Leaves", onClick: () => navigate("/employee-leave-management"), path: "/employee-leave-management" },
         ] : []),
-        { icon: Users, label: "Leave Balance", onClick: () => navigate("/leave-balance") },
+        { icon: Users, label: "Leave Balance", onClick: () => navigate("/leave-balance"), path: "/leave-balance" },
       ],
       isOpen: isLeaveManagementOpen,
     },
-    { icon: Home, label: "Project Management", onClick: handleProjectManagementClick, roles: "ADMIN_HR" },
-    { icon: Clock, label: "Timesheet", onClick: handleTimeSheetManagementClick, roles: "ADMIN_HR" },
-    { icon: Users, label: "Attendance", onClick: handleAttendanceManagementClick, roles: "ALL" },
-    { icon: DollarSign, label: "Payroll", onClick: handlePayRoleManagementClick, roles: "ALL" },
-    { icon: Calendar, label: "Events", onClick: () => navigate("/events"), roles: "ALL" },
-    { icon: FileText, label: "Documents", onClick: handleDocumentsClick, roles: "ALL" },
-    { icon: LogOut, label: "Logout", onClick: handleLogout, roles: "ALL" },
+    { icon: Home, label: "Project Management", onClick: handleProjectManagementClick, roles: "ADMIN_HR", path: "/project-management" },
+    { icon: Clock, label: "Timesheet", onClick: handleTimeSheetManagementClick, roles: "ADMIN_HR", path: "/time-sheet-management" },
+    { icon: Users, label: "Attendance", onClick: handleAttendanceManagementClick, roles: "ALL", path: "/attendance-management" },
+    { icon: DollarSign, label: "Payroll", onClick: handlePayRoleManagementClick, roles: "ALL", path: "/payroll-management" },
+    { icon: Calendar, label: "Events", onClick: () => navigate("/events"), roles: "ALL", path: "/events" },
+    { icon: FileText, label: "Documents", onClick: handleDocumentsClick, roles: "ALL", path: "/documents" },
+    { icon: LogOut, label: "Logout", onClick: handleLogout, roles: "ALL", path: "" },
   ];
 
   const menuItems = allMenuItems.filter(item => {
@@ -134,11 +135,18 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
       }`}
     >
       <div className="flex flex-col p-4 space-y-2">
-        {menuItems.map((item) => (
+        {menuItems.map((item) => {
+          const isActive = item.path && location.pathname === item.path;
+          const isParentActive = item.submenu?.some((s: any) => s.path && location.pathname === s.path);
+          return (
           <div key={item.label}>
             <Button
               variant="ghost"
-              className="justify-start w-full text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+              className={`justify-start w-full transition-colors ${
+                isActive || isParentActive
+                  ? "bg-blue-100 text-blue-700 font-medium"
+                  : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+              }`}
               onClick={item.onClick}
             >
               <item.icon className="h-5 w-5" />
@@ -160,22 +168,30 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
 
             {/* Submenu */}
             {!isCollapsed && item.submenu && item.isOpen && (
-              <div className="ml-4 mt-2 space-y-2">
-                {item.submenu.map((subItem) => (
-                  <Button
-                    key={subItem.label}
-                    variant="ghost"
-                    className="justify-start w-full pl-6 text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                    onClick={subItem.onClick}
-                  >
-                    <subItem.icon className="h-4 w-4" />
-                    <span className="ml-2">{subItem.label}</span>
-                  </Button>
-                ))}
+              <div className="ml-4 mt-1 space-y-1">
+                {item.submenu.map((subItem: any) => {
+                  const isSubActive = subItem.path && location.pathname === subItem.path;
+                  return (
+                    <Button
+                      key={subItem.label}
+                      variant="ghost"
+                      className={`justify-start w-full pl-6 transition-colors ${
+                        isSubActive
+                          ? "bg-blue-100 text-blue-700 font-medium"
+                          : "text-gray-600 hover:bg-blue-50 hover:text-blue-700"
+                      }`}
+                      onClick={subItem.onClick}
+                    >
+                      <subItem.icon className="h-4 w-4" />
+                      <span className="ml-2">{subItem.label}</span>
+                    </Button>
+                  );
+                })}
               </div>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
