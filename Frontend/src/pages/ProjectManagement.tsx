@@ -46,9 +46,7 @@ const ProjectManagement: React.FC = () => {
           setUsers([]);
           return;
         }
-        console.error("Error response:", error.response.data);
       } else {
-        console.error("Non-axios error:", error);
       }
       setUsers([]);
     }
@@ -80,7 +78,6 @@ const ProjectManagement: React.FC = () => {
         throw error;
       }
     } catch (error) {
-      console.error("Error fetching inactive projects:", error);
       setUsers([]);
     }
   };
@@ -114,7 +111,6 @@ const ProjectManagement: React.FC = () => {
         await fetchUsers();
       }
     } catch (error) {
-      console.error("Error activating project:", error);
     }
   };
 
@@ -147,18 +143,13 @@ const ProjectManagement: React.FC = () => {
         throw new Error("Failed to deactivate project");
       }
     } catch (error) {
-      console.error("Error deactivating project:", error);
 
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          console.error("Error response:", error.response.data);
         } else if (error.request) {
-          console.error("No response received:", error.request);
         } else {
-          console.error("Error deactivating project");
         }
       } else {
-        console.error("An unexpected error occurred");
       }
     }
   };
@@ -183,10 +174,8 @@ const ProjectManagement: React.FC = () => {
         setUsers(data);
       } else {
         const errorData = await response.text();
-        console.error("Error fetching projects:", errorData);
       }
     } catch (error) {
-      console.error("Error fetching projects:", error);
     } finally {
       setLoading(false);
     }
@@ -229,7 +218,6 @@ const ProjectManagement: React.FC = () => {
 
         setUsers(users.filter((user) => user.id !== id));
       } catch (error) {
-        console.error("Error deactivating project:", error);
         alert("Failed to deactivate project. Please try again.");
       }
     }
@@ -252,7 +240,6 @@ const ProjectManagement: React.FC = () => {
 
         fetchUsers();
       } catch (error) {
-        console.error("Error activating user:", error);
         alert("Failed to activate project. Please try again.");
       }
     }
@@ -280,7 +267,6 @@ const ProjectManagement: React.FC = () => {
 
       setUsers(response.data);
     } catch (error) {
-      console.error("Error fetching completed projects:", error);
     }
   };
 
@@ -302,7 +288,6 @@ const ProjectManagement: React.FC = () => {
 
       setUsers(response.data);
     } catch (error) {
-      console.error("Error fetching active projects:", error);
     }
   };
 
@@ -324,7 +309,6 @@ const ProjectManagement: React.FC = () => {
 
       setUsers(response.data);
     } catch (error) {
-      console.error("Error fetching on hold projects:", error);
     }
   };
 
@@ -362,7 +346,6 @@ const ProjectManagement: React.FC = () => {
       );
       await fetchUsers();
     } catch (error) {
-      console.error("Error creating project:", error);
     }
   };
 

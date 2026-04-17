@@ -34,7 +34,6 @@ const RoleManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        // toast.error("Authentication token not found");
         return;
       }
 
@@ -47,7 +46,6 @@ const RoleManagement: React.FC = () => {
       });
 
       // Detailed logging
-      console.log("Raw response data:", response.data);
 
       // Log the keys to ensure they exist
       response.data.forEach((role: any) => {
@@ -74,7 +72,6 @@ const RoleManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        // toast.error("Authentication token not found");
         return;
       }
 
@@ -88,31 +85,24 @@ const RoleManagement: React.FC = () => {
 
       // Simply set the users without sorting
       setUsers(response.data);
-      toast.success("Inactive roles loaded successfully");
     } catch (error) {
       handleFetchError(error, "inactive");
     }
   };
 
   const handleFetchError = (error: any, type: string) => {
-    console.error(`Error fetching ${type} roles:`, error);
 
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       setUsers([]);
-      toast.info(`No ${type} roles found`);
       return;
     }
 
     if (axios.isAxiosError(error)) {
       if (error.response) {
-        // toast.error(error.response.data?.message || `Failed to fetch ${type} roles`);
       } else if (error.request) {
-        // toast.error("No response from server");
       } else {
-        // toast.error(`Error fetching ${type} roles`);
       }
     } else {
-      // toast.error("An unexpected error occurred");
     }
     setUsers([]);
   };
@@ -122,7 +112,6 @@ const RoleManagement: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          // toast.error("Authentication token not found");
           return;
         }
 
@@ -152,18 +141,13 @@ const RoleManagement: React.FC = () => {
           throw new Error("Failed to activate role");
         }
       } catch (error) {
-        console.error("Error activating role:", error);
 
         if (axios.isAxiosError(error)) {
           if (error.response) {
-            // toast.error(error.response.data?.message || "Failed to activate role");
           } else if (error.request) {
-            // toast.error("No response from server. Please try again.");
           } else {
-            // toast.error("Error activating role");
           }
         } else {
-          // toast.error("An unexpected error occurred");
         }
       }
     }
@@ -177,7 +161,6 @@ const RoleManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        // toast.error("Authentication token not found");
         return;
       }
 
@@ -205,18 +188,13 @@ const RoleManagement: React.FC = () => {
         throw new Error("Failed to deactivate role");
       }
     } catch (error) {
-      console.error("Error deactivating role:", error);
 
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          // toast.error(error.response.data?.message || "Failed to deactivate role");
         } else if (error.request) {
-          // toast.error("No response from server. Please try again.");
         } else {
-          // toast.error("Error deactivating role");
         }
       } else {
-        // toast.error("An unexpected error occurred");
       }
     }
   };
@@ -234,8 +212,6 @@ const RoleManagement: React.FC = () => {
         await fetchInactiveUsers();
       }
     } catch (error) {
-      console.error("Error changing role status view:", error);
-      // toast.error("Failed to change role status view");
     }
   };
 
@@ -246,7 +222,6 @@ const RoleManagement: React.FC = () => {
   const handleCreateRole = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      // toast.error("Authentication token not found");
       return;
     }
 
@@ -285,18 +260,13 @@ const RoleManagement: React.FC = () => {
         await fetchUsers();
       }
     } catch (error) {
-      console.error("Error creating role:", error);
 
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          // toast.error(error.response.data?.message || "Failed to create role");
         } else if (error.request) {
-          // toast.error("No response from server");
         } else {
-          // toast.error("Failed to create role");
         }
       } else {
-        // toast.error("An unexpected error occurred");
       }
     }
   };
@@ -360,7 +330,6 @@ const RoleManagement: React.FC = () => {
             <tbody className="divide-y divide-gray-200">
               {users.length > 0 ? (
                 users.map((role) => {
-                  console.log("Role object:", role);
                   return (
                     <tr
                       key={role.id}
@@ -390,7 +359,6 @@ const RoleManagement: React.FC = () => {
                           ) : (
                             <button
                               onClick={() => {
-                                console.log(
                                   "Deactivate button clicked for role:",
                                   role
                                 );

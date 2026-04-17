@@ -25,7 +25,6 @@ const DepartmentManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("Authentication token not found");
         return;
       }
 
@@ -45,22 +44,13 @@ const DepartmentManagement: React.FC = () => {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 404) {
           setUsers([]);
-          toast.info("No active departments found");
           return;
         }
 
         if (error.response) {
-          console.error("Error response:", error.response.data);
-          toast.error(
-            error.response.data?.message || "Failed to fetch active departments"
-          );
         } else if (error.request) {
-          console.error("No response received:", error.request);
-          toast.error("No response from server");
         }
       } else {
-        console.error("Non-axios error:", error);
-        toast.error("An unexpected error occurred");
       }
       setUsers([]);
     }
@@ -70,7 +60,6 @@ const DepartmentManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("Authentication token not found");
         return;
       }
 
@@ -87,28 +76,23 @@ const DepartmentManagement: React.FC = () => {
         );
 
         setUsers(response.data);
-        toast.success("Inactive departments loaded successfully");
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           setUsers([]);
-          toast.info("No inactive departments found");
           return;
         }
         throw error;
       }
     } catch (error) {
-      console.error("Error fetching inactive departments:", error);
       setUsers([]);
 
       if (axios.isAxiosError(error) && error.response?.status !== 404) {
-        toast.error("Failed to fetch inactive departments");
       }
     }
   };
 
   const handleActivateDepartment = async (id) => {
     if (!id) {
-      toast.error("Invalid department ID");
       return;
     }
 
@@ -137,14 +121,12 @@ const DepartmentManagement: React.FC = () => {
         await fetchUsers();
       }
     } catch (error) {
-      console.error("Error activating department:", error);
       toast.error("Failed to activate department");
     }
   };
 
   const handleDeactivateDepartment = async (departmentId) => {
     if (!departmentId) {
-      toast.error("Invalid department ID");
       return;
     }
 
@@ -157,7 +139,6 @@ const DepartmentManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("Authentication token not found");
         return;
       }
 
@@ -178,20 +159,13 @@ const DepartmentManagement: React.FC = () => {
         throw new Error("Failed to deactivate department");
       }
     } catch (error) {
-      console.error("Error deactivating department:", error);
 
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          toast.error(
-            error.response.data?.message || "Failed to deactivate department"
-          );
         } else if (error.request) {
-          toast.error("No response from server. Please try again.");
         } else {
-          toast.error("Error deactivating department");
         }
       } else {
-        toast.error("An unexpected error occurred");
       }
     }
   };
@@ -233,7 +207,6 @@ const DepartmentManagement: React.FC = () => {
 
         setUsers(users.filter((user) => user.id !== id));
       } catch (error) {
-        console.error("Error deactivating department:", error);
         alert("Failed to deactivate department. Please try again.");
       }
     }
@@ -256,7 +229,6 @@ const DepartmentManagement: React.FC = () => {
 
         fetchUsers();
       } catch (error) {
-        console.error("Error activating user:", error);
         alert("Failed to activate role. Please try again.");
       }
     }
@@ -277,8 +249,6 @@ const DepartmentManagement: React.FC = () => {
         await fetchInactiveUsers();
       }
     } catch (error) {
-      console.error("Error changing department status view:", error);
-      toast.error("Failed to change department status view");
     }
   };
 
@@ -301,7 +271,6 @@ const DepartmentManagement: React.FC = () => {
       toast.success("Department created successfully");
       await fetchUsers();
     } catch (error) {
-      console.error("Error creating department:", error);
       toast.error("Failed to create department");
     }
   };

@@ -28,10 +28,8 @@ const ViewDepartment: React.FC = () => {
             },
           }
         );
-        console.log("Fetched department data:", response.data);
         setDepartment(response.data);
       } catch (err) {
-        console.error("Error fetching department details:", err);
         setError("Failed to load department details. Please try again later.");
       } finally {
         setLoading(false);
@@ -74,7 +72,6 @@ const ViewDepartment: React.FC = () => {
         setIsEditing(false);
         setDepartment(response.data);
       } catch (err) {
-        console.error("Error updating department:", err);
         if (axios.isAxiosError(err) && err.response) {
           toast.error(`Failed to update department: ${err.response.data}`);
         } else {

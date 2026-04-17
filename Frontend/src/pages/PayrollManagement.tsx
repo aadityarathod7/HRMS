@@ -50,7 +50,6 @@ const PayrollManagement: React.FC = () => {
         : `http://localhost:5000/payroll/status/${selectedStatus}`;
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setPayrolls(response.data);
-    } catch (error) { console.error("Error fetching payrolls:", error); }
     finally { setLoading(false); }
   };
 
@@ -59,7 +58,6 @@ const PayrollManagement: React.FC = () => {
       const token = localStorage.getItem("token");
       const res = await axios.get("http://localhost:5000/user/all", { headers: { Authorization: `Bearer ${token}` } });
       setUsers(res.data);
-    } catch (error) { console.error("Error fetching users:", error); }
   };
 
   useEffect(() => { fetchPayrolls(); }, [selectedStatus]);

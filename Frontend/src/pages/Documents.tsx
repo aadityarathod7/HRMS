@@ -63,7 +63,6 @@ const Documents: React.FC = () => {
         setTotalPages(0);
       }
     } catch (err) {
-      console.error("Error fetching files:", err);
     } finally {
       setLoading(false);
     }

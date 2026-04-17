@@ -70,7 +70,6 @@ const ViewRole: React.FC = () => {
         });
         setUser(response.data);
       } catch (err) {
-        console.error("Error fetching user details:", err);
         setError("Failed to load user details. Please try again later.");
       } finally {
         setLoading(false);
@@ -110,7 +109,6 @@ const ViewRole: React.FC = () => {
           description: user.description,
         };
 
-        console.log("Updating role with payload:", updateRoleRequest);
 
         const headers = {
           Authorization: `Bearer ${token}`,
@@ -123,7 +121,6 @@ const ViewRole: React.FC = () => {
           { headers }
         );
 
-        console.log("Response from update:", response.data);
 
         toast.success("Role updated successfully!");
         setIsEditing(false);
@@ -133,12 +130,7 @@ const ViewRole: React.FC = () => {
         );
         setUser(updatedUser.data);
       } catch (err) {
-        console.error("Error updating role:", err);
-        if (axios.isAxiosError(err) && err.response) {
-          toast.error(`Failed to update role: ${err.response.data}`);
-        } else {
-          toast.error("Failed to update role. Please try again later.");
-        }
+        toast.error("Failed to update role");
       }
     }
   };
@@ -161,12 +153,7 @@ const ViewRole: React.FC = () => {
         toast.success("Role deactivated successfully!");
         // Optionally, you can fetch the updated user data or handle state changes here
       } catch (err) {
-        console.error("Error deactivating role:", err);
-        if (axios.isAxiosError(err) && err.response) {
-          toast.error(`Failed to deactivate role: ${err.response.data}`);
-        } else {
-          toast.error("Failed to deactivate role. Please try again later.");
-        }
+        toast.error("Failed to deactivate role");
       }
     }
   };
@@ -180,27 +167,19 @@ const ViewRole: React.FC = () => {
           "Content-Type": "application/json",
         };
 
-        console.log(`Activating role for user ID: ${user.id}`);
 
         const response = await axios.put(
           `http://localhost:5000/role/activate/${user.id}`,
           {},
           { headers }
         );
-        console.log("Activation response:", response.data);
 
         toast.success("Role activated successfully!");
         // Optionally, you can fetch the updated user data or handle state changes here
       } catch (err) {
-        console.error("Error activating role:", err);
-        if (axios.isAxiosError(err) && err.response) {
-          toast.error(`Failed to activate role: ${err.response.data}`);
-        } else {
-          toast.error("Failed to activate role. Please try again later.");
-        }
+        toast.error("Failed to activate role");
       }
     } else {
-      console.error("User is not defined.");
     }
   };
 

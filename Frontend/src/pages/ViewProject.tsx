@@ -111,12 +111,7 @@ const ViewProject: React.FC = () => {
         toast.success("project deactivated successfully!");
         // Optionally, you can fetch the updated user data or handle state changes here
       } catch (err) {
-        console.error("Error deactivating project:", err);
-        if (axios.isAxiosError(err) && err.response) {
-          toast.error(`Failed to deactivate project: ${err.response.data}`);
-        } else {
-          toast.error("Failed to deactivate project. Please try again later.");
-        }
+        toast.error("Failed to deactivate project");
       }
     }
   };
@@ -130,27 +125,19 @@ const ViewProject: React.FC = () => {
           "Content-Type": "application/json",
         };
 
-        console.log(`Activating project for user ID: ${project.id}`);
 
         const response = await axios.put(
           `http://localhost:5000/project/activate/${project.id}`,
           {},
           { headers }
         );
-        console.log("Activation response:", response.data);
 
         toast.success("project activated successfully!");
         // Optionally, you can fetch the updated user data or handle state changes here
       } catch (err) {
-        console.error("Error activating project:", err);
-        if (axios.isAxiosError(err) && err.response) {
-          toast.error(`Failed to activate project: ${err.response.data}`);
-        } else {
-          toast.error("Failed to activate project. Please try again later.");
-        }
+        toast.error("Failed to activate project");
       }
     } else {
-      console.error("User is not defined.");
     }
   };
 

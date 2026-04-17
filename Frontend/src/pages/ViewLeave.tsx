@@ -38,10 +38,8 @@ const ViewLeave: React.FC = () => {
             },
           }
         );
-        console.log("Fetched leave data:", response.data);
         setLeave(response.data);
       } catch (err) {
-        console.error("Error fetching leave details:", err);
         setError("Failed to load leave details. Please try again later.");
       } finally {
         setLoading(false);
@@ -89,7 +87,6 @@ const ViewLeave: React.FC = () => {
         setIsEditing(false);
         setLeave(response.data);
       } catch (err) {
-        console.error("Error updating leave:", err);
         if (axios.isAxiosError(err) && err.response) {
           toast.error(`Failed to update leave: ${err.response.data}`);
         } else {

@@ -64,12 +64,9 @@ const LeaveManagement: React.FC = () => {
         }
 
         if (error.response) {
-          console.error("Error response:", error.response.data);
         } else if (error.request) {
-          console.error("No response received:", error.request);
         }
       } else {
-        console.error("Non-axios error:", error);
       }
       setUsers([]);
     }
@@ -103,7 +100,6 @@ const LeaveManagement: React.FC = () => {
         throw error;
       }
     } catch (error) {
-      console.error("Error fetching inactive Leaves:", error);
       setUsers([]);
     }
   };
@@ -137,7 +133,6 @@ const LeaveManagement: React.FC = () => {
         await fetchUsers();
       }
     } catch (error) {
-      console.error("Error activating Leave:", error);
     }
   };
 
@@ -172,7 +167,6 @@ const LeaveManagement: React.FC = () => {
         throw new Error("Failed to deactivate Leave");
       }
     } catch (error) {
-      console.error("Error deactivating Leave:", error);
     }
   };
 
@@ -190,7 +184,6 @@ const LeaveManagement: React.FC = () => {
       setRejectedLeaves(response.data);
       setUsers(response.data);
     } catch (error) {
-      console.error("Error fetching rejected leaves:", error);
     }
   };
 
@@ -208,7 +201,6 @@ const LeaveManagement: React.FC = () => {
       setApprovedLeaves(response.data);
       setUsers(response.data);
     } catch (error) {
-      console.error("Error fetching approved leaves:", error);
     }
   };
 
@@ -225,7 +217,6 @@ const LeaveManagement: React.FC = () => {
       );
       setUsers(response.data);
     } catch (error) {
-      console.error("Error fetching pending leaves:", error);
     }
   };
 
@@ -267,7 +258,6 @@ const LeaveManagement: React.FC = () => {
           throw new Error("Failed to delete Leave request");
         }
       } catch (error) {
-        console.error("Error deleting Leave request:", error);
         alert("Failed to delete Leave request. Please try again.");
       }
     }
@@ -290,7 +280,6 @@ const LeaveManagement: React.FC = () => {
 
         fetchUsers();
       } catch (error) {
-        console.error("Error activating user:", error);
         alert("Failed to activate role. Please try again.");
       }
     }
@@ -332,7 +321,6 @@ const LeaveManagement: React.FC = () => {
       );
       await fetchUsers();
     } catch (error) {
-      console.error("Error creating Leave:", error);
     }
   };
 
@@ -358,7 +346,6 @@ const LeaveManagement: React.FC = () => {
         await fetchUsers();
       }
     } catch (error) {
-      console.error("Error approving leave:", error);
     }
   };
 
@@ -380,7 +367,6 @@ const LeaveManagement: React.FC = () => {
         await fetchUsers();
       }
     } catch (error) {
-      console.error("Error rejecting leave:", error);
     }
   };
 

@@ -55,7 +55,6 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
   //   navigate("/team");
   // };
 
-  const handleSettingsClick = () => {
     navigate("/settings");
   };
   const handleEmployeeManagementClick = () => {

@@ -52,7 +52,6 @@ const ResetPassword = () => {
         toast.error(errorData.message || "Failed to reset password");
       }
     } catch (error) {
-      console.error(error);
       toast.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);

@@ -37,7 +37,6 @@ const AttendanceManagement: React.FC = () => {
         : `http://localhost:5000/attendance/status/${selectedStatus}`;
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setRecords(response.data);
-    } catch (error) { console.error("Error fetching attendance:", error); }
     finally { setLoading(false); }
   };
 
@@ -46,7 +45,6 @@ const AttendanceManagement: React.FC = () => {
       const token = localStorage.getItem("token");
       const res = await axios.get("http://localhost:5000/user/all", { headers: { Authorization: `Bearer ${token}` } });
       setUsers(res.data);
-    } catch (error) { console.error("Error fetching users:", error); }
   };
 
   useEffect(() => { fetchRecords(); }, [selectedStatus]);

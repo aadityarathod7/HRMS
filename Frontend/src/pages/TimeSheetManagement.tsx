@@ -40,7 +40,6 @@ const TimeSheetManagement: React.FC = () => {
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setTimesheets(response.data);
     } catch (error) {
-      console.error("Error fetching timesheets:", error);
     } finally { setLoading(false); }
   };
 
@@ -53,7 +52,6 @@ const TimeSheetManagement: React.FC = () => {
       ]);
       setUsers(usersRes.data);
       setProjects(projectsRes.data);
-    } catch (error) { console.error("Error fetching data:", error); }
   };
 
   useEffect(() => { fetchTimesheets(); }, [selectedStatus]);

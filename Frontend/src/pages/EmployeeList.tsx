@@ -25,7 +25,6 @@ const EmployeeList: React.FC = () => {
 
   const fetchUsers = async (isActive: boolean) => {
     const username = localStorage.getItem("username"); // Retrieve username from local storage
-    console.log("Username from local storage:", username); // Debugging log
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -36,11 +35,9 @@ const EmployeeList: React.FC = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log("API response data:", data); // Debugging log
 
       // Check if createdBy is present in the response
       data.forEach((user) => {
-        console.log(`User ID: ${user.id}, Created By: ${user.createdBy}`);
       });
 
       const usersWithCreator = data.map((user: UserDto) => ({
@@ -48,10 +45,8 @@ const EmployeeList: React.FC = () => {
         createdBy: user.createdBy || username, // Use local storage username if createdBy is not set
       }));
 
-      console.log("Fetched users with creator:", usersWithCreator); // Debugging log
       setUsers(usersWithCreator);
     } catch (error) {
-      console.error("Error fetching users:", error);
     }
   };
 
@@ -90,7 +85,6 @@ const EmployeeList: React.FC = () => {
         // Remove the user from the local state
         setUsers(users.filter((user) => user.id !== id));
       } catch (error) {
-        console.error("Error deactivating user:", error);
         alert("Failed to deactivate employee. Please try again.");
       }
     }
@@ -115,7 +109,6 @@ const EmployeeList: React.FC = () => {
         // Refetch users after activation
         fetchUsers(showInactive); // Fetch users based on the current filter (active/inactive)
       } catch (error) {
-        console.error("Error activating user:", error);
         alert("Failed to activate employee. Please try again.");
       }
     }
