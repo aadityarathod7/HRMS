@@ -14,6 +14,10 @@ const createLeaveRequest = async (data) => {
   if (!data.leaveStartDate || !data.leaveEndDate) {
     throw { status: 400, message: 'Leave start date and end date are required' };
   }
+
+  // Sanitize halfDayType — remove if empty string (fails enum)
+  if (!data.halfDayType) delete data.halfDayType;
+
   // Check leave balance (skip for LOP)
   if (data.leaveType !== 'LOP') {
     const year = new Date(data.leaveStartDate).getFullYear();

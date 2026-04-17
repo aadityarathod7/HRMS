@@ -8,7 +8,7 @@ const leaveRequestSchema = new mongoose.Schema({
   leaveType: { type: String, enum: ['CASUAL', 'SICK', 'PRIVILEGE', 'COMP_OFF', 'MATERNITY', 'PATERNITY', 'LOP'] },
   numberOfDays: { type: Number },
   halfDay: { type: Boolean, default: false },
-  halfDayType: { type: String, enum: ['FIRST_HALF', 'SECOND_HALF'] },
+  halfDayType: { type: String, enum: ['FIRST_HALF', 'SECOND_HALF', ''], default: '' },
   description: { type: String },
   leaveStatus: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'], default: 'PENDING' },
   approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
