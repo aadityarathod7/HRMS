@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const GoogleCallback = () => {
   const navigate = useNavigate();
 
@@ -16,7 +18,7 @@ const GoogleCallback = () => {
         }
 
         // Send Google credential to our backend for verification
-        const response = await fetch("http://localhost:5000/auth/google", {
+        const response = await fetch(`${API_URL}/auth/google`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ credential }),
