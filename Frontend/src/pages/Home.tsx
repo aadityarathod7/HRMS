@@ -259,26 +259,7 @@ const Home: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                    {/* Attendance */}
-                    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                      <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-4">Attendance This Month</h3>
-                      <div className="flex gap-3">
-                        {[
-                          { label: "Present", val: stats.attendanceSummary?.present || 0, color: "bg-blue-50 text-blue-600" },
-                          { label: "WFH", val: stats.attendanceSummary?.wfh || 0, color: "bg-indigo-50 text-indigo-600" },
-                          { label: "Absent", val: stats.attendanceSummary?.absent || 0, color: "bg-red-50 text-red-500" },
-                          { label: "Half Day", val: stats.attendanceSummary?.halfDay || 0, color: "bg-amber-50 text-amber-600" },
-                          { label: "On Leave", val: stats.attendanceSummary?.onLeave || 0, color: "bg-gray-50 text-gray-500" },
-                        ].map((item) => (
-                          <div key={item.label} className={`${item.color} rounded-lg px-3 py-2.5 text-center flex-1`}>
-                            <p className="text-lg font-light">{item.val}</p>
-                            <p className="text-[11px]">{item.label}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
+                  <div className="grid grid-cols-1 mb-6">
                     {/* Payslip */}
                     {stats.latestPayroll && (
                       <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
