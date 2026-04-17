@@ -31,7 +31,7 @@ const ProjectManagement: React.FC = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const response = await axios.get("http://localhost:5000/project/all", {
+      const response = await axios.get(, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -59,7 +59,7 @@ const ProjectManagement: React.FC = () => {
 
       try {
         const response = await axios.get(
-          "http://localhost:5000/project/getByStatus/INACTIVE",
+          ,
           {
             headers: {
               "Content-Type": "application/json",
@@ -90,7 +90,7 @@ const ProjectManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/project/activate/${id}`,
+        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/activate/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -129,7 +129,7 @@ const ProjectManagement: React.FC = () => {
 
       const response = await axios({
         method: "PATCH",
-        url: `http://localhost:5000/project/deactivate/${projectId}`,
+        url: `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/deactivate/${projectId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -159,7 +159,7 @@ const ProjectManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:5000/project/getByStatus/ACTIVE",
+        ,
         {
           method: "GET",
           headers: {
@@ -205,7 +205,7 @@ const ProjectManagement: React.FC = () => {
     if (window.confirm("Are you sure you want to deactivate this project?")) {
       try {
         const response = await fetch(
-          `http://localhost:5000/project/deactivate/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/deactivate/${id}`,
           {
             method: "PATCH",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -227,7 +227,7 @@ const ProjectManagement: React.FC = () => {
     if (window.confirm("Are you sure you want to activate this project?")) {
       try {
         const response = await fetch(
-          `http://localhost:5000/project/activate/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/activate/${id}`,
           {
             method: "PUT",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -255,7 +255,7 @@ const ProjectManagement: React.FC = () => {
       if (!token) return;
 
       const response = await axios.get(
-        "http://localhost:5000/project/getByStatus/COMPLETED",
+        ,
         {
           headers: {
             "Content-Type": "application/json",
@@ -276,7 +276,7 @@ const ProjectManagement: React.FC = () => {
       if (!token) return;
 
       const response = await axios.get(
-        "http://localhost:5000/project/getByStatus/ACTIVE",
+        ,
         {
           headers: {
             "Content-Type": "application/json",
@@ -297,7 +297,7 @@ const ProjectManagement: React.FC = () => {
       if (!token) return;
 
       const response = await axios.get(
-        "http://localhost:5000/project/getByStatus/ONHOLD",
+        ,
         {
           headers: {
             "Content-Type": "application/json",
@@ -335,7 +335,7 @@ const ProjectManagement: React.FC = () => {
       const newproject = {};
 
       const response = await axios.post(
-        "http://localhost:5000/project/create",
+        ,
         newproject,
         {
           headers: {

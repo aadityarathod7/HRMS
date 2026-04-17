@@ -21,7 +21,7 @@ const Home: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) { navigate("/login"); return; }
-        const res = await axios.get("http://localhost:5000/dashboard/stats", {
+        const res = await axios.get(, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStats(res.data);

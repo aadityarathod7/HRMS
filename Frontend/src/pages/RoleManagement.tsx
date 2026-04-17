@@ -37,7 +37,7 @@ const RoleManagement: React.FC = () => {
         return;
       }
 
-      const response = await axios.get("http://localhost:5000/role/active", {
+      const response = await axios.get(, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -75,7 +75,7 @@ const RoleManagement: React.FC = () => {
         return;
       }
 
-      const response = await axios.get("http://localhost:5000/role/inactive", {
+      const response = await axios.get(, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -116,7 +116,7 @@ const RoleManagement: React.FC = () => {
         }
 
         const response = await axios.put(
-          `http://localhost:5000/role/activate/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/activate/${id}`,
           {},
           {
             headers: {
@@ -166,7 +166,7 @@ const RoleManagement: React.FC = () => {
 
       const response = await axios({
         method: "PATCH",
-        url: `http://localhost:5000/role/deactivate/${roleId}`,
+        url: `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/deactivate/${roleId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -234,7 +234,7 @@ const RoleManagement: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/role/create",
+        ,
         newRole,
         {
           headers: {

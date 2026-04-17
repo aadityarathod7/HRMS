@@ -31,7 +31,7 @@ const ViewLeave: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/leaverequests/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -78,7 +78,7 @@ const ViewLeave: React.FC = () => {
         };
 
         const response = await axios.put(
-          `http://localhost:5000/leaverequests/update/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/update/${id}`,
           updateRequest,
           { headers }
         );

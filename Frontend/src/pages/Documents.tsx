@@ -52,7 +52,7 @@ const Documents: React.FC = () => {
         queryParams.append("endDate", filters.endDate);
       }
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:5000/file/filter?${queryParams.toString()}`, {
+      const response = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/file/filter?${queryParams.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data) {
@@ -72,7 +72,7 @@ const Documents: React.FC = () => {
     if (!window.confirm("Delete this file?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/file/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/file/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("File deleted");
       fetchFiles();
     } catch (err) { toast.error("Failed to delete file"); }
@@ -82,7 +82,7 @@ const Documents: React.FC = () => {
     if (!window.confirm(`Delete ${checkedFiles.length} files?`)) return;
     try {
       const token = localStorage.getItem("token");
-      await Promise.all(checkedFiles.map(id => axios.delete(`http://localhost:5000/file/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } })));
+      await Promise.all(checkedFiles.map(id => axios.delete(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/file/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } })));
       toast.success("Files deleted");
       setCheckedFiles([]);
       fetchFiles();
@@ -97,7 +97,7 @@ const Documents: React.FC = () => {
     formData.append("uploadedBy", localStorage.getItem("username") || "anonymous");
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post("http://localhost:5000/file/upload", formData, {
+      const response = await axios.post(, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.status === 200 || response.status === 201) {

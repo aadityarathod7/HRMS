@@ -31,9 +31,9 @@ const EmployeeRegistration = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    axios.get("http://localhost:5000/departments/active", { headers: { Authorization: `Bearer ${token}` } })
+    axios.get(, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setDepartments(res.data)).catch(() => {});
-    axios.get("http://localhost:5000/user/all", { headers: { Authorization: `Bearer ${token}` } })
+    axios.get(, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setManagers(res.data)).catch(() => {});
   }, []);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -45,7 +45,7 @@ const EmployeeRegistration = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/user/register", {
+      const response = await fetch(, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ ...formData, createdBy: localStorage.getItem("username") }),

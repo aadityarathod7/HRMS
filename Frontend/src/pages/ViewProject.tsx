@@ -22,7 +22,7 @@ const ViewProject: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/project/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -68,7 +68,7 @@ const ViewProject: React.FC = () => {
         };
 
         await axios.put(
-          `http://localhost:5000/project/update/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/update/${id}`,
           updateProjectRequest,
           {
             headers: {
@@ -81,7 +81,7 @@ const ViewProject: React.FC = () => {
         toast.success("Project updated successfully!");
         setIsEditing(false);
         const updatedProject = await axios.get(
-          `http://localhost:5000/project/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -103,7 +103,7 @@ const ViewProject: React.FC = () => {
         };
 
         await axios.put(
-          `http://localhost:5000/project/deactivate/${project.id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/deactivate/${project.id}`,
           {},
           { headers }
         );
@@ -127,7 +127,7 @@ const ViewProject: React.FC = () => {
 
 
         const response = await axios.put(
-          `http://localhost:5000/project/activate/${project.id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/project/activate/${project.id}`,
           {},
           { headers }
         );

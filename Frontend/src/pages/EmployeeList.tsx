@@ -28,7 +28,7 @@ const EmployeeList: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/user/all?isActive=${isActive ? 1 : 0}`,
+        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/user/all?isActive=${isActive ? 1 : 0}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!response.ok) {
@@ -71,7 +71,7 @@ const EmployeeList: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:5000/user/deactivate/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/user/deactivate/${id}`,
           {
             method: "PUT",
             headers: { Authorization: `Bearer ${token}` },
@@ -95,7 +95,7 @@ const EmployeeList: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:5000/user/activate/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/user/activate/${id}`,
           {
             method: "PUT",
             headers: { Authorization: `Bearer ${token}` },

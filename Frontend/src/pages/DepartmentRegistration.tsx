@@ -20,7 +20,7 @@ const DepartmentRegistration = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/departments/create", {
+      const response = await fetch(, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ departmentName: formData.department, contactPerson: formData.contactPerson }),

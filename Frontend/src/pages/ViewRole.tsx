@@ -63,7 +63,7 @@ const ViewRole: React.FC = () => {
     const fetchUserDetails = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:5000/role/${id}`, {
+        const response = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -116,7 +116,7 @@ const ViewRole: React.FC = () => {
         };
 
         const response = await axios.put(
-          `http://localhost:5000/role/update/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/update/${id}`,
           updateRoleRequest,
           { headers }
         );
@@ -125,7 +125,7 @@ const ViewRole: React.FC = () => {
         toast.success("Role updated successfully!");
         setIsEditing(false);
         const updatedUser = await axios.get(
-          `http://localhost:5000/role/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/${id}`,
           { headers }
         );
         setUser(updatedUser.data);
@@ -145,7 +145,7 @@ const ViewRole: React.FC = () => {
         };
 
         await axios.put(
-          `http://localhost:5000/role/deactivate/${user.id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/deactivate/${user.id}`,
           {},
           { headers }
         );
@@ -169,7 +169,7 @@ const ViewRole: React.FC = () => {
 
 
         const response = await axios.put(
-          `http://localhost:5000/role/activate/${user.id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/role/activate/${user.id}`,
           {},
           { headers }
         );

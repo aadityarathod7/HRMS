@@ -38,7 +38,7 @@ const Events: React.FC = () => {
   const fetchEvents = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5000/events/all?month=${currentMonth}&year=${currentYear}`, {
+      const res = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/events/all?month=${currentMonth}&year=${currentYear}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setEvents(res.data);
@@ -51,7 +51,7 @@ const Events: React.FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/events/create", form, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(, form, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Event created");
       setForm({ title: "", description: "", eventType: "COMPANY_EVENT", date: "", endDate: "", time: "", location: "", isAllDay: true });
       setShowForm(false);
@@ -63,7 +63,7 @@ const Events: React.FC = () => {
     if (!window.confirm("Delete this event?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/events/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/events/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Event deleted");
       setSelectedEvent(null);
       fetchEvents();

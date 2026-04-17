@@ -31,7 +31,7 @@ const LeaveBalance: React.FC = () => {
       const token = localStorage.getItem("token");
       const userId = userProfile.id;
       if (!userId) { setLoading(false); return; }
-      const res = await axios.get(`http://localhost:5000/leaverequests/balance/${userId}?year=${new Date().getFullYear()}`, {
+      const res = await axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/balance/${userId}?year=${new Date().getFullYear()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBalances(res.data);
@@ -43,8 +43,8 @@ const LeaveBalance: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const [balRes, userRes] = await Promise.all([
-        axios.get(`http://localhost:5000/leaverequests/balance/all/${new Date().getFullYear()}`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get("http://localhost:5000/user/all", { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/balance/all/${new Date().getFullYear()}`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       setAllBalances(balRes.data);
       setUsers(userRes.data);
@@ -57,7 +57,7 @@ const LeaveBalance: React.FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.put("http://localhost:5000/leaverequests/balance/update", {
+      await axios.put(, {
         userId: assignForm.userId,
         leaveType: assignForm.leaveType,
         totalAllotted: Number(assignForm.totalAllotted),

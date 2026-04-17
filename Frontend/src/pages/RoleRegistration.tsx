@@ -32,7 +32,7 @@ const RoleRegistration = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/role/create", { role: formData.role, description: formData.description }, {
+      await axios.post(, { role: formData.role, description: formData.description }, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       toast.success("Role created successfully");

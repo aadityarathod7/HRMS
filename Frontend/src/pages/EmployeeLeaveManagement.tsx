@@ -47,7 +47,7 @@ const EmployeeLeaveManagement: React.FC = () => {
       }
 
       const response = await axios.get(
-        "http://localhost:5000/leaverequests/pending",
+        ,
         {
           headers: {
             "Content-Type": "application/json",
@@ -83,7 +83,7 @@ const EmployeeLeaveManagement: React.FC = () => {
 
       try {
         const response = await axios.get(
-          "http://localhost:5000/Leaves/inactive",
+          ,
           {
             headers: {
               "Content-Type": "application/json",
@@ -114,7 +114,7 @@ const EmployeeLeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/Leaves/activate/${id}`,
+        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/activate/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -155,7 +155,7 @@ const EmployeeLeaveManagement: React.FC = () => {
 
       const response = await axios({
         method: "PATCH",
-        url: `http://localhost:5000/Leaves/deactivate/${LeaveId}`,
+        url: `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/deactivate/${LeaveId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -176,7 +176,7 @@ const EmployeeLeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:5000/leaverequests/rejected",
+        ,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -193,7 +193,7 @@ const EmployeeLeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:5000/leaverequests/approved",
+        ,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -210,7 +210,7 @@ const EmployeeLeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:5000/leaverequests/pending",
+        ,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -244,7 +244,7 @@ const EmployeeLeaveManagement: React.FC = () => {
     if (window.confirm("Are you sure you want to deactivate this Leave?")) {
       try {
         const response = await fetch(
-          `http://localhost:5000/Leaves/deactivate/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/deactivate/${id}`,
           {
             method: "PATCH",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -266,7 +266,7 @@ const EmployeeLeaveManagement: React.FC = () => {
     if (window.confirm("Are you sure you want to activate this Leave?")) {
       try {
         const response = await fetch(
-          `http://localhost:5000/Leaves/activate/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/activate/${id}`,
           {
             method: "PUT",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -309,7 +309,7 @@ const EmployeeLeaveManagement: React.FC = () => {
       const newLeave = {};
 
       const response = await axios.post(
-        "http://localhost:5000/Leaves/create",
+        ,
         newLeave,
         {
           headers: {
@@ -332,7 +332,7 @@ const EmployeeLeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/manager/leaveRequest/${id}/updateStatus?status=APPROVED`,
+        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/manager/leaveRequest/${id}/updateStatus?status=APPROVED`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -348,7 +348,7 @@ const EmployeeLeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/manager/leaveRequest/${id}/updateStatus?status=REJECTED`,
+        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/manager/leaveRequest/${id}/updateStatus?status=REJECTED`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

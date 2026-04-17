@@ -14,7 +14,7 @@ const ForgotPassword = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/auth/forgot-password",
+        ,
         {
           method: "POST",
           headers: {

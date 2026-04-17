@@ -28,11 +28,11 @@ const LeaveApplication = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     // Fetch managers for dropdown
-    axios.get("http://localhost:5000/user/all", { headers: { Authorization: `Bearer ${token}` } })
+    axios.get(, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setManagers(res.data)).catch(() => {});
     // Fetch leave balance
     if (userProfile.id) {
-      axios.get(`http://localhost:5000/leaverequests/balance/${userProfile.id}`, { headers: { Authorization: `Bearer ${token}` } })
+      axios.get(`${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/balance/${userProfile.id}`, { headers: { Authorization: `Bearer ${token}` } })
         .then(res => setLeaveBalance(res.data)).catch(() => {});
     }
   }, []);
@@ -46,7 +46,7 @@ const LeaveApplication = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/leaverequests/submit", {
+      const response = await fetch(, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(formData),

@@ -21,7 +21,7 @@ const ViewDepartment: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/departments/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/departments/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -63,7 +63,7 @@ const ViewDepartment: React.FC = () => {
         };
 
         const response = await axios.put(
-          `http://localhost:5000/departments/update/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/departments/update/${id}`,
           updateRequest,
           { headers }
         );

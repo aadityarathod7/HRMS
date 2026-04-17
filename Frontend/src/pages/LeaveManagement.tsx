@@ -45,7 +45,7 @@ const LeaveManagement: React.FC = () => {
       }
 
       const response = await axios.get(
-        "http://localhost:5000/leaverequests/pending",
+        ,
         {
           headers: {
             "Content-Type": "application/json",
@@ -81,7 +81,7 @@ const LeaveManagement: React.FC = () => {
 
       try {
         const response = await axios.get(
-          "http://localhost:5000/Leaves/inactive",
+          ,
           {
             headers: {
               "Content-Type": "application/json",
@@ -112,7 +112,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/Leaves/activate/${id}`,
+        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/activate/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -153,7 +153,7 @@ const LeaveManagement: React.FC = () => {
 
       const response = await axios({
         method: "PATCH",
-        url: `http://localhost:5000/Leaves/deactivate/${LeaveId}`,
+        url: `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/deactivate/${LeaveId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -174,7 +174,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:5000/leaverequests/rejected",
+        ,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -191,7 +191,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:5000/leaverequests/approved",
+        ,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -208,7 +208,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:5000/leaverequests/pending",
+        ,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -243,7 +243,7 @@ const LeaveManagement: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.delete(
-          `http://localhost:5000/leaverequests/delete/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/leaverequests/delete/${id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -267,7 +267,7 @@ const LeaveManagement: React.FC = () => {
     if (window.confirm("Are you sure you want to activate this Leave?")) {
       try {
         const response = await fetch(
-          `http://localhost:5000/Leaves/activate/${id}`,
+          `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/activate/${id}`,
           {
             method: "PUT",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -310,7 +310,7 @@ const LeaveManagement: React.FC = () => {
       const newLeave = {};
 
       const response = await axios.post(
-        "http://localhost:5000/Leaves/create",
+        ,
         newLeave,
         {
           headers: {
@@ -333,7 +333,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.patch(
-        `http://localhost:5000/Leaves/approve/${id}`,
+        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/approve/${id}`,
         {},
         {
           headers: {
@@ -354,7 +354,7 @@ const LeaveManagement: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.patch(
-        `http://localhost:5000/Leaves/reject/${id}`,
+        `${(import.meta.env.VITE_API_URL || 'http://localhost:5000')}/Leaves/reject/${id}`,
         {},
         {
           headers: {
