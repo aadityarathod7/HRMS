@@ -5,31 +5,35 @@ services:
     runtime: node
     rootDir: nodejs-backend
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 5000
       - key: MONGODB_URI
-        sync: false  # Set this in Render dashboard
+        sync: false
       - key: JWT_SECRET
-        sync: false  # Set this in Render dashboard
+        sync: false
       - key: CORS_ORIGIN
-        sync: false  # Set to your frontend URL after deployment
+        sync: false
 
-  # Frontend Service
+  # Frontend Static Site
   - type: web
     name: hrms-sanvii-frontend
     runtime: static
     rootDir: Frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    buildCommand: bun install && bun run build
+    staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
-        sync: false  # Set to your backend URL after deployment
+        sync: false
       - key: VITE_WS_URL
-        sync: false  # Set to your backend WSS URL after deployment
+        sync: false
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
     routes:
       - type: rewrite
         source: /*
