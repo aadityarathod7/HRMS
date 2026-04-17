@@ -3,7 +3,7 @@ services:
   - type: web
     name: hrms-sanvii-backend
     runtime: node
-    rootDir: Nodejs backend
+    rootDir: nodejs-backend
     buildCommand: npm install
     startCommand: npm start
     envVars:
