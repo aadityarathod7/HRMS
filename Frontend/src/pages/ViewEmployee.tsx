@@ -5,7 +5,7 @@ import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { User, Briefcase, CreditCard, Phone, Shield } from "lucide-react";
+import { User, Briefcase, CreditCard, Phone, FileText, Download } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -17,6 +17,7 @@ const ViewEmployee: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
+  const [docs, setDocs] = useState<any[]>([]);
   const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
   const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
 
@@ -31,7 +32,13 @@ const ViewEmployee: React.FC = () => {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchUser(); }, [id]);
+  useEffect(() => {
+    fetchUser();
+    // Fetch employee's documents
+    const token = localStorage.getItem("token");
+    axios.get(`${API_URL}/file/filter?userId=${id}&size=50`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => setDocs(res.data.content || [])).catch(() => {});
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setUser((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -70,6 +77,7 @@ const ViewEmployee: React.FC = () => {
     { id: "organization", label: "Organization", icon: Briefcase },
     { id: "bank", label: "Bank & ID", icon: CreditCard },
     { id: "emergency", label: "Emergency", icon: Phone },
+    { id: "documents", label: "Documents", icon: FileText },
   ];
 
   if (loading) return <div className="flex items-center justify-center min-h-screen"><p className="text-gray-400">Loading...</p></div>;
@@ -191,6 +199,42 @@ const ViewEmployee: React.FC = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <Field label="Emergency Contact Name" name="emergencyContactName" value={user.emergencyContactName} />
                     <Field label="Emergency Contact Number" name="emergencyContactNumber" value={user.emergencyContactNumber} />
+                  </div>
+                )}
+
+                {activeTab === "documents" && (
+                  <div>
+                    {docs.length === 0 ? (
+                      <div className="text-center py-8 text-gray-400 text-sm">No documents uploaded by this employee</div>
+                    ) : (
+                      <div className="space-y-2">
+                        {docs.map((doc: any) => (
+                          <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                                <FileText size={14} />
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-800">{doc.documentName || doc.fileName}</p>
+                                <p className="text-[11px] text-gray-400">{doc.fileName} · {(doc.fileSize / 1024).toFixed(1)} KB · {new Date(doc.createdDate).toLocaleDateString("en-GB")}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className={`px-2 py-0.5 text-[11px] rounded-full ${
+                                doc.status === "APPROVED" ? "bg-emerald-50 text-emerald-700" :
+                                doc.status === "REJECTED" ? "bg-red-50 text-red-600" :
+                                "bg-amber-50 text-amber-700"
+                              }`}>{doc.status || "PENDING"}</span>
+                              <a href={`${API_URL}/file/download/${doc.id}?token=${localStorage.getItem("token")}`}
+                                target="_blank" rel="noreferrer"
+                                className="text-gray-400 hover:text-blue-600" title="Download">
+                                <Download size={16} />
+                              </a>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

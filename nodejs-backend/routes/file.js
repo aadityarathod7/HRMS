@@ -73,17 +73,22 @@ router.get('/filter', authenticate, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-// Download file by id
-router.get('/download/:id', authenticate, async (req, res, next) => {
+// Download file by id (supports token as query param for browser links)
+router.get('/download/:id', async (req, res, next) => {
+  if (req.query.token && !req.headers.authorization) {
+    req.headers.authorization = `Bearer ${req.query.token}`;
+  }
+  return authenticate(req, res, async () => {
   try {
     const file = await UploadedFile.findById(req.params.id);
     if (!file) return res.status(404).json({ message: 'File not found' });
     if (!file.fileData) return res.status(404).json({ message: 'File data not found' });
 
     res.setHeader('Content-Type', file.fileType);
-    res.setHeader('Content-Disposition', `inline; filename="${file.fileName}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${file.fileName}"`);
     res.send(file.fileData);
   } catch (error) { next(error); }
+  });
 });
 
 // Get file content (text files)
