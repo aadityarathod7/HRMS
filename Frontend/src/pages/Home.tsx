@@ -287,13 +287,6 @@ const Home: React.FC = () => {
                       }
                     });
 
-                    const dotColor: Record<string, string> = {
-                      PRESENT: "bg-emerald-500",
-                      WFH: "bg-blue-500",
-                      ABSENT: "bg-red-400",
-                      HALF_DAY: "bg-amber-400",
-                      ON_LEAVE: "bg-purple-400",
-                    };
                     const bgColor: Record<string, string> = {
                       PRESENT: "bg-emerald-50 text-emerald-700",
                       WFH: "bg-blue-50 text-blue-700",
@@ -303,35 +296,41 @@ const Home: React.FC = () => {
                     };
 
                     return (
-                      <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">
-                        <div className="flex justify-between items-center mb-4">
-                          <p className="text-sm font-medium text-gray-700">Attendance — {monthName} {year}</p>
-                          <div className="flex flex-wrap gap-2">
-                            {Object.entries(dotColor).map(([s, c]) => (
-                              <span key={s} className="flex items-center gap-1 text-[10px] text-gray-500">
-                                <span className={`w-2 h-2 rounded-full ${c}`} /> {s.replace("_", " ")}
-                              </span>
-                            ))}
-                          </div>
+                      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4 w-64">
+                        {/* Month header */}
+                        <div className="flex justify-between items-center mb-2">
+                          <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{monthName}</p>
+                          <p className="text-xs text-gray-400">{year}</p>
                         </div>
-                        <div className="grid grid-cols-7 gap-1 mb-1">
-                          {["S","M","T","W","T","F","S"].map((d, i) => (
-                            <div key={i} className="text-center text-[10px] text-gray-400 font-medium pb-1">{d}</div>
+                        {/* Day headers */}
+                        <div className="grid grid-cols-7 mb-1">
+                          {["Su","Mo","Tu","We","Th","Fr","Sa"].map((d, i) => (
+                            <div key={i} className="text-center text-[9px] text-gray-400 font-medium py-0.5">{d}</div>
                           ))}
                         </div>
-                        <div className="grid grid-cols-7 gap-1">
-                          {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} />)}
+                        {/* Day cells */}
+                        <div className="grid grid-cols-7 gap-px">
+                          {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} className="h-6" />)}
                           {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
                             const status = statusMap[day];
                             const isToday = day === now.getDate();
                             return (
-                              <div key={day} className={`relative flex items-center justify-center rounded-lg h-8 text-xs font-light transition
-                                ${status ? bgColor[status] : isToday ? "bg-gray-100" : "text-gray-500"}
-                                ${isToday ? "ring-1 ring-gray-400 font-medium" : ""}`}>
+                              <div key={day} title={status?.replace("_", " ") || ""}
+                                className={`h-6 w-6 mx-auto flex items-center justify-center rounded text-[10px] font-light
+                                  ${status ? bgColor[status] : "text-gray-500"}
+                                  ${isToday ? "ring-1 ring-gray-700 font-semibold" : ""}`}>
                                 {day}
                               </div>
                             );
                           })}
+                        </div>
+                        {/* Mini legend */}
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 pt-3 border-t border-gray-100">
+                          {Object.entries(bgColor).map(([s, c]) => (
+                            <span key={s} className={`flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded ${c}`}>
+                              {s.replace("_", " ")}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     );
