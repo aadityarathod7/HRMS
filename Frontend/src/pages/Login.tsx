@@ -10,7 +10,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [userName, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,12 +37,9 @@ const Login = () => {
         navigate("/home");
         setTimeout(() => toast.success("Login successful!"), 50);
       } else {
-        const errorMessage = await response.text();
-        setErrorMessage(errorMessage);
         toast.error("Invalid credentials. Please try again.");
       }
     } catch (error) {
-      setErrorMessage("An error occurred. Please try again.");
       toast.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -107,9 +103,6 @@ const Login = () => {
             </Button>
           </form>
 
-          {errorMessage && (
-            <div className="text-red-500 text-sm mt-4 text-center">{errorMessage}</div>
-          )}
 
           <p className="text-center mt-5 text-sm text-gray-500">
             Forgot Password?{" "}
