@@ -25,12 +25,17 @@ const addUser = async (userData, createdBy) => {
   const roles = await Role.find({ role: { $in: roleNames } });
   const employeeId = await generateEmployeeId();
 
+  const doj = userData.dateOfJoining ? new Date(userData.dateOfJoining) : new Date();
+  const probationEnd = new Date(doj);
+  probationEnd.setMonth(probationEnd.getMonth() + 3);
+  const initialStatus = new Date() >= probationEnd ? 'ACTIVE' : 'PROBATION';
+
   const user = new User({
     ...userData,
     employeeId,
     password: hashedPassword,
     roles: roles.map(r => r._id),
-    status: 'PROBATION',
+    status: initialStatus,
     isActive: true,
     createdBy,
     createdDate: new Date()
@@ -130,7 +135,18 @@ const getTeamMembers = async (managerId) => {
   return team.map(toDto);
 };
 
-const toDto = (user) => ({
+const toDto = (user) => {
+  let effectiveStatus = user.status;
+  if (user.status === 'PROBATION' && user.dateOfJoining) {
+    const probationEnd = new Date(user.dateOfJoining);
+    probationEnd.setMonth(probationEnd.getMonth() + 3);
+    if (new Date() >= probationEnd) {
+      effectiveStatus = 'ACTIVE';
+      // Update DB in background so it stays in sync
+      User.updateOne({ _id: user._id }, { status: 'ACTIVE' }).catch(() => {});
+    }
+  }
+  return {
   id: user._id,
   employeeId: user.employeeId,
   userName: user.userName,
@@ -142,7 +158,7 @@ const toDto = (user) => ({
   bloodGroup: user.bloodGroup,
   dateOfJoining: user.dateOfJoining,
   isActive: user.isActive,
-  status: user.status,
+  status: effectiveStatus,
   address: user.address,
   email: user.email,
   gender: user.gender,
@@ -165,7 +181,8 @@ const toDto = (user) => ({
   createdDate: user.createdDate,
   updatedBy: user.updatedBy,
   updatedDate: user.updatedDate
-});
+  };
+};
 
 module.exports = {
   addUser, getAllUsers, getUsersByActiveStatus, getUserById,
