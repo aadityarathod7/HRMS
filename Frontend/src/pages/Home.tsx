@@ -8,6 +8,16 @@ import { Users, FileText, Clock, DollarSign, Calendar, UserCheck, UserX, Briefca
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+// Indian national public holidays (YYYY-MM-DD)
+const PUBLIC_HOLIDAYS = new Set([
+  // 2025
+  "2025-01-26","2025-03-14","2025-04-14","2025-04-18","2025-08-15","2025-10-02","2025-10-20","2025-12-25",
+  // 2026
+  "2026-01-26","2026-03-03","2026-04-03","2026-04-14","2026-08-15","2026-10-02","2026-11-09","2026-12-25",
+]);
+
+const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6;
+
 const ATT_COLORS: Record<string, { bg: string; color: string }> = {
   PRESENT: { bg: "#d1fae5", color: "#065f46" },
   WFH: { bg: "#dbeafe", color: "#1e40af" },
@@ -151,10 +161,7 @@ const EmployeeDashboard: React.FC<{ stats: any; attendanceRecords: any[]; naviga
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4">
       {/* Mini calendar */}
       <div className="lg:col-span-2">
-        {attendanceRecords.length > 0
-          ? <MiniCalendar records={attendanceRecords} />
-          : <div className="bg-white rounded-xl border border-gray-200 p-5 text-center text-sm text-gray-400">No attendance data this month</div>
-        }
+        <MiniCalendar records={attendanceRecords} />
       </div>
 
       {/* Payslip + Recent leaves */}
@@ -221,10 +228,47 @@ const Home: React.FC = () => {
         const roles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
         const myProfile = JSON.parse(localStorage.getItem("userProfile") || "{}");
         if (!roles.some(r => ["ADMIN", "HR", "MANAGER"].includes(r)) && myProfile.id) {
-          const attRes = await axios.get(`${API_URL}/attendance/user/${myProfile.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
+          const [attRes, leaveRes] = await Promise.all([
+            axios.get(`${API_URL}/attendance/user/${myProfile.id}`, { headers: { Authorization: `Bearer ${token}` } }),
+            axios.get(`${API_URL}/leaverequests/user/${myProfile.id}`, { headers: { Authorization: `Bearer ${token}` } }),
+          ]);
+
+          const attRecords: any[] = attRes.data || [];
+
+          // Expand approved leaves into individual day records for the calendar
+          const leaveRecords: any[] = [];
+          (leaveRes.data || []).forEach((leave: any) => {
+            if (leave.leaveStatus !== "APPROVED") return;
+            const start = new Date(leave.leaveStartDate);
+            const end = new Date(leave.leaveEndDate);
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+              const dateStr = d.toISOString().split("T")[0];
+              // Only add if not already present in attendance records
+              if (!attRecords.some((a: any) => a.date?.startsWith(dateStr))) {
+                leaveRecords.push({ date: dateStr, status: "ON_LEAVE" });
+              }
+            }
           });
-          setAttendanceRecords(attRes.data || []);
+
+          // Auto-fill weekdays as PRESENT from dateOfJoining to today
+          const autoPresent: any[] = [];
+          const doj = myProfile.dateOfJoining ? new Date(myProfile.dateOfJoining) : null;
+          if (doj) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const allRecordDates = new Set([
+              ...attRecords.map((a: any) => a.date?.split("T")[0]),
+              ...leaveRecords.map((l: any) => l.date),
+            ]);
+            for (let d = new Date(doj); d <= today; d.setDate(d.getDate() + 1)) {
+              const dateStr = d.toISOString().split("T")[0];
+              if (!isWeekend(d) && !PUBLIC_HOLIDAYS.has(dateStr) && !allRecordDates.has(dateStr)) {
+                autoPresent.push({ date: dateStr, status: "PRESENT" });
+              }
+            }
+          }
+
+          setAttendanceRecords([...attRecords, ...leaveRecords, ...autoPresent]);
         }
       } catch (err) {
         if (axios.isAxiosError(err) && err.response?.status === 401) navigate("/login");

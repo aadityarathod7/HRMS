@@ -8,6 +8,11 @@ import Footer from "@/components/Footer";
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const LEAVE_TYPES = ["CASUAL", "SICK", "PRIVILEGE", "COMP_OFF", "MATERNITY", "PATERNITY", "LOP"];
 
+const isWeekend = (dateStr: string) => {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.getDay() === 0 || d.getDay() === 6;
+};
+
 const LeaveApplication = () => {
   const [loading, setLoading] = useState(false);
   const userProfile = JSON.parse(localStorage.getItem("userProfile") || "{}");
@@ -38,6 +43,10 @@ const LeaveApplication = () => {
 
   // When halfDay is true, end date = start date
   const handleStartDateChange = (v: string) => {
+    if (v && isWeekend(v)) {
+      toast.error("Saturdays and Sundays are non-working days. Please select a weekday.");
+      return;
+    }
     setFormData(prev => ({
       ...prev,
       leaveStartDate: v,
@@ -181,7 +190,14 @@ const LeaveApplication = () => {
                       value={formData.leaveEndDate}
                       min={formData.leaveStartDate || new Date().toISOString().split("T")[0]}
                       disabled={formData.halfDay}
-                      onChange={(e) => setFormData({...formData, leaveEndDate: e.target.value})}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        if (v && isWeekend(v)) {
+                          toast.error("Saturdays and Sundays are non-working days. Please select a weekday.");
+                          return;
+                        }
+                        setFormData({...formData, leaveEndDate: v});
+                      }}
                       className={`${inputClass} ${formData.halfDay ? "opacity-50 cursor-not-allowed" : ""}`}
                     />
                   </div>
@@ -193,10 +209,13 @@ const LeaveApplication = () => {
                     {formData.halfDay
                       ? `0.5 day — ${formData.halfDayType === "FIRST_HALF" ? "First Half" : formData.halfDayType === "SECOND_HALF" ? "Second Half" : "Select half"}`
                       : (() => {
-                          const start = new Date(formData.leaveStartDate);
-                          const end = new Date(formData.leaveEndDate);
-                          const days = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-                          return `${days} day${days > 1 ? "s" : ""} leave — ${start.toLocaleDateString("en-GB")} to ${end.toLocaleDateString("en-GB")}`;
+                          const start = new Date(formData.leaveStartDate + "T00:00:00");
+                          const end = new Date(formData.leaveEndDate + "T00:00:00");
+                          let days = 0;
+                          for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                            if (d.getDay() !== 0 && d.getDay() !== 6) days++;
+                          }
+                          return `${days} working day${days !== 1 ? "s" : ""} — ${start.toLocaleDateString("en-GB")} to ${end.toLocaleDateString("en-GB")}`;
                         })()
                     }
                   </div>
