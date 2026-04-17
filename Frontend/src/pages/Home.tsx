@@ -91,12 +91,9 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 relative">
       <div className="flex justify-between items-center mb-3">
-        <button onClick={prevMonth} style={{ fontSize: 14, color: "#6b7280", background: "none", border: "none", cursor: "pointer", padding: "0 4px" }}>‹</button>
-        <div className="text-center">
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1 }} className="text-gray-700 uppercase">{monthName}</p>
-          <p style={{ fontSize: 10 }} className="text-gray-400">{viewYear}</p>
-        </div>
-        <button onClick={nextMonth} style={{ fontSize: 14, color: "#6b7280", background: "none", border: "none", cursor: "pointer", padding: "0 4px" }}>›</button>
+        <button onClick={prevMonth} style={{ fontSize: 16, color: "#6b7280", background: "none", border: "none", cursor: "pointer", padding: "2px 6px", lineHeight: 1 }}>‹</button>
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: "#374151" }}>{monthName.toUpperCase()} {viewYear}</p>
+        <button onClick={nextMonth} style={{ fontSize: 16, color: "#6b7280", background: "none", border: "none", cursor: "pointer", padding: "2px 6px", lineHeight: 1 }}>›</button>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
         {["Su","Mo","Tu","We","Th","Fr","Sa"].map((d, i) => (
@@ -154,97 +151,139 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
   );
 };
 
-const EmployeeDashboard: React.FC<{ stats: any; attendanceRecords: any[]; navigate: any; formatCurrency: any; Badge: any }> = ({ stats, attendanceRecords, navigate, formatCurrency, Badge }) => (
-  <>
-    {/* Stat cards */}
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-      {[
-        { icon: Calendar, label: "Leave Available", value: (stats.leaveBalance || []).reduce((s: number, b: any) => s + b.available, 0), sub: "Days remaining", path: "/leave-balance", color: "bg-blue-600" },
-        { icon: UserCheck, label: "Present This Month", value: stats.attendanceSummary?.present || 0, sub: `${stats.attendanceSummary?.wfh || 0} WFH`, path: "/attendance-management", color: "bg-emerald-500" },
-        { icon: DollarSign, label: "Last Salary", value: stats.latestPayroll ? formatCurrency(stats.latestPayroll.netSalary) : "—", sub: stats.latestPayroll ? `${stats.latestPayroll.month} ${stats.latestPayroll.year}` : "", path: "/payroll-management", color: "bg-violet-500" },
-        { icon: TrendingUp, label: "Absent / On Leave", value: (stats.attendanceSummary?.absent || 0) + (stats.attendanceSummary?.onLeave || 0), sub: "This month", path: null, color: "bg-amber-500" },
-      ].map((item, i) => (
-        <div key={i} onClick={() => item.path && navigate(item.path)}
-          className={`bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3 ${item.path ? "cursor-pointer hover:border-blue-300 transition" : ""}`}>
-          <div className={`${item.color} w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0`}>
-            <item.icon size={16} className="text-white" />
+const EmployeeDashboard: React.FC<{ stats: any; attendanceRecords: any[]; navigate: any; formatCurrency: any; Badge: any }> = ({ stats, attendanceRecords, navigate, formatCurrency, Badge }) => {
+  const totalLeave = (stats.leaveBalance || []).reduce((s: number, b: any) => s + b.available, 0);
+  const present = stats.attendanceSummary?.present || 0;
+  const wfh = stats.attendanceSummary?.wfh || 0;
+  const absentOnLeave = (stats.attendanceSummary?.absent || 0) + (stats.attendanceSummary?.onLeave || 0);
+
+  return (
+    <>
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+        {/* Leave Available */}
+        <div onClick={() => navigate("/leave-balance")} className="bg-white rounded-xl border border-gray-200 p-4 cursor-pointer hover:border-blue-200 hover:shadow-sm transition group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs text-gray-400 uppercase tracking-wider">Leave Available</span>
+            <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition">
+              <Calendar size={15} className="text-blue-600" />
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-xl font-light text-gray-900 truncate">{item.value}</p>
-            <p className="text-xs text-gray-500 truncate">{item.label}</p>
-            {item.sub && <p className="text-[10px] text-gray-400">{item.sub}</p>}
+          <p className="text-2xl font-light text-gray-900">{totalLeave}</p>
+          <p className="text-xs text-gray-400 mt-0.5">days remaining</p>
+        </div>
+
+        {/* Present This Month */}
+        <div onClick={() => navigate("/attendance-management")} className="bg-white rounded-xl border border-gray-200 p-4 cursor-pointer hover:border-emerald-200 hover:shadow-sm transition group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs text-gray-400 uppercase tracking-wider">Present</span>
+            <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center group-hover:bg-emerald-100 transition">
+              <UserCheck size={15} className="text-emerald-600" />
+            </div>
+          </div>
+          <p className="text-2xl font-light text-gray-900">{present}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{wfh} WFH this month</p>
+        </div>
+
+        {/* Last Salary */}
+        <div onClick={() => navigate("/payroll-management")} className="bg-white rounded-xl border border-gray-200 p-4 cursor-pointer hover:border-violet-200 hover:shadow-sm transition group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs text-gray-400 uppercase tracking-wider">Last Salary</span>
+            <div className="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center group-hover:bg-violet-100 transition">
+              <DollarSign size={15} className="text-violet-600" />
+            </div>
+          </div>
+          <p className="text-2xl font-light text-gray-900 truncate">
+            {stats.latestPayroll ? formatCurrency(stats.latestPayroll.netSalary) : "—"}
+          </p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {stats.latestPayroll ? `${stats.latestPayroll.month} ${stats.latestPayroll.year}` : "No payroll yet"}
+          </p>
+        </div>
+
+        {/* Absent / On Leave */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs text-gray-400 uppercase tracking-wider">Absent / Leave</span>
+            <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <TrendingUp size={15} className="text-amber-600" />
+            </div>
+          </div>
+          <p className="text-2xl font-light text-gray-900">{absentOnLeave}</p>
+          <p className="text-xs text-gray-400 mt-0.5">days this month</p>
+        </div>
+      </div>
+
+      {/* Leave Balance */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">
+        <div className="flex justify-between items-center mb-4">
+          <p className="text-sm font-medium text-gray-700">Leave Balance</p>
+          <button onClick={() => navigate("/leave-application")} className="text-xs text-blue-600 border border-blue-200 px-3 py-1 rounded-lg hover:bg-blue-50 transition">+ Apply Leave</button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {(stats.leaveBalance || []).map((lb: any, i: number) => (
+            <div key={i} className="bg-gray-50 rounded-lg p-3">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-medium text-gray-600">{lb.leaveType}</span>
+                <span className="text-xs text-gray-900 font-medium">{lb.available}<span className="text-gray-400 font-normal">/{lb.totalAllotted}</span></span>
+              </div>
+              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-1.5 bg-blue-500 rounded-full transition-all" style={{ width: `${Math.min((lb.available / lb.totalAllotted) * 100, 100)}%` }} />
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1.5">{lb.used} used · {lb.available} left</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Calendar + Recent Leaves side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <MiniCalendar records={attendanceRecords} />
+
+        <div className="flex flex-col gap-4">
+          {/* Latest Payslip */}
+          {stats.latestPayroll && (
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Latest Payslip</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xl font-light text-gray-900">{formatCurrency(stats.latestPayroll.netSalary)}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{stats.latestPayroll.month} {stats.latestPayroll.year}</p>
+                </div>
+                <Badge status={stats.latestPayroll.status} />
+              </div>
+            </div>
+          )}
+
+          {/* Recent Leaves */}
+          <div className="bg-white rounded-xl border border-gray-200 p-4 flex-1">
+            <div className="flex justify-between items-center mb-3">
+              <p className="text-xs text-gray-400 uppercase tracking-wider">Recent Leaves</p>
+              <button onClick={() => navigate("/leave-balance")} className="text-xs text-blue-600 hover:text-blue-800">View all</button>
+            </div>
+            {(stats.recentLeaves || []).length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-4">No leaves applied</p>
+            ) : (
+              <div className="space-y-0 divide-y divide-gray-100">
+                {(stats.recentLeaves || []).slice(0, 5).map((l: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between py-2.5">
+                    <div>
+                      <p className="text-sm text-gray-800">{l.leaveType} <span className="text-gray-400 text-xs">· {l.numberOfDays || 1}d</span></p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">
+                        {new Date(l.leaveStartDate).toLocaleDateString('en-GB')} — {new Date(l.leaveEndDate).toLocaleDateString('en-GB')}
+                      </p>
+                    </div>
+                    <Badge status={l.leaveStatus} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-      ))}
-    </div>
-
-    {/* Leave balance */}
-    <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">
-      <div className="flex justify-between items-center mb-4">
-        <p className="text-sm font-medium text-gray-700">Leave Balance</p>
-        <button onClick={() => navigate("/leave-application")} className="text-xs text-blue-600 hover:text-blue-800 border border-blue-200 px-3 py-1 rounded-lg hover:bg-blue-50 transition">+ Apply Leave</button>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(160px,1fr))", gap: 12 }}>
-        {(stats.leaveBalance || []).map((lb: any, i: number) => (
-          <div key={i}>
-            <div className="flex justify-between text-sm mb-1.5">
-              <span className="text-gray-600">{lb.leaveType}</span>
-              <span className="text-gray-900">{lb.available}<span className="text-gray-400">/{lb.totalAllotted}</span></span>
-            </div>
-            <div className="h-1.5 bg-gray-100 rounded-full">
-              <div className="h-1.5 bg-gray-800 rounded-full transition-all" style={{ width: `${(lb.available / lb.totalAllotted) * 100}%` }} />
-            </div>
-            <p className="text-[11px] text-gray-400 mt-1">{lb.used} used</p>
-          </div>
-        ))}
-      </div>
-    </div>
-
-    {/* Calendar + Right column */}
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4">
-      {/* Mini calendar */}
-      <div className="lg:col-span-2">
-        <MiniCalendar records={attendanceRecords} />
-      </div>
-
-      {/* Payslip + Recent leaves */}
-      <div className="lg:col-span-3 flex flex-col gap-4">
-        {stats.latestPayroll && (
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <p className="text-sm font-medium text-gray-700 mb-3">Latest Payslip</p>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-2xl font-light text-gray-900">{formatCurrency(stats.latestPayroll.netSalary)}</p>
-                <p className="text-xs text-gray-400 mt-1">{stats.latestPayroll.month} {stats.latestPayroll.year}</p>
-              </div>
-              <Badge status={stats.latestPayroll.status} />
-            </div>
-          </div>
-        )}
-
-        {stats.recentLeaves?.length > 0 && (
-          <div className="bg-white rounded-xl border border-gray-200 p-5 flex-1">
-            <div className="flex justify-between items-center mb-3">
-              <p className="text-sm font-medium text-gray-700">Recent Leaves</p>
-              <button onClick={() => navigate("/leave-balance")} className="text-xs text-gray-400 hover:text-blue-600">View all</button>
-            </div>
-            <div className="space-y-2">
-              {stats.recentLeaves.slice(0, 4).map((l: any, i: number) => (
-                <div key={i} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
-                  <div>
-                    <p className="text-sm text-gray-700">{l.leaveType} · {l.numberOfDays || 1}d</p>
-                    <p className="text-[11px] text-gray-400">{new Date(l.leaveStartDate).toLocaleDateString('en-GB')} — {new Date(l.leaveEndDate).toLocaleDateString('en-GB')}</p>
-                  </div>
-                  <Badge status={l.leaveStatus} />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  </>
-);
+    </>
+  );
+};
 
 const Home: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
