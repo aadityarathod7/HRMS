@@ -39,7 +39,8 @@ router.post('/login', async (req, res, next) => {
         email: user.email,
         department: user.department,
         designation: user.designation,
-        profilePicture: user.profilePicture
+        profilePicture: user.profilePicture,
+        dateOfJoining: user.dateOfJoining
       }
     });
   } catch (error) {
@@ -100,7 +101,8 @@ router.post('/google', async (req, res, next) => {
         email: user.email,
         department: user.department,
         designation: user.designation,
-        profilePicture: user.profilePicture
+        profilePicture: user.profilePicture,
+        dateOfJoining: user.dateOfJoining
       }
     });
   } catch (error) {

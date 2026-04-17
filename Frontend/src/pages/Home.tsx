@@ -27,36 +27,46 @@ const ATT_COLORS: Record<string, { bg: string; color: string }> = {
 };
 
 const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
+  const today = new Date();
+  const [viewYear, setViewYear] = React.useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = React.useState(today.getMonth());
   const [tooltip, setTooltip] = React.useState<{ day: number; status: string } | null>(null);
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const monthName = now.toLocaleString("en", { month: "long" });
+
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const monthName = new Date(viewYear, viewMonth, 1).toLocaleString("en", { month: "long" });
+
+  const prevMonth = () => {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
+    else setViewMonth(m => m - 1);
+  };
+  const nextMonth = () => {
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
+    else setViewMonth(m => m + 1);
+  };
 
   const statusMap: Record<number, string> = {};
   records.forEach((r: any) => {
-    // Parse as local date to avoid UTC timezone shifting
-    const dateStr = r.date?.split("T")[0]; // "2026-04-14"
+    const dateStr = r.date?.split("T")[0];
     if (!dateStr) return;
     const [y, m, d] = dateStr.split("-").map(Number);
-    if (m - 1 === month && y === year) statusMap[d] = r.status;
+    if (m - 1 === viewMonth && y === viewYear) statusMap[d] = r.status;
   });
 
   const tooltipLabel: Record<string, string> = {
-    PRESENT: "Present",
-    WFH: "Work From Home",
-    ABSENT: "Absent",
-    HALF_DAY: "Half Day",
-    ON_LEAVE: "On Leave",
+    PRESENT: "Present", WFH: "Work From Home", ABSENT: "Absent",
+    HALF_DAY: "Half Day", ON_LEAVE: "On Leave",
   };
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 relative">
       <div className="flex justify-between items-center mb-3">
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1 }} className="text-gray-700 uppercase">{monthName}</p>
-        <p style={{ fontSize: 10 }} className="text-gray-400">{year}</p>
+        <button onClick={prevMonth} style={{ fontSize: 14, color: "#6b7280", background: "none", border: "none", cursor: "pointer", padding: "0 4px" }}>‹</button>
+        <div className="text-center">
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1 }} className="text-gray-700 uppercase">{monthName}</p>
+          <p style={{ fontSize: 10 }} className="text-gray-400">{viewYear}</p>
+        </div>
+        <button onClick={nextMonth} style={{ fontSize: 14, color: "#6b7280", background: "none", border: "none", cursor: "pointer", padding: "0 4px" }}>›</button>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
         {["Su","Mo","Tu","We","Th","Fr","Sa"].map((d, i) => (
@@ -65,7 +75,7 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
         {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} style={{ height: 22 }} />)}
         {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
           const status = statusMap[day];
-          const isToday = day === now.getDate();
+          const isToday = day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
           const c = status ? ATT_COLORS[status] : null;
           return (
             <div key={day}
@@ -75,14 +85,12 @@ const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
                 height: 22, width: 22, margin: "0 auto", display: "flex",
                 alignItems: "center", justifyContent: "center", borderRadius: 4,
                 fontSize: 10, fontWeight: isToday ? 700 : 400,
-                cursor: status ? "default" : "default",
                 backgroundColor: c?.bg || (isToday ? "#f3f4f6" : "transparent"),
                 color: c?.color || (isToday ? "#111827" : "#6b7280"),
                 outline: isToday ? "1.5px solid #9ca3af" : "none",
                 position: "relative",
               }}>
               {day}
-              {/* Tooltip */}
               {tooltip?.day === day && (
                 <div style={{
                   position: "absolute", bottom: 26, left: "50%", transform: "translateX(-50%)",

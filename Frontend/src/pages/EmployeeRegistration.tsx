@@ -21,13 +21,27 @@ const EmployeeRegistration = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [departments, setDepartments] = useState<any[]>([]);
   const [managers, setManagers] = useState<any[]>([]);
+  const [photoPreview, setPhotoPreview] = useState<string>("");
   const [formData, setFormData] = useState({
     firstname: "", lastname: "", dob: "", bloodGroup: "", branch: "", dateOfJoining: "",
     gender: "", address: "", contactNumber: "", userName: "", password: "", roles: [] as string[], email: "",
     department: "", designation: "", reportingManager: "", employmentType: "FULLTIME",
     ctc: "", panNumber: "", aadharNumber: "", bankAccountNumber: "", bankName: "", ifscCode: "",
-    emergencyContactName: "", emergencyContactNumber: ""
+    emergencyContactName: "", emergencyContactNumber: "", profilePicture: ""
   });
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { toast.error("Photo must be under 2MB"); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      setPhotoPreview(base64);
+      setFormData(prev => ({ ...prev, profilePicture: base64 }));
+    };
+    reader.readAsDataURL(file);
+  };
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
@@ -74,6 +88,23 @@ const EmployeeRegistration = () => {
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
               <h2 className="text-2xl font-light tracking-tight text-gray-900 mb-8">Employee Registration</h2>
               <form onSubmit={handleSubmit}>
+                {/* Photo Upload */}
+                <div className="flex items-center gap-5 mb-7">
+                  <div className="w-20 h-20 rounded-full bg-blue-50 border-2 border-dashed border-blue-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    {photoPreview
+                      ? <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                      : <span className="text-2xl text-blue-300">+</span>
+                    }
+                  </div>
+                  <div>
+                    <label className="cursor-pointer bg-white border border-gray-300 text-gray-600 px-4 py-2 rounded-md text-sm hover:bg-gray-50 transition">
+                      {photoPreview ? "Change Photo" : "Upload Photo"}
+                      <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+                    </label>
+                    <p className="text-xs text-gray-400 mt-1">JPG, PNG up to 2MB</p>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                   <div><label className={labelClass}>First Name</label><input type="text" name="firstname" value={formData.firstname} onChange={handleChange} required className={inputClass} placeholder="John" /></div>
                   <div><label className={labelClass}>Last Name</label><input type="text" name="lastname" value={formData.lastname} onChange={handleChange} required className={inputClass} placeholder="Doe" /></div>

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { User, Briefcase, CreditCard, Phone, FileText, Download } from "lucide-react";
+import { User, Briefcase, CreditCard, Phone, FileText, Download, Camera } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -18,8 +18,20 @@ const ViewEmployee: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
   const [docs, setDocs] = useState<any[]>([]);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
   const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { toast.error("Photo must be under 2MB"); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setUser((prev: any) => ({ ...prev, profilePicture: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
+  };
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
@@ -94,8 +106,22 @@ const ViewEmployee: React.FC = () => {
               <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl font-light">
-                      {(user.firstname || "?").charAt(0)}{(user.lastname || "").charAt(0)}
+                    <div className="relative w-14 h-14 flex-shrink-0">
+                      {user.profilePicture
+                        ? <img src={user.profilePicture} alt="Profile" className="w-14 h-14 rounded-full object-cover" />
+                        : <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl font-light">
+                            {(user.firstname || "?").charAt(0)}{(user.lastname || "").charAt(0)}
+                          </div>
+                      }
+                      {isEditing && (
+                        <>
+                          <button type="button" onClick={() => photoInputRef.current?.click()}
+                            className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                            <Camera size={16} className="text-white" />
+                          </button>
+                          <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+                        </>
+                      )}
                     </div>
                     <div>
                       <h1 className="text-xl font-light text-gray-900">{user.firstname} {user.lastname}</h1>

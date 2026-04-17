@@ -224,8 +224,11 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
                 {/* Profile header */}
                 <div className="p-4 bg-gray-50 border-b border-gray-100">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium">
-                      {(userProfile.firstname || username).charAt(0).toUpperCase()}
+                    <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium overflow-hidden">
+                      {userProfile.profilePicture
+                        ? <img src={userProfile.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                        : (userProfile.firstname || username).charAt(0).toUpperCase()
+                      }
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">{userProfile.firstname || username} {userProfile.lastname || ""}</p>
