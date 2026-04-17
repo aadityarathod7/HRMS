@@ -1,0 +1,36 @@
+services:
+  # Backend Service
+  - type: web
+    name: hrms-sanvii-backend
+    runtime: node
+    rootDir: Nodejs backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false  # Set this in Render dashboard
+      - key: JWT_SECRET
+        sync: false  # Set this in Render dashboard
+      - key: CORS_ORIGIN
+        sync: false  # Set to your frontend URL after deployment
+
+  # Frontend Service
+  - type: web
+    name: hrms-sanvii-frontend
+    runtime: static
+    rootDir: Frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false  # Set to your backend URL after deployment
+      - key: VITE_WS_URL
+        sync: false  # Set to your backend WSS URL after deployment
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
