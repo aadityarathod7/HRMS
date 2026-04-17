@@ -343,21 +343,15 @@ const EmployeeLeaveManagement: React.FC = () => {
     if (!id) return;
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(
+      await axios.put(
         `http://localhost:5000/manager/leaveRequest/${id}/updateStatus?status=APPROVED`,
         {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      if (response.status === 200) {
-        await fetchUsers();
-      }
+      toast.success("Leave approved");
+      await fetchUsers();
     } catch (error) {
-      console.error("Error approving leave:", error);
+      toast.error("Failed to approve leave");
     }
   };
 
@@ -365,21 +359,15 @@ const EmployeeLeaveManagement: React.FC = () => {
     if (!id) return;
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(
+      await axios.put(
         `http://localhost:5000/manager/leaveRequest/${id}/updateStatus?status=REJECTED`,
         {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      if (response.status === 200) {
-        await fetchUsers();
-      }
+      toast.success("Leave rejected");
+      await fetchUsers();
     } catch (error) {
-      console.error("Error rejecting leave:", error);
+      toast.error("Failed to reject leave");
     }
   };
 

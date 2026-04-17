@@ -5,38 +5,43 @@ import "react-toastify/dist/ReactToastify.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
-import NotFound from "./pages/NotFound";
-import Home from "./pages/Home";
-import Documents from "./pages/Documents";
-import View from "./pages/View";
-import EmployeeRegistration from "./pages/EmployeeRegistration";
-import EmployeeList from "./pages/EmployeeList";
-import RoleManagement from "./pages/RoleManagement";
-import DepartmentManagement from "./pages/DepartmentManagement";
-import ViewUser from "./pages/ViewEmployee";
-import ViewEmployee from "./pages/ViewEmployee";
-import RoleRegistration from "./pages/RoleRegistration";
-import ViewRole from "./pages/ViewRole";
-import DepartmentRegistration from "./pages/DepartmentRegistration";
-import ViewDepartment from "./pages/ViewDepartment";
-import EmployeeLeaveManagement from "./pages/EmployeeLeaveManagement";
-import LeaveBalance from "./pages/LeaveBalance";
-import TimeSheetManagement from "./pages/TimeSheetManagement";
 import React from "react";
 import { ToastProvider } from "@/context/ToastContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
+// Pages
+import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import GoogleCallback from "./pages/auth/google/callback";
+import NotFound from "./pages/NotFound";
+import Home from "./pages/Home";
+import EmployeeList from "./pages/EmployeeList";
+import EmployeeRegistration from "./pages/EmployeeRegistration";
+import ViewEmployee from "./pages/ViewEmployee";
+import RoleManagement from "./pages/RoleManagement";
+import RoleRegistration from "./pages/RoleRegistration";
+import ViewRole from "./pages/ViewRole";
+import DepartmentManagement from "./pages/DepartmentManagement";
+import DepartmentRegistration from "./pages/DepartmentRegistration";
+import ViewDepartment from "./pages/ViewDepartment";
+import LeaveApplication from "./pages/LeaveApplication";
+import LeaveManagement from "./pages/LeaveManagement";
+import EmployeeLeaveManagement from "./pages/EmployeeLeaveManagement";
+import LeaveBalance from "./pages/LeaveBalance";
+import ViewLeave from "./pages/ViewLeave";
 import ProjectManagement from "./pages/ProjectManagement";
 import ProjectRegistration from "./pages/ProjectRegistration";
 import ViewProject from "./pages/ViewProject";
-import LeaveApplication from "./pages/LeaveApplication";
-import ViewLeave from "./pages/ViewLeave";
-import LeaveManagement from "./pages/LeaveManagement";
+import TimeSheetManagement from "./pages/TimeSheetManagement";
 import AttendanceManagement from "./pages/AttendanceManagement";
 import PayrollManagement from "./pages/PayrollManagement";
-import GoogleCallback from "./pages/auth/google/callback";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
+import Documents from "./pages/Documents";
+import View from "./pages/View";
+
 const queryClient = new QueryClient();
+const ADMIN_HR = ["ADMIN", "HR"];
+const ADMIN_HR_MGR = ["ADMIN", "HR", "MANAGER"];
 
 const App: React.FC = () => {
   return (
@@ -47,19 +52,14 @@ const App: React.FC = () => {
           <Sonner />
           <ToastContainer
             toastStyle={{
-              backgroundColor: 'white',
-              color: '#1e40af',
-              fontFamily: 'var(--font-system)',
-              fontWeight: 300,
-              borderRadius: '8px',
-              border: '1px solid #dbeafe',
+              backgroundColor: "white", color: "#1e40af",
+              fontFamily: "var(--font-system)", fontWeight: 300,
+              borderRadius: "8px", border: "1px solid #dbeafe",
             }}
-            progressStyle={{
-              background: '#2563eb',
-            }}
+            progressStyle={{ background: "#2563eb" }}
             icon={({ type }) => {
-              if (type === 'success') return <span style={{ color: '#2563eb', fontSize: '18px' }}>✓</span>;
-              if (type === 'error') return <span style={{ color: '#dc2626', fontSize: '18px' }}>✕</span>;
+              if (type === "success") return <span style={{ color: "#2563eb", fontSize: "18px" }}>✓</span>;
+              if (type === "error") return <span style={{ color: "#dc2626", fontSize: "18px" }}>✕</span>;
               return null;
             }}
             position="bottom-right"
@@ -67,66 +67,42 @@ const App: React.FC = () => {
           />
           <BrowserRouter>
             <Routes>
-              <Route path="/leave-balance" element={<LeaveBalance />} />
-              <Route path="/employeelist" element={<EmployeeList />} />
-              <Route
-                path="/department-management"
-                element={<DepartmentManagement />}
-              />
-              <Route path="/view-project/:id" element={<ViewProject />} />
-              <Route path="/role-management" element={<RoleManagement />} />
-              <Route
-                path="/project-management"
-                element={<ProjectManagement />}
-              />
-              <Route
-                path="/employee-leave-management"
-                element={<EmployeeLeaveManagement />}
-              />
-              <Route path="/leave-management" element={<LeaveManagement />} />
-              <Route path="/view/:id" element={<View />} />
-              <Route path="/view-role/:id" element={<ViewRole />} />
-              <Route path="/view-department/:id" element={<ViewDepartment />} />
-              <Route path="/view-employee/:id" element={<ViewEmployee />} />
-              <Route path="/view-leave/:id" element={<ViewLeave />} />
-              <Route path="/documents" element={<Documents />} />
-              <Route path="/leave-application" element={<LeaveApplication />} />
-              <Route path="/home" element={<Home />} />
+              {/* Public routes */}
               <Route path="/" element={<Navigate to="/login" replace />} />
-              <Route
-                path="/employeeregistration"
-                element={<EmployeeRegistration />}
-              />
-              <Route
-                path="/department-registration"
-                element={<DepartmentRegistration />}
-              />
-              <Route path="/roleregistration" element={<RoleRegistration />} />
               <Route path="/login" element={<Login />} />
-              <Route
-                path="/auth/google/callback"
-                element={<GoogleCallback />}
-              />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="*" element={<NotFound />} />
-              <Route
-                path="/time-sheet-management"
-                element={<TimeSheetManagement />}
-              />
-              <Route
-                path="/attendance-management"
-                element={<AttendanceManagement />}
-              />
-              <Route
-                path="/payroll-management"
-                element={<PayrollManagement />}
-              />
+              <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
-              <Route
-                path="/project-registration"
-                element={<ProjectRegistration />}
-              />
+              {/* Protected — All logged-in users */}
+              <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+              <Route path="/leave-application" element={<ProtectedRoute><LeaveApplication /></ProtectedRoute>} />
+              <Route path="/leave-balance" element={<ProtectedRoute><LeaveBalance /></ProtectedRoute>} />
+              <Route path="/view-leave/:id" element={<ProtectedRoute><ViewLeave /></ProtectedRoute>} />
+              <Route path="/view-employee/:id" element={<ProtectedRoute><ViewEmployee /></ProtectedRoute>} />
+              <Route path="/attendance-management" element={<ProtectedRoute><AttendanceManagement /></ProtectedRoute>} />
+              <Route path="/payroll-management" element={<ProtectedRoute><PayrollManagement /></ProtectedRoute>} />
+              <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+              <Route path="/view/:id" element={<ProtectedRoute><View /></ProtectedRoute>} />
+
+              {/* Protected — Admin, HR, Manager only */}
+              <Route path="/employeelist" element={<ProtectedRoute allowedRoles={ADMIN_HR}><EmployeeList /></ProtectedRoute>} />
+              <Route path="/employeeregistration" element={<ProtectedRoute allowedRoles={ADMIN_HR}><EmployeeRegistration /></ProtectedRoute>} />
+              <Route path="/role-management" element={<ProtectedRoute allowedRoles={ADMIN_HR}><RoleManagement /></ProtectedRoute>} />
+              <Route path="/roleregistration" element={<ProtectedRoute allowedRoles={ADMIN_HR}><RoleRegistration /></ProtectedRoute>} />
+              <Route path="/view-role/:id" element={<ProtectedRoute allowedRoles={ADMIN_HR}><ViewRole /></ProtectedRoute>} />
+              <Route path="/department-management" element={<ProtectedRoute allowedRoles={ADMIN_HR}><DepartmentManagement /></ProtectedRoute>} />
+              <Route path="/department-registration" element={<ProtectedRoute allowedRoles={ADMIN_HR}><DepartmentRegistration /></ProtectedRoute>} />
+              <Route path="/view-department/:id" element={<ProtectedRoute allowedRoles={ADMIN_HR}><ViewDepartment /></ProtectedRoute>} />
+              <Route path="/leave-management" element={<ProtectedRoute allowedRoles={ADMIN_HR_MGR}><LeaveManagement /></ProtectedRoute>} />
+              <Route path="/employee-leave-management" element={<ProtectedRoute allowedRoles={ADMIN_HR_MGR}><EmployeeLeaveManagement /></ProtectedRoute>} />
+              <Route path="/project-management" element={<ProtectedRoute allowedRoles={ADMIN_HR}><ProjectManagement /></ProtectedRoute>} />
+              <Route path="/project-registration" element={<ProtectedRoute allowedRoles={ADMIN_HR}><ProjectRegistration /></ProtectedRoute>} />
+              <Route path="/view-project/:id" element={<ProtectedRoute allowedRoles={ADMIN_HR}><ViewProject /></ProtectedRoute>} />
+              <Route path="/time-sheet-management" element={<ProtectedRoute allowedRoles={ADMIN_HR}><TimeSheetManagement /></ProtectedRoute>} />
+
+              {/* 404 */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </ToastProvider>

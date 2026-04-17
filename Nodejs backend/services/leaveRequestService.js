@@ -31,11 +31,7 @@ const createLeaveRequest = async (data) => {
 
   try {
     const name = await getUserName(data.userId);
-    notifyLeaveAction(
-      { type: 'NEW_LEAVE_REQUEST', message: `${name} applied for ${saved.leaveType} leave (${saved.numberOfDays} days)` },
-      null, // don't notify the employee who submitted
-      data.reportingManagerId // notify reporting manager + HR/Admin
-    );
+    notifyLeaveAction({ type: 'NEW_LEAVE_REQUEST', message: `${name} applied for ${saved.leaveType} leave (${saved.numberOfDays} days)`, forRoles: ['HR', 'ADMIN', 'MANAGER'], forUser: data.reportingManagerId?.toString() });
   } catch (e) {}
   return saved;
 };
@@ -64,11 +60,7 @@ const approveLeaveRequest = async (leaveId, approvedById) => {
 
   try {
     const name = await getUserName(leave.userId);
-    notifyLeaveAction(
-      { type: 'LEAVE_APPROVED', message: `${name}'s ${leave.leaveType} leave has been approved` },
-      leave.userId, // notify the employee whose leave was approved
-      leave.reportingManagerId // notify manager + HR/Admin
-    );
+    notifyLeaveAction({ type: 'LEAVE_APPROVED', message: `Your ${leave.leaveType} leave has been approved`, forUser: leave.userId?.toString() });
   } catch (e) {}
   return leave;
 };
@@ -86,11 +78,7 @@ const rejectLeaveRequest = async (leaveId, rejectedById, rejectionReason) => {
 
   try {
     const name = await getUserName(leave.userId);
-    notifyLeaveAction(
-      { type: 'LEAVE_REJECTED', message: `${name}'s ${leave.leaveType} leave has been rejected` },
-      leave.userId, // notify the employee whose leave was rejected
-      leave.reportingManagerId // notify manager + HR/Admin
-    );
+    notifyLeaveAction({ type: 'LEAVE_REJECTED', message: `Your ${leave.leaveType} leave has been rejected`, forUser: leave.userId?.toString() });
   } catch (e) {}
   return leave;
 };

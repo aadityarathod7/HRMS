@@ -74,27 +74,55 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
     setSearchQuery("");
   };
 
-  // WebSocket notifications
+  // WebSocket notifications with auto-reconnect
   useEffect(() => {
-    let socket: WebSocket;
-    try {
-      const wsToken = localStorage.getItem("token");
-      socket = new WebSocket(`ws://localhost:5000/leaveNotification?token=${wsToken}`);
-      socket.onmessage = (event) => {
-        let msg = event.data;
-        let type = "info";
-        try {
-          const parsed = JSON.parse(msg);
-          type = parsed.type || "info";
-          msg = parsed.message || msg;
-        } catch (e) {}
-        setNotifications(prev => [{ message: msg, timestamp: new Date().toLocaleTimeString(), type }, ...prev]);
-        setUnreadCount(prev => prev + 1);
-        toast.success(msg);
-      };
-      socket.onerror = () => {};
-    } catch (e) {}
-    return () => { try { socket?.close(); } catch (e) {} };
+    let socket: WebSocket | null = null;
+    let reconnectTimer: any = null;
+
+    const connect = () => {
+      try {
+        socket = new WebSocket("ws://localhost:5000/leaveNotification");
+
+        socket.onmessage = (event) => {
+          try {
+            const parsed = JSON.parse(event.data);
+            const myRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
+            const myProfile = JSON.parse(localStorage.getItem("userProfile") || "{}");
+            const myId = myProfile.id;
+
+            // Filter: only show if notification is for my role or for me specifically
+            const forRoles = parsed.forRoles || [];
+            const forUser = parsed.forUser;
+
+            const isForMyRole = forRoles.length > 0 && myRoles.some(r => forRoles.includes(r));
+            const isForMe = forUser && myId && forUser === myId;
+
+            if (!isForMyRole && !isForMe) return; // Not for me, ignore
+
+            const msg = parsed.message || event.data;
+            setNotifications(prev => [{ message: msg, timestamp: new Date().toLocaleTimeString(), type: parsed.type || "info" }, ...prev]);
+            setUnreadCount(prev => prev + 1);
+            toast.success(msg);
+          } catch (e) {}
+        };
+
+        socket.onclose = () => {
+          // Auto-reconnect after 3 seconds
+          reconnectTimer = setTimeout(() => {
+            if (localStorage.getItem("token")) connect();
+          }, 3000);
+        };
+
+        socket.onerror = () => {};
+      } catch (e) {}
+    };
+
+    connect();
+
+    return () => {
+      clearTimeout(reconnectTimer);
+      try { socket?.close(); } catch (e) {}
+    };
   }, []);
 
   // Click outside handlers
