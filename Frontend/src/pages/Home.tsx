@@ -8,6 +8,168 @@ import { Users, FileText, Clock, DollarSign, Calendar, UserCheck, UserX, Briefca
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+const ATT_COLORS: Record<string, { bg: string; color: string }> = {
+  PRESENT: { bg: "#d1fae5", color: "#065f46" },
+  WFH: { bg: "#dbeafe", color: "#1e40af" },
+  ABSENT: { bg: "#fee2e2", color: "#b91c1c" },
+  HALF_DAY: { bg: "#fef3c7", color: "#92400e" },
+  ON_LEAVE: { bg: "#ede9fe", color: "#5b21b6" },
+};
+
+const MiniCalendar: React.FC<{ records: any[] }> = ({ records }) => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthName = now.toLocaleString("en", { month: "long" });
+
+  const statusMap: Record<number, string> = {};
+  records.forEach((r: any) => {
+    const d = new Date(r.date);
+    if (d.getMonth() === month && d.getFullYear() === year) statusMap[d.getDate()] = r.status;
+  });
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="flex justify-between items-center mb-3">
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1 }} className="text-gray-700 uppercase">{monthName}</p>
+        <p style={{ fontSize: 10 }} className="text-gray-400">{year}</p>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
+        {["Su","Mo","Tu","We","Th","Fr","Sa"].map((d, i) => (
+          <div key={i} style={{ fontSize: 8, textAlign: "center", color: "#9ca3af", paddingBottom: 3 }}>{d}</div>
+        ))}
+        {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} style={{ height: 22 }} />)}
+        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
+          const status = statusMap[day];
+          const isToday = day === now.getDate();
+          const c = status ? ATT_COLORS[status] : null;
+          return (
+            <div key={day} title={status?.replace("_", " ") || ""}
+              style={{
+                height: 22, width: 22, margin: "0 auto", display: "flex",
+                alignItems: "center", justifyContent: "center", borderRadius: 4,
+                fontSize: 10, fontWeight: isToday ? 700 : 400,
+                backgroundColor: c?.bg || (isToday ? "#f3f4f6" : "transparent"),
+                color: c?.color || (isToday ? "#111827" : "#6b7280"),
+                outline: isToday ? "1.5px solid #9ca3af" : "none",
+              }}>
+              {day}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 8, paddingTop: 8, borderTop: "1px solid #f3f4f6" }}>
+        {[
+          { label: "Present", ...ATT_COLORS.PRESENT },
+          { label: "WFH", ...ATT_COLORS.WFH },
+          { label: "Absent", ...ATT_COLORS.ABSENT },
+          { label: "Half Day", ...ATT_COLORS.HALF_DAY },
+          { label: "On Leave", ...ATT_COLORS.ON_LEAVE },
+        ].map(l => (
+          <span key={l.label} style={{ fontSize: 9, padding: "1px 5px", borderRadius: 4, backgroundColor: l.bg, color: l.color }}>{l.label}</span>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const EmployeeDashboard: React.FC<{ stats: any; attendanceRecords: any[]; navigate: any; formatCurrency: any; Badge: any }> = ({ stats, attendanceRecords, navigate, formatCurrency, Badge }) => (
+  <>
+    {/* Stat cards */}
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+      {[
+        { icon: Calendar, label: "Leave Available", value: (stats.leaveBalance || []).reduce((s: number, b: any) => s + b.available, 0), sub: "Days remaining", path: "/leave-balance", color: "bg-blue-600" },
+        { icon: UserCheck, label: "Present This Month", value: stats.attendanceSummary?.present || 0, sub: `${stats.attendanceSummary?.wfh || 0} WFH`, path: "/attendance-management", color: "bg-emerald-500" },
+        { icon: DollarSign, label: "Last Salary", value: stats.latestPayroll ? formatCurrency(stats.latestPayroll.netSalary) : "—", sub: stats.latestPayroll ? `${stats.latestPayroll.month} ${stats.latestPayroll.year}` : "", path: "/payroll-management", color: "bg-violet-500" },
+        { icon: TrendingUp, label: "Absent / On Leave", value: (stats.attendanceSummary?.absent || 0) + (stats.attendanceSummary?.onLeave || 0), sub: "This month", path: null, color: "bg-amber-500" },
+      ].map((item, i) => (
+        <div key={i} onClick={() => item.path && navigate(item.path)}
+          className={`bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3 ${item.path ? "cursor-pointer hover:border-blue-300 transition" : ""}`}>
+          <div className={`${item.color} w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0`}>
+            <item.icon size={16} className="text-white" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xl font-light text-gray-900 truncate">{item.value}</p>
+            <p className="text-xs text-gray-500 truncate">{item.label}</p>
+            {item.sub && <p className="text-[10px] text-gray-400">{item.sub}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Leave balance */}
+    <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">
+      <div className="flex justify-between items-center mb-4">
+        <p className="text-sm font-medium text-gray-700">Leave Balance</p>
+        <button onClick={() => navigate("/leave-application")} className="text-xs text-blue-600 hover:text-blue-800 border border-blue-200 px-3 py-1 rounded-lg hover:bg-blue-50 transition">+ Apply Leave</button>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(160px,1fr))", gap: 12 }}>
+        {(stats.leaveBalance || []).map((lb: any, i: number) => (
+          <div key={i}>
+            <div className="flex justify-between text-sm mb-1.5">
+              <span className="text-gray-600">{lb.leaveType}</span>
+              <span className="text-gray-900">{lb.available}<span className="text-gray-400">/{lb.totalAllotted}</span></span>
+            </div>
+            <div className="h-1.5 bg-gray-100 rounded-full">
+              <div className="h-1.5 bg-gray-800 rounded-full transition-all" style={{ width: `${(lb.available / lb.totalAllotted) * 100}%` }} />
+            </div>
+            <p className="text-[11px] text-gray-400 mt-1">{lb.used} used</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Calendar + Right column */}
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4">
+      {/* Mini calendar */}
+      <div className="lg:col-span-2">
+        {attendanceRecords.length > 0
+          ? <MiniCalendar records={attendanceRecords} />
+          : <div className="bg-white rounded-xl border border-gray-200 p-5 text-center text-sm text-gray-400">No attendance data this month</div>
+        }
+      </div>
+
+      {/* Payslip + Recent leaves */}
+      <div className="lg:col-span-3 flex flex-col gap-4">
+        {stats.latestPayroll && (
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <p className="text-sm font-medium text-gray-700 mb-3">Latest Payslip</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-light text-gray-900">{formatCurrency(stats.latestPayroll.netSalary)}</p>
+                <p className="text-xs text-gray-400 mt-1">{stats.latestPayroll.month} {stats.latestPayroll.year}</p>
+              </div>
+              <Badge status={stats.latestPayroll.status} />
+            </div>
+          </div>
+        )}
+
+        {stats.recentLeaves?.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-5 flex-1">
+            <div className="flex justify-between items-center mb-3">
+              <p className="text-sm font-medium text-gray-700">Recent Leaves</p>
+              <button onClick={() => navigate("/leave-balance")} className="text-xs text-gray-400 hover:text-blue-600">View all</button>
+            </div>
+            <div className="space-y-2">
+              {stats.recentLeaves.slice(0, 4).map((l: any, i: number) => (
+                <div key={i} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
+                  <div>
+                    <p className="text-sm text-gray-700">{l.leaveType} · {l.numberOfDays || 1}d</p>
+                    <p className="text-[11px] text-gray-400">{new Date(l.leaveStartDate).toLocaleDateString('en-GB')} — {new Date(l.leaveEndDate).toLocaleDateString('en-GB')}</p>
+                  </div>
+                  <Badge status={l.leaveStatus} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </>
+);
+
 const Home: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [stats, setStats] = useState<any>(null);
@@ -238,153 +400,7 @@ const Home: React.FC = () => {
               )}
 
               {/* ====== EMPLOYEE ====== */}
-              {role === "EMPLOYEE" && (
-                <>
-                  {/* Quick Stats Row */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <IconCard icon={Calendar} label="Leave Available" value={(stats.leaveBalance || []).reduce((s: number, b: any) => s + b.available, 0)} sub="All types" color="bg-blue-50 text-blue-600" onClick={() => navigate("/leave-balance")} />
-                    <IconCard icon={UserCheck} label="Present This Month" value={stats.attendanceSummary?.present || 0} sub={`${stats.attendanceSummary?.wfh || 0} WFH`} color="bg-green-50 text-green-600" onClick={() => navigate("/attendance-management")} />
-                    <IconCard icon={DollarSign} label="Last Salary" value={stats.latestPayroll ? formatCurrency(stats.latestPayroll.netSalary) : "—"} sub={stats.latestPayroll ? `${stats.latestPayroll.month} ${stats.latestPayroll.year}` : ""} color="bg-emerald-50 text-emerald-600" />
-                    <IconCard icon={TrendingUp} label="Absent/Leave" value={(stats.attendanceSummary?.absent || 0) + (stats.attendanceSummary?.onLeave || 0)} sub="This month" color="bg-amber-50 text-amber-600" />
-                  </div>
-
-                  {/* Leave Balance with progress bars */}
-                  <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm mb-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xs text-gray-400 uppercase tracking-wider">Leave Balance</h3>
-                      <button onClick={() => navigate("/leave-application")} className="text-xs text-blue-600 hover:text-blue-800 font-medium">+ Apply Leave</button>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      {(stats.leaveBalance || []).map((lb: any, i: number) => (
-                        <div key={i} className="bg-gray-50 rounded-lg p-4">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm text-gray-700">{lb.leaveType}</span>
-                            <span className="text-sm font-medium text-gray-900">{lb.available} left</span>
-                          </div>
-                          <div className="h-2 bg-gray-200 rounded-full">
-                            <div className="h-2 bg-blue-500 rounded-full transition-all" style={{ width: `${(lb.available / lb.totalAllotted) * 100}%` }} />
-                          </div>
-                          <p className="text-[11px] text-gray-400 mt-1.5">{lb.used} used of {lb.totalAllotted}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Attendance Calendar */}
-                  {attendanceRecords.length > 0 && (() => {
-                    const now = new Date();
-                    const year = now.getFullYear();
-                    const month = now.getMonth();
-                    const firstDay = new Date(year, month, 1).getDay();
-                    const daysInMonth = new Date(year, month + 1, 0).getDate();
-                    const monthName = now.toLocaleString("en", { month: "long" });
-
-                    const statusMap: Record<string, string> = {};
-                    attendanceRecords.forEach((r: any) => {
-                      const d = new Date(r.date);
-                      if (d.getMonth() === month && d.getFullYear() === year) {
-                        statusMap[d.getDate()] = r.status;
-                      }
-                    });
-
-
-                    return (
-                      <div style={{ width: 196 }} className="bg-white rounded-xl border border-gray-200 p-3 mb-4">
-                        {/* Month header */}
-                        <div className="flex justify-between items-center mb-2">
-                          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1 }} className="text-gray-700 uppercase">{monthName}</p>
-                          <p style={{ fontSize: 10 }} className="text-gray-400">{year}</p>
-                        </div>
-                        {/* Day headers + cells using inline style grid to avoid CSS override */}
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
-                          {["Su","Mo","Tu","We","Th","Fr","Sa"].map((d, i) => (
-                            <div key={i} style={{ fontSize: 8, textAlign: "center", color: "#9ca3af", paddingBottom: 3 }}>{d}</div>
-                          ))}
-                          {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} style={{ height: 22 }} />)}
-                          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
-                            const status = statusMap[day];
-                            const isToday = day === now.getDate();
-                            const colorMap: Record<string, { bg: string; color: string }> = {
-                              PRESENT: { bg: "#d1fae5", color: "#065f46" },
-                              WFH: { bg: "#dbeafe", color: "#1e40af" },
-                              ABSENT: { bg: "#fee2e2", color: "#b91c1c" },
-                              HALF_DAY: { bg: "#fef3c7", color: "#92400e" },
-                              ON_LEAVE: { bg: "#ede9fe", color: "#5b21b6" },
-                            };
-                            const c = status ? colorMap[status] : null;
-                            return (
-                              <div key={day} title={status?.replace("_", " ") || ""}
-                                style={{
-                                  height: 22, width: 22, margin: "0 auto", display: "flex",
-                                  alignItems: "center", justifyContent: "center", borderRadius: 4,
-                                  fontSize: 10, fontWeight: isToday ? 700 : 400,
-                                  backgroundColor: c?.bg || (isToday ? "#f3f4f6" : "transparent"),
-                                  color: c?.color || (isToday ? "#111827" : "#6b7280"),
-                                  outline: isToday ? "1.5px solid #9ca3af" : "none",
-                                }}>
-                                {day}
-                              </div>
-                            );
-                          })}
-                        </div>
-                        {/* Mini legend */}
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 8, paddingTop: 8, borderTop: "1px solid #f3f4f6" }}>
-                          {[
-                            { label: "Present", bg: "#d1fae5", color: "#065f46" },
-                            { label: "WFH", bg: "#dbeafe", color: "#1e40af" },
-                            { label: "Absent", bg: "#fee2e2", color: "#b91c1c" },
-                            { label: "Half Day", bg: "#fef3c7", color: "#92400e" },
-                            { label: "On Leave", bg: "#ede9fe", color: "#5b21b6" },
-                          ].map(l => (
-                            <span key={l.label} style={{ fontSize: 9, padding: "1px 5px", borderRadius: 4, backgroundColor: l.bg, color: l.color }}>{l.label}</span>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  <div className="grid grid-cols-1 mb-6">
-                    {/* Payslip */}
-                    {stats.latestPayroll && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                        <h3 className="text-xs text-gray-400 uppercase tracking-wider mb-4">Latest Payslip</h3>
-                        <div className="flex items-end gap-3">
-                          <div className="p-2.5 rounded-lg bg-emerald-50 text-emerald-600"><DollarSign size={20} /></div>
-                          <div>
-                            <p className="text-2xl font-light text-gray-900">{formatCurrency(stats.latestPayroll.netSalary)}</p>
-                            <p className="text-xs text-gray-400">{stats.latestPayroll.month} {stats.latestPayroll.year}</p>
-                          </div>
-                          <div className="ml-auto"><Badge status={stats.latestPayroll.status} /></div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Recent Leaves */}
-                  {stats.recentLeaves?.length > 0 && (
-                    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm mb-6">
-                      <div className="flex justify-between items-center mb-3">
-                        <h3 className="text-xs text-gray-400 uppercase tracking-wider">Recent Leave Requests</h3>
-                        <button onClick={() => navigate("/leave-balance")} className="text-xs text-blue-600 hover:text-blue-800 font-medium">View All</button>
-                      </div>
-                      <div className="space-y-1">
-                        {stats.recentLeaves.map((l: any, i: number) => (
-                          <div key={i} className="flex justify-between items-center py-2.5 border-b border-gray-50 last:border-0">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><FileText size={14} /></div>
-                              <div>
-                                <p className="text-sm text-gray-800">{l.leaveType} · {l.numberOfDays || 1} day(s)</p>
-                                <p className="text-[11px] text-gray-400">{new Date(l.leaveStartDate).toLocaleDateString('en-GB')} — {new Date(l.leaveEndDate).toLocaleDateString('en-GB')}</p>
-                              </div>
-                            </div>
-                            <Badge status={l.leaveStatus} />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
+              {role === "EMPLOYEE" && <EmployeeDashboard stats={stats} attendanceRecords={attendanceRecords} navigate={navigate} formatCurrency={formatCurrency} Badge={Badge} />}
               {/* Upcoming Events — All roles */}
               {stats.upcomingEvents?.length > 0 && (
                 <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm mb-6">
