@@ -118,22 +118,20 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     // ── HEADER ───────────────────────────────────────────────────
     doc.rect(0, 0, PG_W, 105).fill('#ffffff');
 
-    // Logo — small, top-left
+    // Logo — small, top-left, no text overlap
     let logoW = 0;
     try {
-      doc.image(logoPath, L, 15, { height: 38 });
-      // logo aspect ratio 1494:871 ≈ 1.716, so width at h=38 is ~65px
-      logoW = 68;
+      doc.image(logoPath, L, 18, { height: 34 });
+      logoW = 62; // ~34 * (1494/871)
     } catch (_) { /* skip if missing */ }
 
-    // Company name & address — always to the right of logo with gap
-    const nameX = L + logoW + 8;
-    const nameWidth = MID - nameX - 10;
+    // Company name & address — starts safely after logo
+    const nameX = L + logoW + 10;
+    const nameWidth = MID - nameX - 5;
     doc.fontSize(15).font('Helvetica-Bold').fillColor('#111827')
-       .text('Sanvii Techmet Pvt. Ltd.', nameX, 18, { width: nameWidth });
+       .text('Sanvii Techmet Pvt. Ltd.', nameX, 20, { width: nameWidth });
     doc.fontSize(7).font('Helvetica').fillColor('#6b7280')
-       .text('403, Princes pride, Near Janjeerwala Square, New Palasia Indore,', nameX, 38, { width: nameWidth })
-       .text('Madhya Pradesh, 452001 India', nameX, 48, { width: nameWidth });
+       .text('403, Princes pride, Near Janjeerwala Square, New Palasia Indore, Madhya Pradesh, 452001 India', nameX, 40, { width: nameWidth, lineBreak: false });
 
     // Right: Payslip label
     doc.fontSize(8).font('Helvetica').fillColor('#6b7280')
@@ -219,10 +217,11 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     const ROW_H = 20;
 
     // Table column positions
+    const AMT_W  = 90;           // width for amount column
     const eLabel = L + 8;
-    const eAmt   = tMid - 10;   // right-align up to here
+    const eAmt   = tMid - 8;    // right edge of earnings amount
     const dLabel = tMid + 10;
-    const dAmt   = R - 8;       // right-align up to here
+    const dAmt   = R - 8;       // right edge of deductions amount
 
     // Vertical divider between earnings and deductions
     const drawVDiv = (fromY, toY) => {
@@ -233,9 +232,9 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     doc.rect(L, y, W, ROW_H).fillAndStroke('#f3f4f6', '#e5e7eb');
     doc.fontSize(8).font('Helvetica-Bold').fillColor('#374151');
     doc.text('EARNINGS', eLabel, y + 6);
-    doc.text('AMOUNT', eAmt - 55, y + 6, { width: 55, align: 'right' });
+    doc.text('AMOUNT', eAmt - AMT_W, y + 6, { width: AMT_W, align: 'right' });
     doc.text('DEDUCTIONS', dLabel, y + 6);
-    doc.text('AMOUNT', dAmt - 55, y + 6, { width: 55, align: 'right' });
+    doc.text('AMOUNT', dAmt - AMT_W, y + 6, { width: AMT_W, align: 'right' });
     const tableHeaderY = y;
     y += ROW_H;
 
@@ -263,11 +262,11 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
       doc.fontSize(8.5).font('Helvetica').fillColor('#111827');
       if (earnings[i]) {
         doc.text(earnings[i][0], eLabel, rowY + 6, { width: tMid - eLabel - 10 });
-        doc.text(fmt(earnings[i][1]), eAmt - 55, rowY + 6, { width: 55, align: 'right' });
+        doc.text(fmt(earnings[i][1]), eAmt - AMT_W, rowY + 6, { width: AMT_W, align: 'right' });
       }
       if (deductions[i]) {
         doc.text(deductions[i][0], dLabel, rowY + 6, { width: dAmt - dLabel - 60 });
-        doc.text(fmt(deductions[i][1]), dAmt - 55, rowY + 6, { width: 55, align: 'right' });
+        doc.text(fmt(deductions[i][1]), dAmt - AMT_W, rowY + 6, { width: AMT_W, align: 'right' });
       }
     }
     y += maxRows * ROW_H;
@@ -279,9 +278,9 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     doc.rect(L, y, W, ROW_H + 2).fillAndStroke('#f3f4f6', '#e5e7eb');
     doc.fontSize(8.5).font('Helvetica-Bold').fillColor('#111827');
     doc.text('Gross Earnings', eLabel, y + 6);
-    doc.text(fmt(payroll.grossSalary || 0), eAmt - 55, y + 6, { width: 55, align: 'right' });
+    doc.text(fmt(payroll.grossSalary || 0), eAmt - AMT_W, y + 6, { width: AMT_W, align: 'right' });
     doc.text('Total Deductions', dLabel, y + 6);
-    doc.text(fmt(payroll.totalDeductions || 0), dAmt - 55, y + 6, { width: 55, align: 'right' });
+    doc.text(fmt(payroll.totalDeductions || 0), dAmt - AMT_W, y + 6, { width: AMT_W, align: 'right' });
     drawVDiv(y, y + ROW_H + 2);
     y += ROW_H + 12;
 

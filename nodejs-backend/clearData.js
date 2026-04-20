@@ -54,7 +54,7 @@ const clear = async () => {
       userName: 'admin',
       email: 'admin@sanvii.com',
       password: hashedPassword,
-      employeeId: 'SANVII-EMP-001',
+      employeeId: 'ST-01',
       roles: [adminRole._id],
       isActive: true,
       status: 'ACTIVE',

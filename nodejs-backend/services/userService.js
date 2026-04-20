@@ -5,10 +5,10 @@ const LeaveBalance = require('../models/LeaveBalance');
 const { initBalancesForNewEmployee } = require('./leaveAccrualService');
 
 const generateEmployeeId = async () => {
-  const last = await User.findOne({ employeeId: { $exists: true, $ne: null } }).sort({ employeeId: -1 });
-  if (!last || !last.employeeId) return 'SANVII-EMP-001';
+  const last = await User.findOne({ employeeId: { $exists: true, $ne: null } }).sort({ createdDate: -1 });
+  if (!last || !last.employeeId) return 'ST-01';
   const num = parseInt(last.employeeId.split('-').pop()) + 1;
-  return `SANVII-EMP-${num.toString().padStart(3, '0')}`;
+  return `ST-${num.toString().padStart(2, '0')}`;
 };
 
 const addUser = async (userData, createdBy) => {
