@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
 const payrollService = require('../services/payrollService');
 const { authenticate, authorize } = require('../middleware/auth');
@@ -66,7 +67,6 @@ router.put('/updateStatus/:id', authenticate, authorize('ADMIN', 'HR'), async (r
 router.get('/payslip/:id', authenticate, async (req, res, next) => {
   try {
     const PDFDocument = require('pdfkit');
-    const path = require('path');
     const Payroll = require('../models/Payroll');
     const User = require('../models/User');
 
@@ -82,7 +82,6 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     doc.pipe(res);
 
     // ── HELPERS ─────────────────────────────────────────────────
-    const path = require('path');
     const logoPath = path.join(__dirname, '../assets/logo.png');
 
     // Format currency — use Rs. prefix (Helvetica doesn't support ₹ glyph)
