@@ -116,32 +116,35 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     let y = 0;
 
     // ── HEADER ───────────────────────────────────────────────────
-    doc.rect(0, 0, PG_W, 100).fill('#ffffff');
+    doc.rect(0, 0, PG_W, 115).fill('#ffffff');
 
-    // Logo — top left, small
+    // Logo — vertically centered in header, sized to match company name block height
+    const logoHeight = 55;
+    const logoY = 14;
     try {
-      doc.image(logoPath, L, 16, { height: 32 });
+      doc.image(logoPath, L, logoY, { height: logoHeight });
     } catch (_) { /* skip */ }
+    const logoEndX = L + Math.round(logoHeight * (1494 / 871)) + 14; // logo width + gap
 
-    // Company name — starts at fixed X past logo
-    const nameX = L + 68;
-    doc.fontSize(14).font('Helvetica-Bold').fillColor('#111827')
-       .text('Sanvii Techmet Pvt. Ltd.', nameX, 18);
+    // Company name — top-aligned with logo
+    const nameX = logoEndX;
+    doc.fontSize(18).font('Helvetica-Bold').fillColor('#111827')
+       .text('Sanvii Techmet Pvt. Ltd.', nameX, logoY);
 
-    // Address — two short lines below company name
-    doc.fontSize(6.5).font('Helvetica').fillColor('#6b7280')
-       .text('403, Princes pride, Near Janjeerwala Square,', nameX, 37)
-       .text('New Palasia Indore, Madhya Pradesh, 452001 India', nameX, 47);
+    // Address — two lines, smaller font, below company name
+    doc.fontSize(8).font('Helvetica').fillColor('#6b7280')
+       .text('403, Princes pride, Near Janjeerwala Square,', nameX, logoY + 26)
+       .text('New Palasia Indore, Madhya Pradesh, 452001 India', nameX, logoY + 37);
 
-    // Right: Payslip label + month
+    // Right: Payslip label + month — vertically centered
     const rightX = R - 160;
     doc.fontSize(8).font('Helvetica').fillColor('#6b7280')
-       .text('Payslip For the Month', rightX, 18, { width: 160, align: 'right' });
+       .text('Payslip For the Month', rightX, logoY + 4, { width: 160, align: 'right' });
     doc.fontSize(15).font('Helvetica-Bold').fillColor('#111827')
-       .text(`${payroll.month} ${payroll.year}`, rightX, 33, { width: 160, align: 'right' });
+       .text(`${payroll.month} ${payroll.year}`, rightX, logoY + 20, { width: 160, align: 'right' });
 
     // Header bottom border
-    y = 68;
+    y = logoY + logoHeight + 12;
     doc.strokeColor('#d1d5db').lineWidth(0.8).moveTo(L, y).lineTo(R, y).stroke();
     y += 12;
 
