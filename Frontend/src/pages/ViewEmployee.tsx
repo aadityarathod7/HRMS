@@ -251,6 +251,11 @@ const ViewEmployee: React.FC = () => {
                                 doc.status === "REJECTED" ? "bg-red-50 text-red-600" :
                                 "bg-amber-50 text-amber-700"
                               }`}>{doc.status || "PENDING"}</span>
+                              <a href={`${API_URL}/file/view/${doc.id}?token=${localStorage.getItem("token")}`}
+                                target="_blank" rel="noreferrer"
+                                className="text-gray-400 hover:text-blue-600" title="View">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                              </a>
                               <a href={`${API_URL}/file/download/${doc.id}?token=${localStorage.getItem("token")}`}
                                 target="_blank" rel="noreferrer"
                                 className="text-gray-400 hover:text-blue-600" title="Download">
