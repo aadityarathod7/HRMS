@@ -115,32 +115,36 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     const MID = L + Math.floor(W / 2);
     let y = 0;
 
-    // ── HEADER BACKGROUND ───────────────────────────────────────
-    doc.rect(0, 0, PG_W, 110).fill('#ffffff');
+    // ── HEADER ───────────────────────────────────────────────────
+    doc.rect(0, 0, PG_W, 105).fill('#ffffff');
 
-    // Logo
+    // Logo — small, top-left
+    let logoW = 0;
     try {
-      doc.image(logoPath, L, 18, { height: 52 });
-    } catch (_) { /* logo not found, skip */ }
+      doc.image(logoPath, L, 15, { height: 38 });
+      // logo aspect ratio 1494:871 ≈ 1.716, so width at h=38 is ~65px
+      logoW = 68;
+    } catch (_) { /* skip if missing */ }
 
-    // Company name & address — offset right of logo
-    const nameX = L + 70;
-    doc.fontSize(16).font('Helvetica-Bold').fillColor('#111827')
-       .text('Sanvii Techmet Pvt. Ltd.', nameX, 22, { width: 280 });
-    doc.fontSize(7.5).font('Helvetica').fillColor('#6b7280')
-       .text('403, Princes pride, Near Janjeerwala Square,', nameX, 44, { width: 260 })
-       .text('New Palasia Indore, Madhya Pradesh, 452001 India', nameX, 55, { width: 260 });
+    // Company name & address — always to the right of logo with gap
+    const nameX = L + logoW + 8;
+    const nameWidth = MID - nameX - 10;
+    doc.fontSize(15).font('Helvetica-Bold').fillColor('#111827')
+       .text('Sanvii Techmet Pvt. Ltd.', nameX, 18, { width: nameWidth });
+    doc.fontSize(7).font('Helvetica').fillColor('#6b7280')
+       .text('403, Princes pride, Near Janjeerwala Square, New Palasia Indore,', nameX, 38, { width: nameWidth })
+       .text('Madhya Pradesh, 452001 India', nameX, 48, { width: nameWidth });
 
     // Right: Payslip label
-    doc.fontSize(8.5).font('Helvetica').fillColor('#6b7280')
-       .text('Payslip For the Month', R - 140, 24, { width: 140, align: 'right' });
+    doc.fontSize(8).font('Helvetica').fillColor('#6b7280')
+       .text('Payslip For the Month', MID + 10, 20, { width: R - MID - 10, align: 'right' });
     doc.fontSize(15).font('Helvetica-Bold').fillColor('#111827')
-       .text(`${payroll.month} ${payroll.year}`, R - 140, 40, { width: 140, align: 'right' });
+       .text(`${payroll.month} ${payroll.year}`, MID + 10, 36, { width: R - MID - 10, align: 'right' });
 
     // Header bottom border
-    y = 82;
+    y = 72;
     doc.strokeColor('#d1d5db').lineWidth(0.8).moveTo(L, y).lineTo(R, y).stroke();
-    y += 14;
+    y += 12;
 
     // ── EMPLOYEE SUMMARY SECTION ─────────────────────────────────
     doc.fontSize(8).font('Helvetica-Bold').fillColor('#6b7280')
@@ -171,7 +175,7 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     // Green left bar on box
     doc.rect(boxX, boxY, 4, boxH).fill('#16a34a');
 
-    doc.fontSize(22).font('Helvetica-Bold').fillColor('#16a34a')
+    doc.fontSize(16).font('Helvetica-Bold').fillColor('#16a34a')
        .text(`Rs.${fmtN(payroll.netSalary)}`, boxX + 12, boxY + 8, { width: boxW - 16 });
     doc.fontSize(8).font('Helvetica').fillColor('#6b7280')
        .text('Total Net Pay', boxX + 12, boxY + 36);
@@ -287,8 +291,8 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
        .text('TOTAL NET PAYABLE', L + 12, y + 8);
     doc.fontSize(7.5).font('Helvetica').fillColor('#6b7280')
        .text('Gross Earnings - Total Deductions', L + 12, y + 24);
-    doc.fontSize(15).font('Helvetica-Bold').fillColor('#15803d')
-       .text(`Rs.${fmtN(payroll.netSalary || 0)}`, R - 160, y + 12, { width: 148, align: 'right' });
+    doc.fontSize(13).font('Helvetica-Bold').fillColor('#15803d')
+       .text(`Rs.${fmtN(payroll.netSalary || 0)}`, R - 170, y + 14, { width: 158, align: 'right' });
     y += 54;
 
     // ── AMOUNT IN WORDS ──────────────────────────────────────────
