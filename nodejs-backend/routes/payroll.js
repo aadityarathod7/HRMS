@@ -82,7 +82,16 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     doc.pipe(res);
 
     // ── HELPERS ─────────────────────────────────────────────────
-    const logoPath = path.join(__dirname, '../assets/logo.png');
+    const logoPath    = path.join(__dirname, '../assets/logo.png');
+    const fontReg     = path.join(__dirname, '../assets/Poppins-Regular.ttf');
+    const fontBold    = path.join(__dirname, '../assets/Poppins-Bold.ttf');
+    const fontSemi    = path.join(__dirname, '../assets/Poppins-SemiBold.ttf');
+
+    // Register fonts (fallback to Helvetica if files missing)
+    try { doc.registerFont('P-Regular', fontReg); } catch(_) {}
+    try { doc.registerFont('P-Bold',    fontBold);   } catch(_) {}
+    try { doc.registerFont('P-Semi',    fontSemi);   } catch(_) {}
+
 
     // Format currency — use Rs. prefix (Helvetica doesn't support ₹ glyph)
     const fmtN = (n) => new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
@@ -115,42 +124,45 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     const MID = L + Math.floor(W / 2);
     let y = 0;
 
+    // Font helpers
+    const PR  = (sz) => doc.font('P-Regular').fontSize(sz);
+    const PB  = (sz) => doc.font('P-Bold').fontSize(sz);
+    const PS  = (sz) => doc.font('P-Semi').fontSize(sz);
+
     // ── HEADER ───────────────────────────────────────────────────
-    doc.rect(0, 0, PG_W, 115).fill('#ffffff');
+    doc.rect(0, 0, PG_W, 110).fill('#ffffff');
 
-    // Logo — vertically centered in header, sized to match company name block height
-    const logoHeight = 55;
-    const logoY = 14;
+    // Logo — use fit to constrain the full image (icon + text) into a box
+    // The actual S-icon is the top ~60% of the image height
+    const LOGO_BOX_H = 48; // total logo image height in PDF
+    const LOGO_BOX_W = Math.round(LOGO_BOX_H * 1494 / 871); // ~82px
+    const LOGO_Y = 16;
     try {
-      doc.image(logoPath, L, logoY, { height: logoHeight });
+      doc.image(logoPath, L, LOGO_Y, { fit: [LOGO_BOX_W, LOGO_BOX_H] });
     } catch (_) { /* skip */ }
-    const logoEndX = L + Math.round(logoHeight * (1494 / 871)) + 14; // logo width + gap
 
-    // Company name — top-aligned with logo
-    const nameX = logoEndX;
-    doc.fontSize(18).font('Helvetica-Bold').fillColor('#111827')
-       .text('Sanvii Techmet Pvt. Ltd.', nameX, logoY);
+    // Company name — aligned to top of S-icon (~top 60% of logo box)
+    const nameX = L + LOGO_BOX_W + 10;
+    const nameAvailW = R - nameX - 175; // leave room for payslip label on right
+    PB(17).fillColor('#111827')
+      .text('Sanvii Techmet Pvt. Ltd.', nameX, LOGO_Y + 2, { width: nameAvailW });
+    PR(7.5).fillColor('#6b7280')
+      .text('403, Princes pride, Near Janjeerwala Square,', nameX, LOGO_Y + 24, { width: nameAvailW })
+      .text('New Palasia Indore, Madhya Pradesh, 452001 India', nameX, LOGO_Y + 34, { width: nameAvailW });
 
-    // Address — two lines, smaller font, below company name
-    doc.fontSize(8).font('Helvetica').fillColor('#6b7280')
-       .text('403, Princes pride, Near Janjeerwala Square,', nameX, logoY + 26)
-       .text('New Palasia Indore, Madhya Pradesh, 452001 India', nameX, logoY + 37);
-
-    // Right: Payslip label + month — vertically centered
-    const rightX = R - 160;
-    doc.fontSize(8).font('Helvetica').fillColor('#6b7280')
-       .text('Payslip For the Month', rightX, logoY + 4, { width: 160, align: 'right' });
-    doc.fontSize(15).font('Helvetica-Bold').fillColor('#111827')
-       .text(`${payroll.month} ${payroll.year}`, rightX, logoY + 20, { width: 160, align: 'right' });
+    // Right: Payslip label
+    PR(8).fillColor('#6b7280')
+      .text('Payslip For the Month', R - 155, LOGO_Y + 6, { width: 155, align: 'right' });
+    PB(16).fillColor('#111827')
+      .text(`${payroll.month} ${payroll.year}`, R - 155, LOGO_Y + 20, { width: 155, align: 'right' });
 
     // Header bottom border
-    y = logoY + logoHeight + 12;
+    y = LOGO_Y + LOGO_BOX_H + 10;
     doc.strokeColor('#d1d5db').lineWidth(0.8).moveTo(L, y).lineTo(R, y).stroke();
     y += 12;
 
-    // ── EMPLOYEE SUMMARY SECTION ─────────────────────────────────
-    doc.fontSize(8).font('Helvetica-Bold').fillColor('#6b7280')
-       .text('EMPLOYEE SUMMARY', L, y);
+    // ── EMPLOYEE SUMMARY ─────────────────────────────────────────
+    PS(7.5).fillColor('#9ca3af').text('EMPLOYEE SUMMARY', L, y);
     y += 12;
 
     const summaryY = y;
@@ -164,42 +176,29 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     ];
     summaryRows.forEach(([lbl, val], i) => {
       const ry = summaryY + i * 17;
-      doc.fontSize(8).font('Helvetica').fillColor('#6b7280').text(lbl, L, ry, { width: labelW });
-      doc.fontSize(8).font('Helvetica').fillColor('#374151').text(':', L + labelW, ry);
-      doc.fontSize(8).font('Helvetica-Bold').fillColor('#111827').text(val, valX, ry, { width: 180 });
+      PR(8).fillColor('#6b7280').text(lbl, L, ry, { width: labelW });
+      PR(8).fillColor('#374151').text(':', L + labelW, ry);
+      PS(8).fillColor('#111827').text(val, valX, ry, { width: 185 });
     });
 
     // Net Pay box
-    const boxX = MID + 40, boxY = summaryY - 4;
-    const boxW = R - boxX, boxH = 90;
+    const boxX = MID + 35, boxY = summaryY - 4;
+    const boxW = R - boxX, boxH = 92;
     doc.roundedRect(boxX, boxY, boxW, boxH, 5).fillAndStroke('#f9fafb', '#e5e7eb');
-
-    // Green left accent bar — inset by border-radius (5px) top & bottom to avoid overflow
     doc.rect(boxX, boxY + 5, 4, boxH - 10).fill('#16a34a');
 
-    // Amount — font 14 so it fits on one line always
-    doc.fontSize(14).font('Helvetica-Bold').fillColor('#16a34a')
-       .text(`Rs.${fmtN(payroll.netSalary)}`, boxX + 10, boxY + 10, { width: boxW - 14, lineBreak: false });
+    PB(14).fillColor('#16a34a')
+      .text(`Rs.${fmtN(payroll.netSalary)}`, boxX + 12, boxY + 10, { width: boxW - 16, lineBreak: false });
+    PR(7.5).fillColor('#6b7280').text('Total Net Pay', boxX + 12, boxY + 30);
 
-    // "Total Net Pay" label right below amount
-    doc.fontSize(7.5).font('Helvetica').fillColor('#6b7280')
-       .text('Total Net Pay', boxX + 10, boxY + 30);
-
-    // Divider
     doc.strokeColor('#e5e7eb').lineWidth(0.5)
-       .moveTo(boxX + 10, boxY + 44).lineTo(boxX + boxW - 10, boxY + 44).stroke();
+       .moveTo(boxX + 12, boxY + 44).lineTo(boxX + boxW - 12, boxY + 44).stroke();
 
-    // Paid Days / LOP Days
-    doc.fontSize(7.5).font('Helvetica').fillColor('#6b7280')
-       .text('Paid Days', boxX + 10, boxY + 52);
-    doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#111827')
-       .text(`: ${paidDays}`, boxX + 65, boxY + 52);
-    doc.fontSize(7.5).font('Helvetica').fillColor('#6b7280')
-       .text('LOP Days', boxX + 10, boxY + 66);
-    doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#111827')
-       .text(`: ${payroll.lopDays || 0}`, boxX + 65, boxY + 66);
+    PR(8).fillColor('#6b7280').text('Paid Days', boxX + 12, boxY + 52);
+    PS(8).fillColor('#111827').text(`: ${paidDays}`, boxX + 68, boxY + 52);
+    PR(8).fillColor('#6b7280').text('LOP Days', boxX + 12, boxY + 66);
+    PS(8).fillColor('#111827').text(`: ${payroll.lopDays || 0}`, boxX + 68, boxY + 66);
 
-    // Move y past whichever is taller — summary rows or net pay box
     y = Math.max(summaryY + summaryRows.length * 17, boxY + boxH) + 10;
     doc.strokeColor('#e5e7eb').lineWidth(0.5).moveTo(L, y).lineTo(R, y).stroke();
     y += 10;
@@ -210,14 +209,14 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
       ['Designation', emp.designation || '-',       'Date of birth',emp.dob ? new Date(emp.dob).toLocaleDateString('en-GB') : '-'],
       ['Account No.', emp.bankAccountNumber || '-', 'IFSC code',    emp.ifscCode || '-'],
     ];
-    const dL1 = L, dL2 = L + 62, dL3 = MID + 10, dL4 = MID + 82;
+    const dL1 = L, dL2 = L + 62, dL3 = MID + 10, dL4 = MID + 85;
     detailPairs.forEach(([l1, v1, l2, v2]) => {
-      doc.fontSize(8).font('Helvetica').fillColor('#6b7280').text(l1, dL1, y, { width: 58 });
-      doc.fontSize(8).font('Helvetica').fillColor('#374151').text(':', dL2 - 4, y);
-      doc.fontSize(8).font('Helvetica-Bold').fillColor('#111827').text(v1, dL2, y, { width: MID - dL2 - 10 });
-      doc.fontSize(8).font('Helvetica').fillColor('#6b7280').text(l2, dL3, y, { width: 70 });
-      doc.fontSize(8).font('Helvetica').fillColor('#374151').text(':', dL4 - 4, y);
-      doc.fontSize(8).font('Helvetica-Bold').fillColor('#111827').text(v2, dL4, y, { width: R - dL4 });
+      PR(8).fillColor('#6b7280').text(l1, dL1, y, { width: 58 });
+      PR(8).fillColor('#374151').text(':', dL2 - 4, y);
+      PS(8).fillColor('#111827').text(v1, dL2, y, { width: MID - dL2 - 10 });
+      PR(8).fillColor('#6b7280').text(l2, dL3, y, { width: 73 });
+      PR(8).fillColor('#374151').text(':', dL4 - 4, y);
+      PS(8).fillColor('#111827').text(v2, dL4, y, { width: R - dL4 });
       y += 15;
     });
 
@@ -227,27 +226,24 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
 
     // ── EARNINGS & DEDUCTIONS TABLE ──────────────────────────────
     const tMid = MID;
-    const ROW_H = 20;
-
-    // Table column positions
-    const AMT_W  = 90;           // width for amount column
+    const ROW_H = 21;
+    const AMT_W = 90;
     const eLabel = L + 8;
-    const eAmt   = tMid - 8;    // right edge of earnings amount
+    const eAmt   = tMid - 8;
     const dLabel = tMid + 10;
-    const dAmt   = R - 8;       // right edge of deductions amount
+    const dAmt   = R - 8;
 
-    // Vertical divider between earnings and deductions
     const drawVDiv = (fromY, toY) => {
       doc.strokeColor('#e5e7eb').lineWidth(0.5).moveTo(tMid, fromY).lineTo(tMid, toY).stroke();
     };
 
-    // Header row
+    // Table header
     doc.rect(L, y, W, ROW_H).fillAndStroke('#f3f4f6', '#e5e7eb');
-    doc.fontSize(8).font('Helvetica-Bold').fillColor('#374151');
-    doc.text('EARNINGS', eLabel, y + 6);
-    doc.text('AMOUNT', eAmt - AMT_W, y + 6, { width: AMT_W, align: 'right' });
-    doc.text('DEDUCTIONS', dLabel, y + 6);
-    doc.text('AMOUNT', dAmt - AMT_W, y + 6, { width: AMT_W, align: 'right' });
+    PS(8).fillColor('#374151');
+    doc.text('EARNINGS',   eLabel,        y + 7);
+    doc.text('AMOUNT',     eAmt - AMT_W,  y + 7, { width: AMT_W, align: 'right' });
+    doc.text('DEDUCTIONS', dLabel,        y + 7);
+    doc.text('AMOUNT',     dAmt - AMT_W,  y + 7, { width: AMT_W, align: 'right' });
     const tableHeaderY = y;
     y += ROW_H;
 
@@ -272,14 +268,14 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
       if (i % 2 === 0) doc.rect(L, rowY, W, ROW_H).fill('#fafafa');
       doc.strokeColor('#f3f4f6').lineWidth(0.3).moveTo(L, rowY).lineTo(R, rowY).stroke();
 
-      doc.fontSize(8.5).font('Helvetica').fillColor('#111827');
+      PR(8.5).fillColor('#111827');
       if (earnings[i]) {
-        doc.text(earnings[i][0], eLabel, rowY + 6, { width: tMid - eLabel - 10 });
-        doc.text(fmt(earnings[i][1]), eAmt - AMT_W, rowY + 6, { width: AMT_W, align: 'right' });
+        doc.text(earnings[i][0], eLabel, rowY + 7, { width: tMid - eLabel - 10 });
+        PS(8.5).fillColor('#111827').text(fmt(earnings[i][1]), eAmt - AMT_W, rowY + 7, { width: AMT_W, align: 'right' });
       }
       if (deductions[i]) {
-        doc.text(deductions[i][0], dLabel, rowY + 6, { width: dAmt - dLabel - 60 });
-        doc.text(fmt(deductions[i][1]), dAmt - AMT_W, rowY + 6, { width: AMT_W, align: 'right' });
+        PR(8.5).fillColor('#111827').text(deductions[i][0], dLabel, rowY + 7, { width: dAmt - dLabel - 60 });
+        PS(8.5).fillColor('#111827').text(fmt(deductions[i][1]), dAmt - AMT_W, rowY + 7, { width: AMT_W, align: 'right' });
       }
     }
     y += maxRows * ROW_H;
@@ -289,36 +285,34 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
 
     // Gross Earnings / Total Deductions footer row
     doc.rect(L, y, W, ROW_H + 2).fillAndStroke('#f3f4f6', '#e5e7eb');
-    doc.fontSize(8.5).font('Helvetica-Bold').fillColor('#111827');
-    doc.text('Gross Earnings', eLabel, y + 6);
-    doc.text(fmt(payroll.grossSalary || 0), eAmt - AMT_W, y + 6, { width: AMT_W, align: 'right' });
-    doc.text('Total Deductions', dLabel, y + 6);
-    doc.text(fmt(payroll.totalDeductions || 0), dAmt - AMT_W, y + 6, { width: AMT_W, align: 'right' });
+    PB(8.5).fillColor('#111827');
+    doc.text('Gross Earnings',  eLabel,       y + 7);
+    doc.text(fmt(payroll.grossSalary    || 0), eAmt - AMT_W, y + 7, { width: AMT_W, align: 'right' });
+    doc.text('Total Deductions', dLabel,       y + 7);
+    doc.text(fmt(payroll.totalDeductions|| 0), dAmt - AMT_W, y + 7, { width: AMT_W, align: 'right' });
     drawVDiv(y, y + ROW_H + 2);
     y += ROW_H + 12;
 
     // ── TOTAL NET PAYABLE ────────────────────────────────────────
-    doc.rect(L, y, W, 44).fillAndStroke('#f0fdf4', '#bbf7d0');
-    doc.fontSize(9).font('Helvetica-Bold').fillColor('#111827')
-       .text('TOTAL NET PAYABLE', L + 12, y + 8);
-    doc.fontSize(7.5).font('Helvetica').fillColor('#6b7280')
-       .text('Gross Earnings - Total Deductions', L + 12, y + 24);
-    doc.fontSize(13).font('Helvetica-Bold').fillColor('#15803d')
-       .text(`Rs.${fmtN(payroll.netSalary || 0)}`, R - 170, y + 14, { width: 158, align: 'right' });
-    y += 54;
+    doc.rect(L, y, W, 46).fillAndStroke('#f0fdf4', '#bbf7d0');
+    PB(9).fillColor('#111827').text('TOTAL NET PAYABLE', L + 12, y + 8);
+    PR(7.5).fillColor('#6b7280').text('Gross Earnings - Total Deductions', L + 12, y + 24);
+    PB(13).fillColor('#15803d')
+      .text(`Rs.${fmtN(payroll.netSalary || 0)}`, R - 175, y + 15, { width: 163, align: 'right' });
+    y += 56;
 
     // ── AMOUNT IN WORDS ──────────────────────────────────────────
-    doc.fontSize(8).font('Helvetica').fillColor('#6b7280').text('Amount In Words : ', L, y, { continued: true });
-    doc.fontSize(8).font('Helvetica-Bold').fillColor('#111827')
-       .text(`Indian Rupee ${toWords(Math.round(payroll.netSalary || 0))} Only`, { lineBreak: false });
+    PR(8).fillColor('#6b7280').text('Amount In Words : ', L, y, { continued: true });
+    PB(8).fillColor('#111827')
+      .text(`Indian Rupee ${toWords(Math.round(payroll.netSalary || 0))} Only`, { lineBreak: false });
     y += 22;
 
     doc.strokeColor('#e5e7eb').lineWidth(0.5).moveTo(L, y).lineTo(R, y).stroke();
     y += 14;
 
     // ── FOOTER ───────────────────────────────────────────────────
-    doc.fontSize(8).font('Helvetica').fillColor('#9ca3af')
-       .text('-- This is a system-generated document. --', L, y, { width: W, align: 'center' });
+    PR(8).fillColor('#9ca3af')
+      .text('-- This is a system-generated document. --', L, y, { width: W, align: 'center' });
 
     doc.end();
   } catch (error) { next(error); }
