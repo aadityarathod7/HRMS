@@ -115,7 +115,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
       isOpen: isLeaveManagementOpen,
     },
     { icon: Home, label: "Project Management", onClick: handleProjectManagementClick, roles: "ADMIN_HR", path: "/project-management" },
-    { icon: Clock, label: "Timesheet", onClick: handleTimeSheetManagementClick, roles: "ADMIN_HR", path: "/time-sheet-management" },
+    { icon: Clock, label: "Timesheet", onClick: handleTimeSheetManagementClick, roles: "ADMIN_HR_MGR", path: "/time-sheet-management" },
     { icon: Users, label: "Attendance", onClick: handleAttendanceManagementClick, roles: "ALL", path: "/attendance-management" },
     { icon: DollarSign, label: "Payroll", onClick: handlePayRoleManagementClick, roles: "ALL", path: "/payroll-management" },
     { icon: Calendar, label: "Events", onClick: () => navigate("/events"), roles: "ALL", path: "/events" },
@@ -126,6 +126,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const menuItems = allMenuItems.filter(item => {
     if (item.roles === "ALL") return true;
     if (item.roles === "ADMIN_HR") return isAdminOrHR;
+    if (item.roles === "ADMIN_HR_MGR") return isAdminOrHR || isManager;
     return false;
   });
   return (
@@ -155,7 +156,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                   <span className="ml-2 flex-1 text-left">{item.label}</span>
                   {item.submenu && (
                     <span className="ml-2">
-                      {isEmployeeManagementOpen ? (
+                      {item.isOpen ? (
                         <ChevronDown className="h-4 w-4" />
                       ) : (
                         <ChevronRight className="h-4 w-4" />

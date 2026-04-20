@@ -8,7 +8,7 @@ router.post('/submit', authenticate, async (req, res, next) => {
   catch (error) { next(error); }
 });
 
-router.put('/update/:id', authenticate, async (req, res, next) => {
+router.put('/update/:id', authenticate, authorize('ADMIN', 'HR'), async (req, res, next) => {
   try { res.json(await leaveService.updateLeaveRequest(req.params.id, req.body)); }
   catch (error) { next(error); }
 });

@@ -64,7 +64,7 @@ const App: React.FC = () => {
               return null;
             }}
             position="bottom-right"
-            autoClose={800}
+            autoClose={3000}
           />
           <BrowserRouter>
             <Routes>
@@ -101,7 +101,7 @@ const App: React.FC = () => {
               <Route path="/project-management" element={<ProtectedRoute allowedRoles={ADMIN_HR}><ProjectManagement /></ProtectedRoute>} />
               <Route path="/project-registration" element={<ProtectedRoute allowedRoles={ADMIN_HR}><ProjectRegistration /></ProtectedRoute>} />
               <Route path="/view-project/:id" element={<ProtectedRoute allowedRoles={ADMIN_HR}><ViewProject /></ProtectedRoute>} />
-              <Route path="/time-sheet-management" element={<ProtectedRoute allowedRoles={ADMIN_HR}><TimeSheetManagement /></ProtectedRoute>} />
+              <Route path="/time-sheet-management" element={<ProtectedRoute allowedRoles={ADMIN_HR_MGR}><TimeSheetManagement /></ProtectedRoute>} />
 
               {/* 404 */}
               <Route path="*" element={<NotFound />} />

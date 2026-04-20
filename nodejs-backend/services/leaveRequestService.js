@@ -76,11 +76,11 @@ const approveLeaveRequest = async (leaveId, approvedById) => {
 const rejectLeaveRequest = async (leaveId, rejectedById, rejectionReason) => {
   const leave = await LeaveRequest.findById(leaveId);
   if (!leave) throw { status: 404, message: 'Leave request not found' };
-  if (!rejectionReason) throw { status: 400, message: 'Rejection reason is required' };
+  if (leave.leaveStatus !== 'PENDING') throw { status: 400, message: 'Only PENDING leaves can be rejected' };
 
   leave.leaveStatus = 'REJECTED';
-  leave.approvedBy = rejectedById;
-  leave.rejectionReason = rejectionReason;
+  leave.approvedBy = rejectedById;  // reusing field as "processedBy"
+  leave.rejectionReason = rejectionReason || 'Rejected by manager';
   leave.updatedDate = new Date();
   await leave.save();
 
@@ -160,7 +160,9 @@ const getLeavesByStatus = async (status) => {
 };
 
 const getLeavesByUser = async (userId) => {
-  return await LeaveRequest.find({ userId }).sort({ createdDate: -1 });
+  return await LeaveRequest.find({ userId })
+    .populate('reportingManagerId', 'firstname lastname')
+    .sort({ createdDate: -1 });
 };
 
 const getLeaveBalance = async (userId, year) => {

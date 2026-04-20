@@ -160,15 +160,8 @@ const DepartmentManagement: React.FC = () => {
       } else {
         throw new Error("Failed to deactivate department");
       }
-    } catch (error) {
-
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-        } else if (error.request) {
-        } else {
-        }
-      } else {
-      }
+    } catch {
+      toast.error("Failed to deactivate department");
     }
   };
 
@@ -217,21 +210,14 @@ const DepartmentManagement: React.FC = () => {
   const handleActivate = async (id: number) => {
     if (window.confirm("Are you sure you want to activate this department?")) {
       try {
-        const response = await fetch(
-          `${API_URL}/departments/activate/${id}`,
-          {
-            method: "PUT",
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
+        const token = localStorage.getItem("token");
+        await axios.patch(`${API_URL}/departments/activate/${id}`, {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        toast.success("Department activated successfully");
         fetchUsers();
-      } catch (error) {
-        alert("Failed to activate role. Please try again.");
+      } catch {
+        toast.error("Failed to activate department");
       }
     }
   };

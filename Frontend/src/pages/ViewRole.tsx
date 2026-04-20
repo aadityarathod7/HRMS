@@ -146,11 +146,12 @@ const ViewRole: React.FC = () => {
           "Content-Type": "application/json",
         };
 
-        await axios.put(
+        await axios.patch(
           `${API_URL}/role/deactivate/${user.id}`,
           {},
           { headers }
         );
+        setUser((u) => u ? { ...u, active: false } : u);
 
         toast.success("Role deactivated successfully!");
         // Optionally, you can fetch the updated user data or handle state changes here
@@ -170,19 +171,16 @@ const ViewRole: React.FC = () => {
         };
 
 
-        const response = await axios.put(
+        await axios.put(
           `${API_URL}/role/activate/${user.id}`,
           {},
           { headers }
         );
-
+        setUser((u) => u ? { ...u, active: true } : u);
         toast.success("Role activated successfully!");
-        // Optionally, you can fetch the updated user data or handle state changes here
       } catch (err) {
         toast.error("Failed to activate role");
       }
-    } else {
-    }
   };
 
   if (loading) return <p>Loading role details...</p>;
@@ -210,14 +208,14 @@ const ViewRole: React.FC = () => {
                 Cancel
               </button>
             </>
-          ) : (
+          ) : isAdminOrHR ? (
             <button
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 transition text-sm"
-              onClick={() => isAdminOrHR && setIsEditing(true)}
+              onClick={() => setIsEditing(true)}
             >
               Edit
             </button>
-          )}
+          ) : null}
           <button
             className="border border-gray-300 text-gray-600 bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition text-sm ml-2"
             onClick={() => navigate(-1)}

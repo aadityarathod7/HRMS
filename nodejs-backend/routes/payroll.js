@@ -22,8 +22,10 @@ router.get('/all', authenticate, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.get('/status/:status', authenticate, async (req, res, next) => {
+router.get('/status/:status', authenticate, authorize('ADMIN', 'HR'), async (req, res, next) => {
   try {
+    const allowed = ['PENDING', 'PROCESSED', 'PAID'];
+    if (!allowed.includes(req.params.status)) return res.status(400).json({ message: 'Invalid status' });
     const entries = await payrollService.getPayrollsByStatus(req.params.status);
     res.json(entries);
   } catch (error) { next(error); }
@@ -53,6 +55,8 @@ router.put('/update/:id', authenticate, authorize('ADMIN', 'HR'), async (req, re
 router.put('/updateStatus/:id', authenticate, authorize('ADMIN', 'HR'), async (req, res, next) => {
   try {
     const { status } = req.query;
+    const allowed = ['PENDING', 'PROCESSED', 'PAID'];
+    if (!status || !allowed.includes(status)) return res.status(400).json({ message: 'Invalid status. Must be PENDING, PROCESSED or PAID' });
     const entry = await payrollService.updatePayrollStatus(req.params.id, status);
     res.json(entry);
   } catch (error) { next(error); }

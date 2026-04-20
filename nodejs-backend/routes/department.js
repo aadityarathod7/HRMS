@@ -23,6 +23,11 @@ router.patch('/deactivate/:id', authenticate, authorize('ADMIN', 'HR'), async (r
   catch (error) { next(error); }
 });
 
+router.get('/', authenticate, async (req, res, next) => {
+  try { res.json(await departmentService.getAllActive()); }
+  catch (error) { next(error); }
+});
+
 router.get('/active', authenticate, async (req, res, next) => {
   try { res.json(await departmentService.getAllActive()); }
   catch (error) { next(error); }

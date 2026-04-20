@@ -107,14 +107,14 @@ const ViewDepartment: React.FC = () => {
                 Cancel
               </button>
             </>
-          ) : (
+          ) : isAdminOrHR ? (
             <button
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 transition text-sm"
-              onClick={() => isAdminOrHR && setIsEditing(true)}
+              onClick={() => setIsEditing(true)}
             >
               Edit
             </button>
-          )}
+          ) : null}
           <button
             className="border border-gray-300 text-gray-600 bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition text-sm ml-2"
             onClick={() => navigate(-1)}

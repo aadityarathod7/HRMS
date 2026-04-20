@@ -142,15 +142,8 @@ const RoleManagement: React.FC = () => {
         } else {
           throw new Error("Failed to activate role");
         }
-      } catch (error) {
-
-        if (axios.isAxiosError(error)) {
-          if (error.response) {
-          } else if (error.request) {
-          } else {
-          }
-        } else {
-        }
+      } catch {
+        toast.error("Failed to activate role");
       }
     }
   };
@@ -189,15 +182,8 @@ const RoleManagement: React.FC = () => {
       } else {
         throw new Error("Failed to deactivate role");
       }
-    } catch (error) {
-
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-        } else if (error.request) {
-        } else {
-        }
-      } else {
-      }
+    } catch {
+      toast.error("Failed to deactivate role");
     }
   };
 
@@ -261,15 +247,8 @@ const RoleManagement: React.FC = () => {
         // If currently viewing active roles, fetch active roles
         await fetchUsers();
       }
-    } catch (error) {
-
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-        } else if (error.request) {
-        } else {
-        }
-      } else {
-      }
+    } catch {
+      toast.error("Failed to create role");
     }
   };
 

@@ -38,21 +38,21 @@ const PayrollManagement: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [showForm, setShowForm] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
-  const [form, setForm] = useState({ userId: "", month: "", year: new Date().getFullYear().toString(), basicSalary: "", allowances: "", deductions: "" });
+  const [form, setForm] = useState({ userId: "", month: "", year: new Date().getFullYear().toString(), basicSalary: "", specialAllowance: "", lopDeduction: "", tds: "" });
   const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
   const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  const fetchPayrolls = async () => {
+  const fetchPayrolls = async (status = selectedStatus) => {
     try {
       const token = localStorage.getItem("token");
-      const url = selectedStatus === "ALL"
+      const url = status === "ALL"
         ? `${API_URL}/payroll/all`
-        : `${API_URL}/payroll/status/${selectedStatus}`;
+        : `${API_URL}/payroll/status/${status}`;
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setPayrolls(response.data);
-    } catch (err) {} finally { setLoading(false); }
+    } catch (err) { toast.error("Failed to load payroll records"); } finally { setLoading(false); }
   };
 
   const fetchUsers = async () => {
@@ -60,7 +60,7 @@ const PayrollManagement: React.FC = () => {
       const token = localStorage.getItem("token");
       const res = await axios.get(`${API_URL}/user/all`, { headers: { Authorization: `Bearer ${token}` } });
       setUsers(res.data);
-    } catch (err) {}
+    } catch { toast.error("Failed to load employees"); }
   };
 
   useEffect(() => { fetchPayrolls(); }, [selectedStatus]);
@@ -75,15 +75,16 @@ const PayrollManagement: React.FC = () => {
         month: form.month,
         year: Number(form.year),
         basicSalary: Number(form.basicSalary),
-        allowances: Number(form.allowances) || 0,
-        deductions: Number(form.deductions) || 0,
+        specialAllowance: Number(form.specialAllowance) || 0,
+        lopDeduction: Number(form.lopDeduction) || 0,
+        tds: Number(form.tds) || 0,
         createdBy: localStorage.getItem("username") || "system",
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Payroll created");
-      setForm({ userId: "", month: "", year: new Date().getFullYear().toString(), basicSalary: "", allowances: "", deductions: "" });
+      setForm({ userId: "", month: "", year: new Date().getFullYear().toString(), basicSalary: "", specialAllowance: "", lopDeduction: "", tds: "" });
       setShowForm(false);
       fetchPayrolls();
-    } catch (error) { toast.error("Failed to create payroll"); }
+    } catch (error: any) { toast.error(error?.response?.data?.message || "Failed to create payroll"); }
   };
 
   const handleProcess = async (id: string) => {
@@ -91,7 +92,7 @@ const PayrollManagement: React.FC = () => {
       const token = localStorage.getItem("token");
       await axios.put(`${API_URL}/payroll/updateStatus/${id}?status=PROCESSED`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Payroll processed");
-      fetchPayrolls();
+      fetchPayrolls(selectedStatus);
     } catch (error) { toast.error("Failed to process"); }
   };
 
@@ -119,7 +120,7 @@ const PayrollManagement: React.FC = () => {
       const token = localStorage.getItem("token");
       await axios.put(`${API_URL}/payroll/updateStatus/${id}?status=PAID`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Marked as paid");
-      fetchPayrolls();
+      fetchPayrolls(selectedStatus);
     } catch (error) { toast.error("Failed to update"); }
   };
 
@@ -186,14 +187,19 @@ const PayrollManagement: React.FC = () => {
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Basic Salary (INR)</label>
                   <input type="number" required min="0" value={form.basicSalary} onChange={(e) => setForm({ ...form, basicSalary: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="50000" />
+                  <p className="text-[10px] text-gray-400 mt-0.5">HRA (40%), DA (10%), TA ₹1600 auto-calculated</p>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Allowances (INR)</label>
-                  <input type="number" min="0" value={form.allowances} onChange={(e) => setForm({ ...form, allowances: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="10000" />
+                  <label className="block text-sm text-gray-600 mb-1">Special Allowance (INR)</label>
+                  <input type="number" min="0" value={form.specialAllowance} onChange={(e) => setForm({ ...form, specialAllowance: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="0" />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Deductions (INR)</label>
-                  <input type="number" min="0" value={form.deductions} onChange={(e) => setForm({ ...form, deductions: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="5000" />
+                  <label className="block text-sm text-gray-600 mb-1">LOP Deduction (INR)</label>
+                  <input type="number" min="0" value={form.lopDeduction} onChange={(e) => setForm({ ...form, lopDeduction: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="0" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">TDS (INR)</label>
+                  <input type="number" min="0" value={form.tds} onChange={(e) => setForm({ ...form, tds: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="0" />
                 </div>
               </div>
               <div className="mt-4 flex justify-end">

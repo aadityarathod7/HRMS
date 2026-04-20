@@ -4,7 +4,6 @@ import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 import DateInput from "@/components/DateInput";
-import { CheckCircle, Close } from "@mui/icons-material";
 import { toast } from "react-toastify";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -30,19 +29,19 @@ const TimeSheetManagement: React.FC = () => {
   const [form, setForm] = useState({ userId: "", date: "", hoursWorked: "", project: "", taskDescription: "" });
   const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
   const isAdminOrHR = userRoles.some(r => ["ADMIN", "HR"].includes(r));
+  const canApprove = userRoles.some(r => ["ADMIN", "HR", "MANAGER"].includes(r));
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  const fetchTimesheets = async () => {
+  const fetchTimesheets = async (status = selectedStatus) => {
     try {
       const token = localStorage.getItem("token");
-      const url = selectedStatus === "ALL"
+      const url = status === "ALL"
         ? `${API_URL}/timesheets/all`
-        : `${API_URL}/timesheets/status/${selectedStatus}`;
+        : `${API_URL}/timesheets/status/${status}`;
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setTimesheets(response.data);
-    } catch (error) {
-    } finally { setLoading(false); }
+    } catch { toast.error("Failed to load timesheets"); } finally { setLoading(false); }
   };
 
   const fetchUsersAndProjects = async () => {
@@ -54,7 +53,7 @@ const TimeSheetManagement: React.FC = () => {
       ]);
       setUsers(usersRes.data);
       setProjects(projectsRes.data);
-    } catch (err) {}
+    } catch { toast.error("Failed to load users or projects"); }
   };
 
   useEffect(() => { fetchTimesheets(); }, [selectedStatus]);
@@ -75,7 +74,7 @@ const TimeSheetManagement: React.FC = () => {
       toast.success("Timesheet added");
       setForm({ userId: "", date: "", hoursWorked: "", project: "", taskDescription: "" });
       setShowForm(false);
-      fetchTimesheets();
+      fetchTimesheets(selectedStatus);
     } catch (error) { toast.error("Failed to add timesheet"); }
   };
 
@@ -84,7 +83,7 @@ const TimeSheetManagement: React.FC = () => {
       const token = localStorage.getItem("token");
       await axios.put(`${API_URL}/timesheets/updateStatus/${id}?status=APPROVED`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Timesheet approved");
-      fetchTimesheets();
+      fetchTimesheets(selectedStatus);
     } catch (error) { toast.error("Failed to approve"); }
   };
 
@@ -93,7 +92,7 @@ const TimeSheetManagement: React.FC = () => {
       const token = localStorage.getItem("token");
       await axios.put(`${API_URL}/timesheets/updateStatus/${id}?status=REJECTED`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Timesheet rejected");
-      fetchTimesheets();
+      fetchTimesheets(selectedStatus);
     } catch (error) { toast.error("Failed to reject"); }
   };
 
@@ -195,7 +194,7 @@ const TimeSheetManagement: React.FC = () => {
                     <td className="px-4 py-3 text-gray-600 text-sm">{entry.taskDescription || "-"}</td>
                     <td className="px-4 py-3">{getStatusBadge(entry.status)}</td>
                     <td className="px-4 py-3">
-                      {entry.status === "PENDING" && isAdminOrHR && (
+                      {entry.status === "PENDING" && canApprove && (
                         <div className="flex gap-2">
                           <button onClick={() => handleApprove(entry.id)} className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-500 transition">Approve</button>
                           <button onClick={() => handleReject(entry.id)} className="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs hover:bg-gray-300 transition">Reject</button>

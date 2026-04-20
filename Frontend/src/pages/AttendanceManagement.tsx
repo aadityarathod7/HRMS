@@ -39,7 +39,7 @@ const AttendanceManagement: React.FC = () => {
         : `${API_URL}/attendance/status/${selectedStatus}`;
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setRecords(response.data);
-    } catch (err) {} finally { setLoading(false); }
+    } catch (err) { toast.error("Failed to load attendance records"); } finally { setLoading(false); }
   };
 
   const fetchUsers = async () => {
@@ -47,7 +47,7 @@ const AttendanceManagement: React.FC = () => {
       const token = localStorage.getItem("token");
       const res = await axios.get(`${API_URL}/user/all`, { headers: { Authorization: `Bearer ${token}` } });
       setUsers(res.data);
-    } catch (err) {}
+    } catch { toast.error("Failed to load employees"); }
   };
 
   useEffect(() => { fetchRecords(); }, [selectedStatus]);
@@ -55,6 +55,10 @@ const AttendanceManagement: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (form.checkIn && form.checkOut && form.checkOut <= form.checkIn) {
+      toast.error("Check-out time must be after check-in time");
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
       await axios.post(`${API_URL}/attendance/mark`, form, { headers: { Authorization: `Bearer ${token}` } });

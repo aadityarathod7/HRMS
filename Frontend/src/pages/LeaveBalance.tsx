@@ -44,7 +44,7 @@ const LeaveBalance: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBalances(res.data);
-    } catch (err) {} finally { setLoading(false); }
+    } catch { toast.error("Failed to load leave balance"); } finally { setLoading(false); }
   };
 
   const fetchAllBalances = async () => {
@@ -57,7 +57,7 @@ const LeaveBalance: React.FC = () => {
       ]);
       setAllBalances(balRes.data);
       setUsers(userRes.data);
-    } catch (err) {}
+    } catch { toast.error("Failed to load all leave balances"); }
   };
 
   useEffect(() => { fetchMyBalance(); fetchAllBalances(); }, []);

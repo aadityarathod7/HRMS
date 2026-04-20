@@ -9,6 +9,7 @@ import {
   KeyboardArrowDown,
 } from "@mui/icons-material";
 import Footer from "@/components/Footer";
+import { toast } from "react-toastify";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -30,7 +31,7 @@ const EmployeeList: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${API_URL}/user/all?isActive=${isActive ? 1 : 0}`,
+        `${API_URL}/user/all?isActive=${isActive ? 'true' : 'false'}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!response.ok) {
@@ -48,7 +49,8 @@ const EmployeeList: React.FC = () => {
       }));
 
       setUsers(usersWithCreator);
-    } catch (error) {
+    } catch {
+      toast.error("Failed to load employees");
     }
   };
 
@@ -86,8 +88,9 @@ const EmployeeList: React.FC = () => {
 
         // Remove the user from the local state
         setUsers(users.filter((user) => user.id !== id));
-      } catch (error) {
-        alert("Failed to deactivate employee. Please try again.");
+        toast.success("Employee deactivated");
+      } catch {
+        toast.error("Failed to deactivate employee");
       }
     }
   };
@@ -108,10 +111,10 @@ const EmployeeList: React.FC = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Refetch users after activation
-        fetchUsers(showInactive); // Fetch users based on the current filter (active/inactive)
-      } catch (error) {
-        alert("Failed to activate employee. Please try again.");
+        toast.success("Employee activated");
+        fetchUsers(!showInactive);
+      } catch {
+        toast.error("Failed to activate employee");
       }
     }
   };
@@ -210,7 +213,7 @@ const EmployeeList: React.FC = () => {
                     <td className="px-4 py-3">
                       <div className="flex space-x-3">
                         <Link
-                          to={`/view-Employee/${user.id}`}
+                          to={`/view-employee/${user.id}`}
                           className="text-blue-600 hover:text-blue-800 transition-colors duration-150"
                           title="View"
                         >
@@ -239,7 +242,7 @@ const EmployeeList: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="text-center text-gray-500 py-4">
+                  <td colSpan={9} className="text-center text-gray-500 py-4">
                     No users found.
                   </td>
                 </tr>

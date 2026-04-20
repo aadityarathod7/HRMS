@@ -44,7 +44,7 @@ const Events: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setEvents(res.data);
-    } catch (err) {} finally { setLoading(false); }
+    } catch { toast.error("Failed to load events"); } finally { setLoading(false); }
   };
 
   useEffect(() => { fetchEvents(); }, [currentMonth, currentYear]);
