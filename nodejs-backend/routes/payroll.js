@@ -83,17 +83,16 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
 
     // ── HELPERS ─────────────────────────────────────────────────
     const logoPath    = path.join(__dirname, '../assets/logo.png');
-    const fontReg     = path.join(__dirname, '../assets/Poppins-Regular.ttf');
-    const fontBold    = path.join(__dirname, '../assets/Poppins-Bold.ttf');
-    const fontSemi    = path.join(__dirname, '../assets/Poppins-SemiBold.ttf');
+    const fontReg  = path.join(__dirname, '../assets/Inter-Regular.ttf');
+    const fontBold = path.join(__dirname, '../assets/Inter-Bold.ttf');
+    const fontSemi = path.join(__dirname, '../assets/Inter-SemiBold.ttf');
 
-    // Register fonts (fallback to Helvetica if files missing)
-    try { doc.registerFont('P-Regular', fontReg); } catch(_) {}
-    try { doc.registerFont('P-Bold',    fontBold);   } catch(_) {}
-    try { doc.registerFont('P-Semi',    fontSemi);   } catch(_) {}
+    // Register Inter fonts
+    try { doc.registerFont('I-Regular', fontReg);  } catch(_) {}
+    try { doc.registerFont('I-Bold',    fontBold); } catch(_) {}
+    try { doc.registerFont('I-Semi',    fontSemi); } catch(_) {}
 
-
-    // Format currency — use Rs. prefix (Helvetica doesn't support ₹ glyph)
+    // Format currency — use Rs. prefix (built-in fonts don't support ₹ glyph)
     const fmtN = (n) => new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
     const fmt  = (n) => `Rs.${fmtN(n)}`;
 
@@ -124,10 +123,10 @@ router.get('/payslip/:id', authenticate, async (req, res, next) => {
     const MID = L + Math.floor(W / 2);
     let y = 0;
 
-    // Font helpers
-    const PR  = (sz) => doc.font('P-Regular').fontSize(sz);
-    const PB  = (sz) => doc.font('P-Bold').fontSize(sz);
-    const PS  = (sz) => doc.font('P-Semi').fontSize(sz);
+    // Font helpers — Inter (clean, professional, used by Notion/Linear/Stripe)
+    const PR  = (sz) => { try { return doc.font('I-Regular').fontSize(sz); } catch(_) { return doc.font('Helvetica').fontSize(sz); } };
+    const PB  = (sz) => { try { return doc.font('I-Bold').fontSize(sz);    } catch(_) { return doc.font('Helvetica-Bold').fontSize(sz); } };
+    const PS  = (sz) => { try { return doc.font('I-Semi').fontSize(sz);    } catch(_) { return doc.font('Helvetica').fontSize(sz); } };
 
     // ── HEADER ───────────────────────────────────────────────────
     doc.rect(0, 0, PG_W, 110).fill('#ffffff');
