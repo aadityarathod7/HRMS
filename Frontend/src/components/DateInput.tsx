@@ -16,11 +16,16 @@ const isoToDisplay = (iso: string): string => {
   return `${parts[2]}/${parts[1]}/${parts[0]}`;
 };
 
-// Converts display (dd/mm/yyyy) to ISO (yyyy-mm-dd)
+// Converts display (dd/mm/yyyy) to ISO (yyyy-mm-dd) with validation
 const displayToIso = (display: string): string => {
   const parts = display.split("/");
   if (parts.length !== 3 || parts[2].length !== 4) return "";
-  return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  const [d, m, y] = parts.map(Number);
+  if (!d || !m || !y || m < 1 || m > 12 || d < 1 || d > 31) return "";
+  const date = new Date(y, m - 1, d);
+  // Check that the date is actually valid (e.g. 31/02 would roll over)
+  if (date.getFullYear() !== y || date.getMonth() + 1 !== m || date.getDate() !== d) return "";
+  return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
 };
 
 const DateInput: React.FC<DateInputProps> = ({ value, onChange, required, className, placeholder = "dd/mm/yyyy" }) => {

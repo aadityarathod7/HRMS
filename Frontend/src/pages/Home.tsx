@@ -433,7 +433,7 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <>
-              {/* ====== ADMIN ====== */}
+              {/* ====== ADMIN / HR ====== */}
               {role === "ADMIN" && (
                 <>
                   {/* Stat cards */}

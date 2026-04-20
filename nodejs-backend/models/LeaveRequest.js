@@ -30,4 +30,8 @@ leaveRequestSchema.pre('save', function () {
   }
 });
 
+leaveRequestSchema.index({ userId: 1, leaveStatus: 1 });
+leaveRequestSchema.index({ leaveStatus: 1, leaveStartDate: 1, leaveEndDate: 1 });
+leaveRequestSchema.index({ reportingManagerId: 1, leaveStatus: 1 });
+
 module.exports = mongoose.model('LeaveRequest', leaveRequestSchema);

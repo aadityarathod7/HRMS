@@ -22,12 +22,16 @@ attendanceSchema.pre('save', function () {
   if (this.checkIn && this.checkOut) {
     const [inH, inM] = this.checkIn.split(':').map(Number);
     const [outH, outM] = this.checkOut.split(':').map(Number);
-    const totalMinutes = (outH * 60 + outM) - (inH * 60 + inM);
+    let totalMinutes = (outH * 60 + outM) - (inH * 60 + inM);
+    if (totalMinutes < 0) totalMinutes += 24 * 60; // overnight shift support
     this.hoursWorked = Math.round((totalMinutes / 60) * 100) / 100;
-    if (this.hoursWorked > 9) {
-      this.overtimeHours = Math.round((this.hoursWorked - 9) * 100) / 100;
-    }
+    this.overtimeHours = this.hoursWorked > 9
+      ? Math.round((this.hoursWorked - 9) * 100) / 100
+      : 0;
   }
 });
+
+attendanceSchema.index({ userId: 1, date: -1 });
+attendanceSchema.index({ date: 1, status: 1 });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);

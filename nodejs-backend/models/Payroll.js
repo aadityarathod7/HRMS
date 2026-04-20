@@ -47,4 +47,7 @@ payrollSchema.pre('save', function () {
   this.netSalary = this.grossSalary - this.totalDeductions;
 });
 
+payrollSchema.index({ userId: 1, year: -1, month: 1 });
+payrollSchema.index({ status: 1 });
+
 module.exports = mongoose.model('Payroll', payrollSchema);

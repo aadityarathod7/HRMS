@@ -131,6 +131,7 @@ const ViewProject: React.FC = () => {
       } catch (err) {
         toast.error("Failed to activate project");
       }
+    }
   };
 
   if (loading) return <p>Loading project details...</p>;

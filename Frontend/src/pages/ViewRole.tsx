@@ -181,6 +181,7 @@ const ViewRole: React.FC = () => {
       } catch (err) {
         toast.error("Failed to activate role");
       }
+    }
   };
 
   if (loading) return <p>Loading role details...</p>;

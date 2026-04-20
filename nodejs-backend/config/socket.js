@@ -6,8 +6,19 @@ const initSocket = (server) => {
   wss = new WebSocketServer({ server, path: '/leaveNotification' });
 
   wss.on('connection', (ws) => {
-    ws.on('close', () => {});
+    ws.isAlive = true;
+    ws.on('pong', () => { ws.isAlive = true; });
+    ws.on('close', () => { ws.isAlive = false; });
   });
+
+  // Heartbeat — terminate stale connections every 30s to prevent memory leak
+  const heartbeat = setInterval(() => {
+    wss.clients.forEach(ws => {
+      if (!ws.isAlive) return ws.terminate();
+      ws.isAlive = false;
+      ws.ping();
+    });
+  }, 30000);
 
   return wss;
 };
