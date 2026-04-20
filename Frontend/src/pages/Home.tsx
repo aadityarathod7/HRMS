@@ -57,11 +57,19 @@ const CheckInWidget: React.FC = () => {
 
   React.useEffect(() => { fetchToday(); }, []);
 
+  const localTimeStr = () => {
+    const d = new Date();
+    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  };
+
   const handleCheckIn = async () => {
     setWorking(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(`${API_URL}/attendance/checkin`, { location }, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.post(`${API_URL}/attendance/checkin`, {
+        location,
+        checkIn: localTimeStr(),  // send local time from browser
+      }, { headers: { Authorization: `Bearer ${token}` } });
       setRecord(res.data);
     } catch (e: any) {
       const msg = e?.response?.data?.message || "Check-in failed";
@@ -74,7 +82,9 @@ const CheckInWidget: React.FC = () => {
     setWorking(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.put(`${API_URL}/attendance/checkout`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.put(`${API_URL}/attendance/checkout`, {
+        checkOut: localTimeStr(),  // send local time from browser
+      }, { headers: { Authorization: `Bearer ${token}` } });
       setRecord(res.data);
     } catch (e: any) {
       alert(e?.response?.data?.message || "Check-out failed");

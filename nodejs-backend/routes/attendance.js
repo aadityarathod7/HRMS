@@ -18,7 +18,7 @@ router.post('/checkin', authenticate, async (req, res, next) => {
       return res.status(409).json({ message: 'Already checked in today', record: existing });
     }
 
-    const checkIn = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const checkIn = req.body.checkIn || `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     const entry = await attendanceService.markAttendance({
       userId,
       date: now,
@@ -44,7 +44,7 @@ router.put('/checkout', authenticate, async (req, res, next) => {
     if (!existing) return res.status(404).json({ message: 'No check-in found for today. Please check in first.' });
     if (existing.checkOut) return res.status(409).json({ message: 'Already checked out today', record: existing });
 
-    const checkOut = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const checkOut = req.body.checkOut || `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     existing.checkOut = checkOut;
     if (req.body.notes) existing.notes = req.body.notes;
     await existing.save();
