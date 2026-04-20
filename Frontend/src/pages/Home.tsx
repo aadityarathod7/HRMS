@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import DashboardNavbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
-import { Users, FileText, Clock, DollarSign, Calendar, UserCheck, UserX, Briefcase, TrendingUp, Gift } from "lucide-react";
+import { Users, FileText, Clock, DollarSign, Calendar, UserCheck, UserX, Briefcase, TrendingUp, Gift, LogIn, LogOut, MapPin } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -31,6 +31,156 @@ const PUBLIC_HOLIDAYS: Record<string, string> = {
 };
 
 const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6;
+
+const CheckInWidget: React.FC = () => {
+  const [record, setRecord] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [working, setWorking] = React.useState(false);
+  const [location, setLocation] = React.useState("OFFICE");
+  const [now, setNow] = React.useState(new Date());
+
+  // Live clock
+  React.useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Fetch today's record
+  const fetchToday = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${API_URL}/attendance/today`, { headers: { Authorization: `Bearer ${token}` } });
+      setRecord(res.data);
+    } catch { setRecord(null); }
+    finally { setLoading(false); }
+  };
+
+  React.useEffect(() => { fetchToday(); }, []);
+
+  const handleCheckIn = async () => {
+    setWorking(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(`${API_URL}/attendance/checkin`, { location }, { headers: { Authorization: `Bearer ${token}` } });
+      setRecord(res.data);
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || "Check-in failed";
+      if (e?.response?.status === 409) setRecord(e.response.data.record);
+      else alert(msg);
+    } finally { setWorking(false); }
+  };
+
+  const handleCheckOut = async () => {
+    setWorking(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(`${API_URL}/attendance/checkout`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      setRecord(res.data);
+    } catch (e: any) {
+      alert(e?.response?.data?.message || "Check-out failed");
+    } finally { setWorking(false); }
+  };
+
+  const fmt = (t: string) => {
+    const [h, m] = t.split(":").map(Number);
+    return `${h % 12 || 12}:${String(m).padStart(2,"0")} ${h >= 12 ? "PM" : "AM"}`;
+  };
+
+  const clockStr = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
+  const dateStr  = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+  const checkedIn  = !!record?.checkIn;
+  const checkedOut = !!record?.checkOut;
+
+  let hoursWorked = "";
+  if (checkedIn && checkedOut) {
+    const [inH, inM]   = record.checkIn.split(":").map(Number);
+    const [outH, outM] = record.checkOut.split(":").map(Number);
+    const mins = (outH * 60 + outM) - (inH * 60 + inM);
+    hoursWorked = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+  } else if (checkedIn) {
+    const [inH, inM] = record.checkIn.split(":").map(Number);
+    const mins = (now.getHours() * 60 + now.getMinutes()) - (inH * 60 + inM);
+    if (mins > 0) hoursWorked = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">
+      {/* Clock */}
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <p className="text-2xl font-light text-gray-900 tracking-wide">{clockStr}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{dateStr}</p>
+        </div>
+        {record && (
+          <span className={`px-2.5 py-1 text-xs rounded-full font-medium ${
+            checkedOut ? "bg-gray-100 text-gray-600" :
+            checkedIn  ? "bg-emerald-50 text-emerald-700" :
+                         "bg-gray-50 text-gray-400"
+          }`}>
+            {checkedOut ? "Completed" : checkedIn ? "● Working" : "Not started"}
+          </span>
+        )}
+      </div>
+
+      {loading ? (
+        <p className="text-sm text-gray-400">Loading...</p>
+      ) : (
+        <>
+          {/* Status row */}
+          <div className="flex gap-4 mb-4 text-sm">
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Check In</p>
+              <p className="text-gray-900 font-medium">{checkedIn ? fmt(record.checkIn) : "—"}</p>
+            </div>
+            <div className="border-l border-gray-100 pl-4">
+              <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Check Out</p>
+              <p className="text-gray-900 font-medium">{checkedOut ? fmt(record.checkOut) : "—"}</p>
+            </div>
+            {hoursWorked && (
+              <div className="border-l border-gray-100 pl-4">
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">{checkedOut ? "Total" : "Duration"}</p>
+                <p className="text-gray-900 font-medium">{hoursWorked}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Location selector — only before check-in */}
+          {!checkedIn && (
+            <div className="flex gap-2 mb-4">
+              {["OFFICE","WFH","HYBRID"].map(loc => (
+                <button key={loc} type="button" onClick={() => setLocation(loc)}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs border transition ${
+                    location === loc ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
+                  }`}>
+                  <MapPin size={11} />
+                  {loc === "WFH" ? "WFH" : loc === "HYBRID" ? "Hybrid" : "Office"}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Action button */}
+          {!checkedIn ? (
+            <button onClick={handleCheckIn} disabled={working}
+              className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-500 transition text-sm font-medium disabled:opacity-60">
+              <LogIn size={15} />
+              {working ? "Checking in..." : "Check In"}
+            </button>
+          ) : !checkedOut ? (
+            <button onClick={handleCheckOut} disabled={working}
+              className="flex items-center gap-2 bg-gray-800 text-white px-5 py-2 rounded-lg hover:bg-gray-700 transition text-sm font-medium disabled:opacity-60">
+              <LogOut size={15} />
+              {working ? "Checking out..." : "Check Out"}
+            </button>
+          ) : (
+            <p className="text-sm text-gray-400">You have completed your attendance for today.</p>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
 
 const ATT_COLORS: Record<string, { bg: string; color: string }> = {
   PRESENT:  { bg: "#d1fae5", color: "#065f46" },
@@ -245,6 +395,9 @@ const EmployeeDashboard: React.FC<{ stats: any; attendanceRecords: any[]; naviga
           <p className="text-xs text-gray-400 mt-0.5">days this month</p>
         </div>
       </div>
+
+      {/* Check In / Check Out */}
+      <CheckInWidget />
 
       {/* Leave Balance */}
       <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">

@@ -28,6 +28,7 @@ const LeaveBalance: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAssign, setShowAssign] = useState(false);
+  const [assigning, setAssigning] = useState(false);
   const [assignForm, setAssignForm] = useState({ userId: "", leaveType: "CASUAL", totalAllotted: "12" });
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
@@ -64,6 +65,7 @@ const LeaveBalance: React.FC = () => {
 
   const handleAssign = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAssigning(true);
     try {
       const token = localStorage.getItem("token");
       await axios.put(`${API_URL}/leaverequests/balance/update`, {
@@ -78,6 +80,7 @@ const LeaveBalance: React.FC = () => {
       fetchAllBalances();
       fetchMyBalance();
     } catch (err) { toast.error("Failed to update leave balance"); }
+    finally { setAssigning(false); }
   };
 
   // Group all balances by employee
@@ -144,7 +147,7 @@ const LeaveBalance: React.FC = () => {
                   <input type="number" required min="0" value={assignForm.totalAllotted} onChange={(e) => setAssignForm({ ...assignForm, totalAllotted: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                 </div>
-                <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm h-[38px]">Assign</button>
+                <button type="submit" disabled={assigning} className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm h-[38px] disabled:opacity-60">{assigning ? "Saving..." : "Assign"}</button>
               </div>
             </form>
           )}

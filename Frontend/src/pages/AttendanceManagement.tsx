@@ -24,6 +24,7 @@ const AttendanceManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [showForm, setShowForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
   const [form, setForm] = useState({ userId: "", date: "", checkIn: "", checkOut: "", status: "PRESENT", notes: "" });
   const userRoles: string[] = JSON.parse(localStorage.getItem("roles") || "[]");
@@ -63,6 +64,7 @@ const AttendanceManagement: React.FC = () => {
         return;
       }
     }
+    setSubmitting(true);
     try {
       const token = localStorage.getItem("token");
       await axios.post(`${API_URL}/attendance/mark`, form, { headers: { Authorization: `Bearer ${token}` } });
@@ -70,7 +72,9 @@ const AttendanceManagement: React.FC = () => {
       setForm({ userId: "", date: "", checkIn: "", checkOut: "", status: "PRESENT", notes: "" });
       setShowForm(false);
       fetchRecords();
-    } catch (error) { toast.error("Failed to mark attendance"); }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to mark attendance");
+    } finally { setSubmitting(false); }
   };
 
   const handleDelete = async (id: string) => {
@@ -110,6 +114,7 @@ const AttendanceManagement: React.FC = () => {
               <option value="ALL">All</option>
               <option value="PRESENT">Present</option>
               <option value="ABSENT">Absent</option>
+              <option value="WFH">WFH</option>
               <option value="HALF_DAY">Half Day</option>
               <option value="ON_LEAVE">On Leave</option>
             </select>
@@ -139,6 +144,7 @@ const AttendanceManagement: React.FC = () => {
                   <label className="block text-sm text-gray-600 mb-1">Status</label>
                   <select required value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     <option value="PRESENT">Present</option>
+                    <option value="WFH">WFH</option>
                     <option value="ABSENT">Absent</option>
                     <option value="HALF_DAY">Half Day</option>
                     <option value="ON_LEAVE">On Leave</option>
@@ -158,7 +164,7 @@ const AttendanceManagement: React.FC = () => {
                 </div>
               </div>
               <div className="mt-4 flex justify-end">
-                <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm">Submit</button>
+                <button type="submit" disabled={submitting} className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm disabled:opacity-60">{submitting ? "Submitting..." : "Submit"}</button>
               </div>
             </form>
           )}

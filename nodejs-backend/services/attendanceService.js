@@ -1,6 +1,16 @@
 const Attendance = require('../models/Attendance');
 
 const markAttendance = async (data) => {
+  if (!data.userId || !data.date || !data.status) {
+    throw { status: 400, message: 'userId, date, and status are required' };
+  }
+  // Prevent duplicate attendance for same user on same date
+  const dateObj = new Date(data.date);
+  dateObj.setHours(0, 0, 0, 0);
+  const nextDay = new Date(dateObj);
+  nextDay.setDate(nextDay.getDate() + 1);
+  const existing = await Attendance.findOne({ userId: data.userId, date: { $gte: dateObj, $lt: nextDay } });
+  if (existing) throw { status: 409, message: 'Attendance already marked for this employee on this date' };
   const entry = new Attendance({ ...data, createdDate: new Date() });
   return await entry.save();
 };
@@ -34,7 +44,8 @@ const getAttendanceByDate = async (date) => {
 const updateAttendance = async (id, data) => {
   const entry = await Attendance.findById(id);
   if (!entry) throw { status: 404, message: 'Attendance record not found' };
-  Object.assign(entry, data);
+  const allowed = ['status', 'checkIn', 'checkOut', 'notes', 'location'];
+  allowed.forEach(f => { if (data[f] !== undefined) entry[f] = data[f]; });
   return await entry.save();
 };
 

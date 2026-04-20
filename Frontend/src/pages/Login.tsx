@@ -139,8 +139,7 @@ const Login = () => {
                     window.location.href = "/auth/google/callback";
                   }
                 }}
-                onError={() => {
-                }}
+                onError={() => { toast.error("Google sign-in failed. Please try again."); }}
               />
             </GoogleOAuthProvider>
           </div>
