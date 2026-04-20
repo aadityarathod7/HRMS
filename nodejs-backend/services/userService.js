@@ -2,12 +2,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Role = require('../models/Role');
 const LeaveBalance = require('../models/LeaveBalance');
-
-const DEFAULT_LEAVE_ALLOTMENTS = [
-  { leaveType: 'CASUAL', totalAllotted: 12 },
-  { leaveType: 'SICK', totalAllotted: 12 },
-  { leaveType: 'PRIVILEGE', totalAllotted: 15 },
-];
+const { initBalancesForNewEmployee } = require('./leaveAccrualService');
 
 const generateEmployeeId = async () => {
   const last = await User.findOne({ employeeId: { $exists: true, $ne: null } }).sort({ employeeId: -1 });
@@ -43,17 +38,8 @@ const addUser = async (userData, createdBy) => {
 
   await user.save();
 
-  // Auto-create leave balances for current year
-  const year = new Date().getFullYear();
-  const balances = DEFAULT_LEAVE_ALLOTMENTS.map(lb => ({
-    userId: user._id,
-    leaveType: lb.leaveType,
-    totalAllotted: lb.totalAllotted,
-    used: 0,
-    available: lb.totalAllotted,
-    year
-  }));
-  await LeaveBalance.insertMany(balances);
+  // Init leave balances with accrual from joining month to current month
+  await initBalancesForNewEmployee(user._id, userData.dateOfJoining);
 
   return 'Employee registered successfully with ID: ' + employeeId;
 };

@@ -11,7 +11,12 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const LEAVE_TYPES = ["CASUAL", "SICK", "PRIVILEGE", "COMP_OFF", "MATERNITY", "PATERNITY"];
+const LEAVE_TYPES = ["CASUAL", "SICK", "COMP_OFF", "MATERNITY", "PATERNITY"];
+
+const ACCRUAL_INFO: Record<string, string> = {
+  CASUAL: "1 day / month · 12/year",
+  SICK:   "0.25 day / month · 3/year",
+};
 const COLORS = [
   "#3B82F6", // blue - CASUAL
   "#10B981", // emerald - SICK
@@ -29,6 +34,7 @@ const LeaveBalance: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showAssign, setShowAssign] = useState(false);
   const [assigning, setAssigning] = useState(false);
+  const [runningAccrual, setRunningAccrual] = useState(false);
   const [assignForm, setAssignForm] = useState({ userId: "", leaveType: "CASUAL", totalAllotted: "12" });
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
@@ -114,11 +120,32 @@ const LeaveBalance: React.FC = () => {
         <div className="pt-28 px-5 pb-5 flex-grow">
 
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-light text-gray-900">Leave Balance — {userProfile.firstname} {userProfile.lastname}</h2>
+            <div>
+              <h2 className="text-2xl font-light text-gray-900">Leave Balance — {userProfile.firstname} {userProfile.lastname}</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Casual: 1/month · Sick: 0.25/month · Unused carry forward · Resets Jan 1</p>
+            </div>
             {isAdminOrHR && (
-              <button onClick={() => setShowAssign(!showAssign)} className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm">
-                {showAssign ? "Cancel" : "Assign Leaves"}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={async () => {
+                    setRunningAccrual(true);
+                    try {
+                      const token = localStorage.getItem("token");
+                      const res = await (await import("axios")).default.post(`${API_URL}/leaverequests/accrual/run`, {}, { headers: { Authorization: `Bearer ${token}` } });
+                      toast.success(res.data.message || "Accrual complete");
+                      fetchAllBalances(); fetchMyBalance();
+                    } catch { toast.error("Accrual failed"); }
+                    finally { setRunningAccrual(false); }
+                  }}
+                  disabled={runningAccrual}
+                  className="border border-gray-300 text-gray-600 bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition text-sm disabled:opacity-60"
+                >
+                  {runningAccrual ? "Running..." : "Run Accrual"}
+                </button>
+                <button onClick={() => setShowAssign(!showAssign)} className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm">
+                  {showAssign ? "Cancel" : "Assign Leaves"}
+                </button>
+              </div>
             )}
           </div>
 
@@ -180,7 +207,8 @@ const LeaveBalance: React.FC = () => {
                         <thead>
                           <tr className="bg-gray-50 border-b border-gray-200">
                             <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Leave Type</th>
-                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Allotted</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Accrued</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Annual Max</th>
                             <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Used</th>
                             <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">Available</th>
                           </tr>
@@ -188,11 +216,17 @@ const LeaveBalance: React.FC = () => {
                         <tbody className="divide-y divide-gray-200">
                           {balances.map((b: any, i: number) => (
                             <tr key={b.id} className="hover:bg-gray-50">
-                              <td className="px-4 py-3 text-sm text-gray-800 flex items-center gap-2">
-                                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                                {b.leaveType}
+                              <td className="px-4 py-3 text-sm text-gray-800">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                                  <div>
+                                    <p>{b.leaveType}</p>
+                                    {ACCRUAL_INFO[b.leaveType] && <p className="text-[10px] text-gray-400">{ACCRUAL_INFO[b.leaveType]}</p>}
+                                  </div>
+                                </div>
                               </td>
-                              <td className="px-4 py-3 text-sm text-gray-600">{b.totalAllotted}</td>
+                              <td className="px-4 py-3 text-sm text-gray-600">{b.accrued ?? b.totalAllotted}</td>
+                              <td className="px-4 py-3 text-sm text-gray-400">{b.totalAllotted}</td>
                               <td className="px-4 py-3 text-sm text-gray-600">{b.used}</td>
                               <td className="px-4 py-3 text-sm font-medium" style={{ color: COLORS[i % COLORS.length] }}>{b.available}</td>
                             </tr>

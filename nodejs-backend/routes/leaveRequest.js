@@ -108,4 +108,13 @@ router.get('/', authenticate, async (req, res, next) => {
   catch (error) { next(error); }
 });
 
+// Manual accrual trigger — Admin/HR only (for testing / month-end override)
+router.post('/accrual/run', authenticate, authorize('ADMIN', 'HR'), async (req, res, next) => {
+  try {
+    const { runMonthlyAccrual } = require('../services/leaveAccrualService');
+    const count = await runMonthlyAccrual();
+    res.json({ message: `Accrual complete. ${count} balances updated.` });
+  } catch (error) { next(error); }
+});
+
 module.exports = router;
