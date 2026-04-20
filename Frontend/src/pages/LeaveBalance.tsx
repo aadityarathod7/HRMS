@@ -126,22 +126,30 @@ const LeaveBalance: React.FC = () => {
             </div>
             {isAdminOrHR && (
               <div className="flex gap-2">
-                <button
-                  onClick={async () => {
-                    setRunningAccrual(true);
-                    try {
-                      const token = localStorage.getItem("token");
-                      const res = await (await import("axios")).default.post(`${API_URL}/leaverequests/accrual/run`, {}, { headers: { Authorization: `Bearer ${token}` } });
-                      toast.success(res.data.message || "Accrual complete");
-                      fetchAllBalances(); fetchMyBalance();
-                    } catch { toast.error("Accrual failed"); }
-                    finally { setRunningAccrual(false); }
-                  }}
-                  disabled={runningAccrual}
-                  className="border border-gray-300 text-gray-600 bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition text-sm disabled:opacity-60"
-                >
-                  {runningAccrual ? "Running..." : "Run Accrual"}
-                </button>
+                <div className="relative group">
+                  <button
+                    onClick={async () => {
+                      setRunningAccrual(true);
+                      try {
+                        const token = localStorage.getItem("token");
+                        const res = await (await import("axios")).default.post(`${API_URL}/leaverequests/accrual/run`, {}, { headers: { Authorization: `Bearer ${token}` } });
+                        toast.success(res.data.message || "Monthly leaves credited successfully");
+                        fetchAllBalances(); fetchMyBalance();
+                      } catch { toast.error("Failed to credit monthly leaves"); }
+                      finally { setRunningAccrual(false); }
+                    }}
+                    disabled={runningAccrual}
+                    className="border border-gray-300 text-gray-600 bg-white px-4 py-2 rounded-md hover:bg-gray-50 transition text-sm disabled:opacity-60"
+                  >
+                    {runningAccrual ? "Crediting..." : "Credit Monthly Leaves"}
+                  </button>
+                  <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block z-10 w-56">
+                    <div className="bg-gray-800 text-white text-xs rounded-lg px-3 py-2 text-center shadow-lg">
+                      Adds this month's leave quota to all employees (1 Casual + 0.25 Sick). Runs automatically on 1st of each month.
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
+                    </div>
+                  </div>
+                </div>
                 <button onClick={() => setShowAssign(!showAssign)} className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-500 transition text-sm">
                   {showAssign ? "Cancel" : "Assign Leaves"}
                 </button>

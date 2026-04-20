@@ -186,8 +186,8 @@ const PayrollManagement: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Basic Salary (INR)</label>
-                  <input type="number" required min="0" value={form.basicSalary} onChange={(e) => setForm({ ...form, basicSalary: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="50000" />
-                  <p className="text-[10px] text-gray-400 mt-0.5">HRA (40%), DA (10%), TA ₹1600 auto-calculated</p>
+                  <input type="number" required min="0" value={form.basicSalary} onChange={(e) => setForm({ ...form, basicSalary: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="15000" />
+                  <p className="text-[10px] text-gray-400 mt-0.5">HRA 40% + DA 20% + Special 40% auto-calculated · PF = 12.5% of Gross · PT = ₹167</p>
                 </div>
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Special Allowance (INR)</label>

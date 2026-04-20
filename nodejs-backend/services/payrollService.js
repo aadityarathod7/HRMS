@@ -1,27 +1,26 @@
 const Payroll = require('../models/Payroll');
 
 const createPayroll = async (data) => {
-  // Auto-calculate components if only CTC/basic provided
-  const basic = data.basicSalary || 0;
-  const hra = data.hra || Math.round(basic * 0.4);
-  const da = data.da || Math.round(basic * 0.1);
-  const ta = data.ta || 1600;
-  const special = data.specialAllowance || 0;
+  const basic   = data.basicSalary || 0;
+  const hra     = data.hra     !== undefined ? data.hra     : Math.round(basic * 0.40); // 40% of Basic
+  const da      = data.da      !== undefined ? data.da      : Math.round(basic * 0.20); // 20% of Basic
+  const special = data.specialAllowance !== undefined ? data.specialAllowance : Math.round(basic * 0.40); // 40% of Basic
+  const ta      = 0; // No TA in this format
 
-  const pfEmployee = data.pfEmployee || Math.round(basic * 0.12);
-  const pfEmployer = data.pfEmployer || Math.round(basic * 0.12);
-  const pt = data.professionalTax || 200;
-  const tds = data.tds || 0;
-  const lopDeduction = data.lopDeduction || 0;
+  const grossSalary = basic + hra + da + special + ta;
+
+  const pfEmployee    = data.pfEmployee    !== undefined ? data.pfEmployee    : Math.round(grossSalary * 0.125); // 12.5% of Gross
+  const pfEmployer    = data.pfEmployer    !== undefined ? data.pfEmployer    : Math.round(grossSalary * 0.125);
+  const professionalTax = data.professionalTax !== undefined ? data.professionalTax : 167; // ₹167/month (MP slab)
+  const tds           = data.tds           !== undefined ? data.tds           : 0;          // Income Tax
+  const lopDeduction  = data.lopDeduction  !== undefined ? data.lopDeduction  : 0;
 
   const entry = new Payroll({
     ...data,
     basicSalary: basic,
-    hra, da, ta,
-    specialAllowance: special,
+    hra, da, ta, specialAllowance: special,
     pfEmployee, pfEmployer,
-    professionalTax: pt,
-    tds, lopDeduction,
+    professionalTax, tds, lopDeduction,
     createdDate: new Date()
   });
 
